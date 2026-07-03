@@ -46,11 +46,22 @@
                 <i class="fa-solid fa-bell"></i>
                 <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
             </button>
-            <!-- Nút Đăng nhập / Avatar (Tạm thời để cứng avatar) -->
-            <div id="user-header-zone" class="flex items-center space-x-2 cursor-pointer">
-                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=mon" alt="Avatar" class="w-8 h-8 rounded-full border border-gray-600 bg-gray-700">
-            </div>
-        </div>
+            <!-- Khu vực hiển thị Đăng nhập / Avatar tùy theo trạng thái -->
+<div id="user-header-zone" class="flex items-center space-x-3">
+    <!-- Mặc định khi chưa đăng nhập sẽ hiện nút này -->
+    <button id="btn-open-auth-modal" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 px-4 rounded-lg transition">
+        Đăng nhập
+    </button>
+    
+    <!-- Khi đã đăng nhập thành công, JS sẽ gỡ lớp 'hidden' để hiện cụm này -->
+    <div id="user-logged-in" class="hidden flex items-center space-x-3">
+        <img id="user-avatar" src="" alt="Avatar" class="w-8 h-8 rounded-full border border-gray-600 bg-gray-700">
+        <span id="user-display-name" class="text-sm font-medium text-gray-300"></span>
+        <button id="btn-logout" class="text-xs text-gray-400 hover:text-red-400 transition" title="Đăng xuất">
+            <i class="fa-solid fa-right-from-bracket text-base"></i>
+        </button>
+    </div>
+</div>
     </header>
 
     <!-- 2. BỐ CỤC CHÍNH (3 CỘT GIỐNG VIDEO MON FANSUB) -->
