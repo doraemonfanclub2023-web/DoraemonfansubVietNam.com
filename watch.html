@@ -2,26 +2,51 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Xem phim - Doraemon Fansub</title>
+    <title>Kho phim - Doraemon Fansub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>body { background-color: #0d0e12; color: #ffffff; }</style>
 </head>
 <body>
-    <!-- Header bồ copy y hệt bên index qua để giữ menu -->
+    <!-- Header đồng bộ -->
     <header class="flex items-center justify-between px-6 py-3 bg-[#16181f] border-b border-gray-800">
         <h1 class="text-xl font-bold text-blue-500">doraemon<span class="text-white">fansub</span></h1>
         <nav class="flex space-x-4">
-            <a href="index.html" class="hover:text-white">Trang chủ</a>
+            <a href="index.html" class="hover:text-gray-300">Trang chủ</a>
             <a href="watch.html" class="text-white bg-gray-800 px-3 py-1 rounded-lg">Xem phim</a>
         </nav>
     </header>
 
     <!-- Danh sách phim -->
-    <main class="max-w-[1200px] mx-auto p-6">
+    <main class="max-w-[1000px] mx-auto p-6">
         <h2 class="text-2xl font-bold mb-6">Kho phim Doraemon</h2>
-        <div id="movie-list" class="grid grid-cols-4 gap-4">
-            <!-- Nơi bồ sẽ load danh sách phim từ Firestore hoặc Blogger vào đây -->
-            <div class="bg-[#16181f] p-4 rounded-xl">Phim tập 1...</div>
+        
+        <!-- Grid hiển thị phim -->
+        <div id="movie-list" class="grid grid-cols-1 gap-8">
+            
+            <!-- THẺ PHIM CỦA BỒ (Chú khủng long của Nobita) -->
+            <div class="bg-[#16181f] p-5 rounded-2xl border border-gray-800">
+                <div class="flex flex-col md:flex-row gap-6">
+                    <!-- Ảnh bìa -->
+                    <img src="https://static.wikia.nocookie.net/dorepedia/images/3/37/Chu-khung-long-cua-nobita-2.jpg/revision/latest?cb=20120415114957&path-prefix=vi" 
+                         class="w-full md:w-64 h-40 object-cover rounded-xl">
+                    
+                    <!-- Nội dung và Player -->
+                    <div class="flex-1">
+                        <h3 class="font-bold text-xl mb-3">Chú khủng long của Nobita</h3>
+                        
+                        <!-- Khung xem phim tự co giãn -->
+                        <div class="relative w-full pt-[56.25%] bg-black rounded-lg overflow-hidden border border-gray-700">
+                            <iframe class="absolute top-0 left-0 w-full h-full" 
+                                    src="https://abyssplayer.com/d9wfiN-31" 
+                                    frameborder="0" 
+                                    allowfullscreen>
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Khi nào có phim mới bồ chỉ cần copy cái thẻ <div class="bg-[#16181f]..."> ở trên dán tiếp xuống dưới là xong! -->
         </div>
     </main>
 </body>
