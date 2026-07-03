@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Fansub - Mạng Xã Hội Hoạt Hình</title>
+    <!-- Nhúng Tailwind CSS để làm giao diện nhanh -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Nhúng FontAwesome để xài các icon (Home, Watch, Kính lúp...) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #0d0e12; color: #ffffff; }
+    </style>
+</head>
+<body>
+
+    <!-- 1. THANH HEADER TRÊN CÙNG -->
+    <header class="sticky top-0 z-50 flex items-center justify-between px-6 py-3 bg-[#16181f] border-b border-gray-800">
+        <!-- Bên trái: Logo -->
+        <div class="flex items-center space-x-6">
+            <h1 class="text-xl font-bold text-red-500 tracking-wider flex items-center">
+                <i class="fa-solid flex-sharp fa-cat mr-2"></i> mon<span class="text-white">fansub</span>
+            </h1>
+            <!-- Menu nhanh -->
+            <nav class="flex space-x-4 text-gray-400">
+                <a href="index.html" class="text-white bg-gray-800 px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm">
+                    <i class="fa-solid fa-house"></i> Trang chủ
+                </a>
+                <a href="watch.html" class="hover:text-white px-3 py-1.5 flex items-center gap-2 text-sm transition">
+                    <i class="fa-solid fa-film"></i> Xem phim
+                </a>
+            </nav>
+        </div>
+
+        <!-- Ở giữa: Thanh tìm kiếm -->
+        <div class="relative w-1/3">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </span>
+            <input type="text" placeholder="Tìm kiếm bài viết, phim..." class="w-full bg-[#20232b] text-sm text-white pl-10 pr-4 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-600">
+        </div>
+
+        <!-- Bên phải: Chuông thông báo & Avatar -->
+        <div class="flex items-center space-x-4">
+            <button class="text-gray-400 hover:text-white relative p-2 rounded-full bg-[#20232b]">
+                <i class="fa-solid fa-bell"></i>
+                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+            <!-- Nút Đăng nhập / Avatar (Tạm thời để cứng avatar) -->
+            <div id="user-header-zone" class="flex items-center space-x-2 cursor-pointer">
+                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=mon" alt="Avatar" class="w-8 h-8 rounded-full border border-gray-600 bg-gray-700">
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. BỐ CỤC CHÍNH (3 CỘT GIỐNG VIDEO MON FANSUB) -->
+    <main class="max-w-[1400px] mx-auto px-6 py-6 grid grid-cols-12 gap-6">
+        
+        <!-- CỘT TRÁI: Menu điều hướng nhanh (Gồm 3 cột trong lưới) -->
+        <aside class="col-span-3 space-y-2 sticky top-20 h-fit">
+            <a href="#" class="flex items-center space-x-3 p-3 rounded-xl bg-[#16181f] text-white font-medium transition">
+                <i class="fa-solid fa-bolt text-yellow-500 w-5 text-center"></i>
+                <span>Mới nhất</span>
+            </a>
+            <a href="#" class="flex items-center space-x-3 p-3 rounded-xl hover:bg-[#16181f] text-gray-400 hover:text-white transition">
+                <i class="fa-solid fa-users text-blue-500 w-5 text-center"></i>
+                <span>Đang theo dõi</span>
+            </a>
+        </aside>
+
+        <!-- CỘT GIỮA: Dòng thời gian / Danh sách bài viết Newsfeed (Gồm 6 cột trong lưới) -->
+        <section class="col-span-6">
+            
+            <!-- ĐÃ THAY ĐỔI: Thêm thẻ div container này để file js/newsfeed.js tự động nạp bài viết từ Firebase vào đây -->
+            <div id="newsfeed-container" class="space-y-6">
+                <p class="text-center text-sm text-gray-500 py-4">Đang tải bản tin...</p>
+            </div>
+
+        </section>
+
+        <!-- CỘT PHẢI: Hộp công cụ tạo bài viết (Gồm 3 cột trong lưới) -->
+        <aside class="col-span-3 space-y-4 sticky top-20 h-fit">
+            <div class="bg-[#16181f] rounded-2xl p-4 border border-gray-800/50 space-y-4 text-center">
+                <div class="flex items-center space-x-3 justify-start text-left">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=mon" alt="Avatar" class="w-10 h-10 rounded-full bg-gray-700">
+                    <p class="text-sm font-medium text-gray-300">nguyễn tuấn khải</p>
+                </div>
+                <!-- Nút bấm mở pop-up Tạo bài viết (Nút xanh lá signature) -->
+                <button id="btn-open-post-modal" class="w-full bg-[#248a3d] hover:bg-[#1e7232] text-white font-semibold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition text-sm shadow-md">
+                    <i class="fa-solid fa-pen-nib"></i> Tạo bài viết
+                </button>
+            </div>
+        </aside>
+
+    </main>
+
+    <!-- 3. POP-UP TẠO BÀI VIẾT (MẶC ĐỊNH LÀ ẨN - HIDDEN) -->
+    <div id="post-modal" class="hidden fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
+        <div class="bg-[#16181f] border border-gray-800 w-full max-w-lg rounded-2xl p-5 space-y-4 relative animate-fade-in">
+            <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                <h3 class="text-lg font-bold">Tạo bài viết mới</h3>
+                <button id="btn-close-post-modal" class="text-gray-400 hover:text-white text-xl">&times;</button>
+            </div>
+            <!-- Khung nhập text -->
+            <textarea id="post-content" rows="4" placeholder="Bồ đang nghĩ gì thế..." class="w-full bg-[#20232b] rounded-xl p-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-gray-600 resize-none"></textarea>
+            
+            <!-- Khu vực chọn File đính kèm -->
+            <div class="flex items-center justify-between bg-[#20232b] p-3 rounded-xl">
+                <span class="text-xs text-gray-400">Thêm vào bài viết của bồ:</span>
+                <label class="cursor-pointer text-green-500 hover:text-green-400 text-lg flex items-center gap-2">
+                    <i class="fa-regular fa-images"></i>
+                    <input type="file" id="post-file" accept="image/*,video/*" class="hidden">
+                </label>
+            </div>
+
+            <!-- Nút đăng bài -->
+            <button id="btn-submit-post" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-xl transition text-sm">
+                Đăng bài lên Bản Tin
+            </button>
+        </div>
+    </div>
+
+    <!-- Nhúng file cấu hình Firebase & Cloudinary của tụi mình vào cuối trang -->
+    <script type="module">
+        // Lệnh bật tắt Modal Pop-up Tạo bài viết bằng JS thuần
+        const modal = document.getElementById('post-modal');
+        document.getElementById('btn-open-post-modal').addEventListener('click', () => modal.classList.remove('hidden'));
+        document.getElementById('btn-close-post-modal').addEventListener('click', () => modal.classList.add('hidden'));
+    </script>
+
+    <!-- ĐỀ XUẤT THAY ĐỔI: Nhúng file logic xử lý Newsfeed chính thức vào trang web -->
+    <script type="module" src="./js/newsfeed.js"></script>
+</body>
+</html>
