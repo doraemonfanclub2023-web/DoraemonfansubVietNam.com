@@ -128,11 +128,11 @@ onAuthStateChanged(auth, (user) => {
         if (userLoggedInZone) userLoggedInZone.classList.remove('hidden');
         
         // Hiển thị thông tin lên thanh Header trên cùng
-        if (userDisplayName) userDisplayName.innerText = user.displayName || "Thành viên Mon Fansub";
+        if (userDisplayName) userDisplayName.innerText = user.displayName || "Thành viên Doraemon Fansub";
         if (userAvatar) userAvatar.src = user.photoURL || `https://api.dicebear.com/7.x/bottts/svg?seed=mon`;
         
         // ĐỒNG BỘ: Hiển thị thông tin xuống hộp công cụ ở Cột Phải
-        if (sideUserName) sideUserName.innerText = user.displayName || "Thành viên Mon Fansub";
+        if (sideUserName) sideUserName.innerText = user.displayName || "Thành viên Doraemon Fansub";
         if (sideUserAvatar) sideUserAvatar.src = user.photoURL || `https://api.dicebear.com/7.x/bottts/svg?seed=mon`;
     } else {
         // --- TRẠNG THÁI: CHƯA ĐĂNG NHẬP / ĐĂNG XUẤT ---
