@@ -4,10 +4,20 @@
     <meta charset="UTF-8">
     <title>Kho phim - Doraemon Fansub</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        function showMovie(url) {
+            document.getElementById('video-frame').src = url;
+            document.getElementById('player-container').classList.remove('hidden');
+        }
+        function hideMovie() {
+            document.getElementById('video-frame').src = '';
+            document.getElementById('player-container').classList.add('hidden');
+        }
+    </script>
 </head>
 <body class="bg-gray-900 text-white">
 
-    <header class="flex items-center gap-8 px-6 py-4 border-b border-gray-700 bg-gray-800">
+    <header class="flex items-center justify-start gap-8 px-6 py-4 border-b border-gray-700 bg-gray-800">
         <h1 class="text-xl font-bold text-blue-500">doraemon<span class="text-white">fansub</span></h1>
         <nav class="flex gap-4">
             <a href="index.html" class="hover:text-blue-300">Trang chủ</a>
@@ -17,15 +27,23 @@
 
     <main class="max-w-4xl mx-auto p-6">
         <h2 class="text-2xl font-bold mb-6">Danh sách phim</h2>
-        <div class="space-y-4">
-            <div class="p-4 bg-gray-800 rounded border border-gray-700">
-                <h3 class="font-bold mb-2">Chú khủng long của Nobita</h3>
-                <iframe class="w-full aspect-video" src="https://abyssplayer.com/d9wfiN-31" frameborder="0" allowfullscreen></iframe>
+        
+        <!-- List phim -->
+        <div class="space-y-3 mb-10">
+            <button onclick="showMovie('https://abyssplayer.com/d9wfiN-31')" class="w-full text-left p-4 bg-gray-800 hover:bg-gray-700 rounded border border-gray-700">
+                ▶ Chú khủng long của Nobita
+            </button>
+            <button onclick="showMovie('https://abyssplayer.com/qZKGH3thJG')" class="w-full text-left p-4 bg-gray-800 hover:bg-gray-700 rounded border border-gray-700">
+                ▶ Stand by Me Doraemon 2
+            </button>
+        </div>
+
+        <!-- Khung video ẩn -->
+        <div id="player-container" class="hidden bg-gray-800 p-5 rounded border border-gray-700">
+            <div class="relative w-full aspect-video bg-black rounded overflow-hidden">
+                <iframe id="video-frame" class="absolute top-0 left-0 w-full h-full" frameborder="0" allowfullscreen></iframe>
             </div>
-            <div class="p-4 bg-gray-800 rounded border border-gray-700">
-                <h3 class="font-bold mb-2">Stand by Me Doraemon 2</h3>
-                <iframe class="w-full aspect-video" src="https://abyssplayer.com/qZKGH3thJG" frameborder="0" allowfullscreen></iframe>
-            </div>
+            <button onclick="hideMovie()" class="mt-4 text-sm text-gray-400 hover:text-white">Đóng video</button>
         </div>
     </main>
 </body>
