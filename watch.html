@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Xem phim - Doraemon Fansub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>body { background-color: #0d0e12; color: #ffffff; }</style>
+</head>
+<body>
+    <!-- Header bồ copy y hệt bên index qua để giữ menu -->
+    <header class="flex items-center justify-between px-6 py-3 bg-[#16181f] border-b border-gray-800">
+        <h1 class="text-xl font-bold text-blue-500">doraemon<span class="text-white">fansub</span></h1>
+        <nav class="flex space-x-4">
+            <a href="index.html" class="hover:text-white">Trang chủ</a>
+            <a href="watch.html" class="text-white bg-gray-800 px-3 py-1 rounded-lg">Xem phim</a>
+        </nav>
+    </header>
+
+    <!-- Danh sách phim -->
+    <main class="max-w-[1200px] mx-auto p-6">
+        <h2 class="text-2xl font-bold mb-6">Kho phim Doraemon</h2>
+        <div id="movie-list" class="grid grid-cols-4 gap-4">
+            <!-- Nơi bồ sẽ load danh sách phim từ Firestore hoặc Blogger vào đây -->
+            <div class="bg-[#16181f] p-4 rounded-xl">Phim tập 1...</div>
+        </div>
+    </main>
+</body>
+</html>
