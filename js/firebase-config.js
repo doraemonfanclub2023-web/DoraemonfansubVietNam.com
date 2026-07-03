@@ -1,42 +1,22 @@
 // js/firebase-config.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-// 1. THÊM DÒNG NÀY: Import thư viện Auth của Google
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBt3G9n5JYu3EsvqJR9IoW2vRAc_Es3-ws",
-  authDomain: "doraemon-fansub-vietnam.firebaseapp.com",
-  projectId: "doraemon-fansub-vietnam",
-  storageBucket: "doraemon-fansub-vietnam.firebasestorage.app",
-  messagingSenderId: "380840935390",
-  appId: "1:380840935390:web:60fab4722a9fba5053a74f",
-  measurementId: "G-0S2Z4XRK0B"
-};
-
-const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
-
-// 2. THÊM DÒNG NÀY: Khởi tạo và export Auth ra ngoài để sử dụng
-export const auth = getAuth(app);
-
-// ĐÃ SỬA: Thay đổi đường dẫn import từ "firebase/app" thành link CDN của Google để chạy được trên web thuần
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// Cấu hình Firebase thực tế của bồ
+// Giữ nguyên đống mã key dự án của bồ ở đây nhé
 const firebaseConfig = {
-  apiKey: "AIzaSyBt3G9n5JYu3EsvqJR9IoW2vRAc_Es3-ws",
-  authDomain: "doraemon-fansub-vietnam.firebaseapp.com",
-  projectId: "doraemon-fansub-vietnam",
-  storageBucket: "doraemon-fansub-vietnam.firebasestorage.app",
-  messagingSenderId: "380840935390",
-  appId: "1:380840935390:web:60fab4722a9fba5053a74f",
-  measurementId: "G-0S2Z4XRK0B"
+    apiKey: "YOUR_API_KEY",
+    authDomain: "doraemon-fansub-vietnam.firebaseapp.com",
+    projectId: "doraemon-fansub-vietnam",
+    storageBucket: "doraemon-fansub-vietnam.appspot.com",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
 };
 
-// Khởi tạo Firebase
+// Khởi tạo (Chỉ gọi duy nhất 1 lần dòng này, không khai báo lại)
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-// ĐÃ SỬA: Khởi tạo Firestore và export biến "db" ra ngoài để file newsfeed.js có thể liên kết dữ liệu
-export const db = getFirestore(app);
+// Xuất biến ra cho auth.js và newsfeed.js xài
+export { auth, db };
