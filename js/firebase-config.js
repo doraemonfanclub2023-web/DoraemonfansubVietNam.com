@@ -5,12 +5,12 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebas
 
 // Giữ nguyên đống mã key dự án của bồ ở đây nhé
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
+    apiKey: "AIzaSyBt3G9n5JYu3EsvqJR9IoW2vRAc_Es3-ws",
     authDomain: "doraemon-fansub-vietnam.firebaseapp.com",
     projectId: "doraemon-fansub-vietnam",
     storageBucket: "doraemon-fansub-vietnam.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    messagingSenderId: "380840935390",
+    appId: "1:380840935390:web:60fab4722a9fba5053a74f"
 };
 
 // Khởi tạo (Chỉ gọi duy nhất 1 lần dòng này, không khai báo lại)
