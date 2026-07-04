@@ -55,7 +55,6 @@ if (newsfeedContainer) {
     onSnapshot(q, async (snapshot) => {
         newsfeedContainer.innerHTML = '';
         
-        // Tối ưu lấy danh sách like của user hiện tại
         let likedPosts = [];
         if (auth.currentUser) {
             const qLikes = query(collection(db, "likes"), where("uid", "==", auth.currentUser.uid));
@@ -94,13 +93,16 @@ if (newsfeedContainer) {
                         <button data-id="${docSnap.id}" class="like-btn text-sm transition ${isLiked ? 'text-blue-500' : 'text-gray-400'}">
                             <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-thumbs-up mr-1"></i> Like
                         </button>
+                        <button data-id="${docSnap.id}" class="comment-btn text-gray-400 hover:text-blue-500 transition text-sm">
+                            <i class="fa-regular fa-comment mr-1"></i> Bình luận
+                        </button>
                     </div>
                 </div>
             `;
             newsfeedContainer.insertAdjacentHTML('beforeend', postCard);
         });
 
-        // Xử lý sự kiện click
+        // Xử lý sự kiện sau khi render
         newsfeedContainer.querySelectorAll('.like-btn').forEach(btn => {
             btn.onclick = async () => {
                 if (!auth.currentUser) return alert("Đăng nhập mới like được!");
@@ -117,6 +119,13 @@ if (newsfeedContainer) {
                     btn.className = "like-btn text-sm transition text-blue-500";
                     btn.querySelector('i').className = "fa-solid fa-thumbs-up mr-1";
                 }
+            };
+        });
+
+        newsfeedContainer.querySelectorAll('.comment-btn').forEach(btn => {
+            btn.onclick = () => {
+                const commentText = prompt("Nhập bình luận của bồ:");
+                if (commentText) alert("Đã gửi bình luận: " + commentText);
             };
         });
 
