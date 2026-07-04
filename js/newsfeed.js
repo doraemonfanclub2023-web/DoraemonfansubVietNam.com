@@ -1,10 +1,10 @@
+// Sử dụng đường dẫn tương đối ổn định hơn cho GitHub Pages
 import { auth, db } from '../firebase-config.js';
 import { cloudinaryConfig, CLOUDINARY_URL } from '../cloudinary-config.js';
 import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, doc, deleteDoc, setDoc, getDoc, getDocs, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const getEl = (id) => document.getElementById(id);
 
-// 1. Hàm upload ảnh
 async function uploadToCloudinary(file) {
     const formData = new FormData();
     formData.append('file', file);
@@ -19,7 +19,6 @@ async function uploadToCloudinary(file) {
     }
 }
 
-// 2. Xử lý đăng bài
 const btnSubmitPost = getEl('btn-submit-post');
 if (btnSubmitPost) {
     btnSubmitPost.addEventListener('click', async () => {
@@ -47,7 +46,6 @@ if (btnSubmitPost) {
     });
 }
 
-// 3. Render danh sách bài viết
 const newsfeedContainer = getEl('newsfeed-container');
 
 if (newsfeedContainer) {
@@ -72,7 +70,7 @@ if (newsfeedContainer) {
             const postCard = `
                 <div class="post-item bg-[#16181f] rounded-2xl p-4 border border-gray-800/50 space-y-3">
                     <div class="flex items-center space-x-3">
-                        <img src="${post.avatar}" class="w-10 h-10 rounded-full bg-gray-700">
+                        <img src="${post.avatar}" class="w-10 h-10 rounded-full bg-gray-700" alt="avatar">
                         <div class="flex-1">
                             <h4 class="font-semibold text-sm text-white">${post.username}</h4>
                             <p class="text-[10px] text-gray-500">${date}</p>
@@ -85,7 +83,7 @@ if (newsfeedContainer) {
                         </div>
                     </div>
                     <p class="text-sm text-gray-200 whitespace-pre-line">${post.content}</p>
-                    ${post.mediaUrl ? `<img src="${post.mediaUrl}" class="max-h-96 w-full object-cover rounded-xl mt-2 post-image cursor-pointer">` : ''}
+                    ${post.mediaUrl ? `<img src="${post.mediaUrl}" class="max-h-96 w-full object-cover rounded-xl mt-2 post-image cursor-pointer" alt="post-img">` : ''}
                     <div class="flex gap-6 mt-3 border-t border-gray-800 pt-3">
                         <button data-id="${docSnap.id}" class="like-btn text-sm transition ${isLiked ? 'text-blue-500' : 'text-gray-400'}">
                             <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-thumbs-up mr-1"></i> Like
@@ -99,9 +97,13 @@ if (newsfeedContainer) {
             newsfeedContainer.insertAdjacentHTML('beforeend', postCard);
         });
 
-        // Gắn sự kiện Like
-        newsfeedContainer.querySelectorAll('.like-btn').forEach(btn => {
-            btn.onclick = async () => {
+        // Gắn sự kiện (Event Delegation để tránh lỗi mất sự kiện khi render lại)
+        newsfeedContainer.onclick = async (e) => {
+            const target = e.target;
+            
+            // Xử lý Like
+            if (target.closest('.like-btn')) {
+                const btn = target.closest('.like-btn');
                 if (!auth.currentUser) return alert("Đăng nhập mới like được!");
                 const postId = btn.dataset.id;
                 const likeRef = doc(db, "likes", `${postId}_${auth.currentUser.uid}`);
@@ -113,25 +115,23 @@ if (newsfeedContainer) {
                     await setDoc(likeRef, { postId, uid: auth.currentUser.uid, createdAt: serverTimestamp() });
                     btn.className = "like-btn text-sm transition text-blue-500";
                 }
-            };
-        });
+            }
 
-        // Gắn sự kiện Xóa
-        newsfeedContainer.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.onclick = async () => {
+            // Xử lý Xóa
+            if (target.closest('.delete-btn')) {
+                const btn = target.closest('.delete-btn');
                 if(confirm("Xóa bài này?")) await deleteDoc(doc(db, "posts", btn.dataset.id));
-            };
-        });
+            }
 
-        // Gắn sự kiện mở Popup
-        newsfeedContainer.querySelectorAll('.comment-btn').forEach(btn => {
-            btn.onclick = () => {
+            // Xử lý mở Popup
+            if (target.closest('.comment-btn')) {
+                const btn = target.closest('.comment-btn');
                 const popup = document.getElementById('comment-popup');
                 if (popup) {
                     popup.classList.remove('hidden');
                     popup.dataset.postId = btn.dataset.id;
                 }
-            };
-        });
+            }
+        };
     });
 }
