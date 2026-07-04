@@ -61,4 +61,19 @@
     <script type="module" src="js/auth.js"></script>
     <script type="module" src="js/newsfeed.js"></script>
 </body>
+    <!-- Modal xem ảnh full -->
+<div id="image-modal" class="fixed inset-0 bg-black/90 hidden z-[200] flex items-center justify-center p-4">
+    <img id="full-image" src="" class="max-w-full max-h-full object-contain cursor-pointer">
+</div>
+<script>
+    // Bấm vào ảnh để hiện full
+    document.addEventListener('click', (e) => {
+        if(e.target.tagName === 'IMG' && e.target.classList.contains('post-image')) {
+            document.getElementById('full-image').src = e.target.src;
+            document.getElementById('image-modal').classList.remove('hidden');
+        }
+    });
+    // Bấm vào màn hình đen để tắt
+    document.getElementById('image-modal').onclick = () => document.getElementById('image-modal').classList.add('hidden');
+</script>
 </html>
