@@ -1,10 +1,21 @@
-<!-- ... (giữ nguyên phần head như cũ) ... -->
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doraemon Fansub - Mạng Xã Hội</title>
+    <!-- Tailwind CSS qua CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>body { background-color: #0d0e12; color: #ffffff; }</style>
+</head>
 <body>
-    <!-- HEADER ĐẦY ĐỦ -->
+
+    <!-- 1. HEADER -->
     <header class="sticky top-0 z-50 flex items-center justify-between px-6 py-3 bg-[#16181f] border-b border-gray-800">
         <div class="flex items-center space-x-6 w-1/3">
             <h1 class="text-xl font-bold text-blue-500 flex items-center">
-                <i class="fa-solid fa-cat mr-2"></i> doraemon<span class="text-white">fansub</span>
+                <i class="fa-solid fa-cat mr-2 text-blue-400"></i> doraemon<span class="text-white">fansub</span>
             </h1>
             <nav class="flex space-x-4 text-gray-400">
                 <a href="index.html" class="text-white bg-gray-800 px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm">
@@ -15,23 +26,46 @@
                 </a>
             </nav>
         </div>
-        <!-- (Phần tìm kiếm và User zone như cũ) -->
+
+        <div id="user-header-zone" class="flex items-center justify-end w-1/3">
+            <button id="btn-open-auth-modal" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-semibold">Đăng nhập</button>
+            <div id="user-logged-in" class="hidden flex items-center gap-3 bg-[#20232b] px-3 py-1.5 rounded-full border border-gray-700">
+                <img id="user-avatar" class="w-6 h-6 rounded-full bg-gray-700">
+                <span id="user-display-name" class="text-xs font-medium"></span>
+                <button id="btn-logout" class="text-red-400 hover:text-red-300 ml-1"><i class="fa-solid fa-right-from-bracket"></i></button>
+            </div>
+        </div>
     </header>
 
+    <!-- 2. MAIN -->
     <main class="max-w-4xl mx-auto p-6">
-        <!-- KHUNG ĐĂNG BÀI (Chỉ hiện khi đã đăng nhập) -->
+        <!-- Khung Đăng bài -->
         <div id="post-modal" class="bg-[#16181f] p-4 rounded-2xl mb-6 border border-gray-800">
             <textarea id="post-content" placeholder="Bồ đang nghĩ gì thế?" class="w-full bg-[#20232b] text-white p-3 rounded-lg mb-2 focus:outline-none"></textarea>
             <div class="flex justify-between items-center">
                 <input type="file" id="post-file" class="text-xs text-gray-400">
-                <button id="btn-submit-post" class="bg-blue-600 px-4 py-2 rounded-lg text-sm font-bold">Đăng bài lên Bản Tin</button>
+                <button id="btn-submit-post" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-bold">Đăng bài lên Bản Tin</button>
             </div>
         </div>
 
         <div id="newsfeed-container" class="space-y-6"></div>
     </main>
-    
-    <!-- (Modal đăng nhập giữ nguyên như cũ) -->
+
+    <!-- 3. MODAL ĐĂNG NHẬP -->
+    <div id="auth-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 hidden">
+        <div class="bg-[#16181f] p-8 rounded-2xl w-full max-w-sm border border-gray-700">
+            <h2 class="text-white text-xl font-bold mb-6">Đăng nhập</h2>
+            <div class="space-y-4">
+                <input type="text" id="auth-username" placeholder="Tên hiển thị (chỉ khi đăng ký)" class="w-full bg-[#20232b] text-white p-3 rounded-lg border border-gray-700">
+                <input type="email" id="auth-email" placeholder="Email" class="w-full bg-[#20232b] text-white p-3 rounded-lg border border-gray-700">
+                <input type="password" id="auth-password" placeholder="Mật khẩu" class="w-full bg-[#20232b] text-white p-3 rounded-lg border border-gray-700">
+                <button id="btnAuthSubmit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg">Đăng Nhập</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. SCRIPTS -->
     <script type="module" src="js/auth.js"></script>
     <script type="module" src="js/newsfeed.js"></script>
 </body>
+</html>
