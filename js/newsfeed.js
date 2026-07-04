@@ -55,6 +55,7 @@ if (newsfeedContainer) {
     onSnapshot(q, async (snapshot) => {
         newsfeedContainer.innerHTML = '';
         
+        // Lấy danh sách ID các bài mà user hiện tại đã like
         let likedPosts = [];
         if (auth.currentUser) {
             const qLikes = query(collection(db, "likes"), where("uid", "==", auth.currentUser.uid));
@@ -68,6 +69,7 @@ if (newsfeedContainer) {
             const isOwner = auth.currentUser && auth.currentUser.uid === post.uid;
             const isLiked = likedPosts.includes(docSnap.id);
 
+            // Giao diện bài viết
             const postCard = `
                 <div class="post-item bg-[#16181f] rounded-2xl p-4 border border-gray-800/50 space-y-3">
                     <div class="flex items-center space-x-3">
@@ -102,7 +104,7 @@ if (newsfeedContainer) {
             newsfeedContainer.insertAdjacentHTML('beforeend', postCard);
         });
 
-        // Xử lý sự kiện sau khi render
+        // Gắn sự kiện (phải nằm trong onSnapshot)
         newsfeedContainer.querySelectorAll('.like-btn').forEach(btn => {
             btn.onclick = async () => {
                 if (!auth.currentUser) return alert("Đăng nhập mới like được!");
@@ -123,10 +125,7 @@ if (newsfeedContainer) {
         });
 
         newsfeedContainer.querySelectorAll('.comment-btn').forEach(btn => {
-            btn.onclick = () => {
-                const commentText = prompt("Nhập bình luận của bồ:");
-                if (commentText) alert("Đã gửi bình luận: " + commentText);
-            };
+            btn.onclick = () => alert("Tính năng bình luận đang được phát triển!");
         });
 
         newsfeedContainer.querySelectorAll('.delete-btn').forEach(btn => {
