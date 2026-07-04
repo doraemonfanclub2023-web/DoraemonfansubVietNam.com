@@ -3,111 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doraemon Fansub - Mạng Xã Hội Hoạt Hình</title>
+    <title>Doraemon Fansub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>body { background-color: #0d0e12; color: #ffffff; }</style>
 </head>
-<body>
-    <!-- Cần có type="module" để chạy được các file JS có import -->
-<script type="module" src="js/auth.js"></script>
-<script type="module" src="js/newsfeed.js"></script>
+<body class="bg-[#0d0e12] text-white">
 
-    <!-- 1. HEADER (Đã trả lại Đăng Nhập, Tìm Kiếm và Thêm Chuông Thông Báo) -->
+    <!-- Header -->
     <header class="sticky top-0 z-50 flex items-center justify-between px-6 py-3 bg-[#16181f] border-b border-gray-800">
-        <div class="flex items-center space-x-6 w-1/3">
-            <h1 class="text-xl font-bold text-blue-500 tracking-wider flex items-center">
-                <i class="fa-solid fa-cat mr-2 text-blue-400"></i> doraemon<span class="text-white">fansub</span>
-            </h1>
-            <nav class="flex space-x-4 text-gray-400">
-                <a href="index.html" class="text-white bg-gray-800 px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm">
-                    <i class="fa-solid fa-house"></i> Trang chủ
-                </a>
-                <a href="watch.html" class="hover:text-white px-3 py-1.5 flex items-center gap-2 text-sm transition">
-                    <i class="fa-solid fa-film"></i> Xem phim
-                </a>
-            </nav>
-        </div>
-
-        <!-- Thanh tìm kiếm -->
-        <div class="relative w-1/3 flex justify-center">
-            <div class="relative w-full max-w-md">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </span>
-                <input type="text" placeholder="Tìm kiếm bài viết, phim..." class="w-full bg-[#20232b] text-sm text-white pl-10 pr-4 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-600">
-            </div>
-        </div>
-
-        <!-- Khu vực User & Thông báo -->
-        <div class="flex items-center justify-end space-x-6 w-1/3">
-            <!-- Chuông thông báo chứa Tagger (Rê chuột vào sẽ hiện) -->
-            <div class="relative group cursor-pointer flex items-center h-full py-2">
-                <i class="fa-solid fa-bell text-gray-400 group-hover:text-white text-xl transition"></i>
-                <span class="absolute top-1 -right-1 bg-red-500 rounded-full w-2.5 h-2.5 border border-[#16181f]"></span>
-                
-                <!-- Dropdown Thông báo -->
-                <div class="absolute right-0 top-full mt-1 w-80 bg-[#20232b] rounded-xl shadow-lg border border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden">
-                    <div class="p-3 border-b border-gray-700 bg-[#16181f]">
-                        <h4 class="text-white font-bold text-sm">Thông báo mới</h4>
-                    </div>
-                    <div class="p-4 hover:bg-gray-800 transition cursor-default">
-                        <span class="px-2 py-1 bg-yellow-600 text-[10px] rounded text-white font-bold inline-block mb-2">TAGGER: SÁNG MAI</span>
-                        <h3 class="font-bold text-sm text-white mb-1">Thông báo lịch chiếu</h3>
-                        <p class="text-xs text-gray-400">Lịch chiếu phim Doraemon đã được cập nhật. Bồ kiểm tra trong danh sách phim nhé!</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Nút Đăng nhập / User Profile (ID giữ nguyên cho auth.js) -->
-            <div id="user-header-zone" class="flex items-center">
-                <button id="btn-open-auth-modal" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 px-4 rounded-lg transition">
-                    Đăng nhập
-                </button>
-                <div id="user-logged-in" class="hidden flex items-center space-x-3 bg-[#20232b] px-3 py-1.5 rounded-full border border-gray-700">
-                    <img id="user-avatar" src="" alt="Avatar" class="w-6 h-6 rounded-full bg-gray-700">
-                    <span id="user-display-name" class="text-xs font-medium text-white truncate max-w-[80px]"></span>
-                    <button id="btn-logout" class="text-gray-400 hover:text-red-400 ml-1">
-                        <i class="fa-solid fa-right-from-bracket text-sm"></i>
-                    </button>
-                </div>
+        <h1 class="text-xl font-bold text-blue-500">doraemon<span class="text-white">fansub</span></h1>
+        <div id="user-header-zone">
+            <button id="btn-open-auth-modal" class="bg-blue-600 px-4 py-2 rounded-lg text-sm">Đăng nhập</button>
+            <div id="user-logged-in" class="hidden flex items-center gap-3">
+                <img id="user-avatar" class="w-8 h-8 rounded-full">
+                <span id="user-display-name"></span>
+                <button id="btn-logout" class="text-red-400">Đăng xuất</button>
             </div>
         </div>
     </header>
 
-    <!-- 2. BỐ CỤC CHÍNH -->
-    <main class="max-w-[1400px] mx-auto px-6 py-6 grid grid-cols-12 gap-6">
-        
-        <!-- Sidebar Trái -->
-        <aside class="col-span-3 space-y-2 sticky top-20 h-fit">
-            <a href="#" class="flex items-center space-x-3 p-3 rounded-xl bg-[#16181f] text-white font-medium transition">
-                <i class="fa-solid fa-bolt text-yellow-500 w-5 text-center"></i> <span>Mới nhất</span>
-            </a>
-        </aside>
-
-        <!-- Cột Giữa (Main Feed) -->
-        <section class="col-span-6">
-            <div id="newsfeed-container" class="space-y-6">
-                <!-- ĐÃ XÓA BẢN TIN TAGGER Ở ĐÂY. newsfeed.js sẽ tự động load bài viết vào div này -->
-            </div>
-        </section>
-
-        <!-- Sidebar Phải (Đã khóa chức năng khi chưa đăng nhập) -->
-        <aside class="col-span-3 space-y-4 sticky top-20 h-fit">
-            <div class="bg-[#16181f] rounded-2xl p-4 border border-gray-800/50 space-y-4 text-center">
-                <div class="flex items-center space-x-3 justify-start text-left">
-                    <img id="side-user-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=guest" alt="Avatar" class="w-10 h-10 rounded-full bg-gray-800 opacity-40 grayscale">
-                    <p id="side-user-name" class="text-sm font-medium text-gray-500">Vui lòng đăng nhập</p>
-                </div>
-                <!-- Nút bị disable, đổi màu tối để báo hiệu không bấm được -->
-                <button id="btn-open-post-modal" disabled class="w-full bg-gray-800 text-gray-500 cursor-not-allowed font-semibold py-2.5 rounded-xl transition text-sm flex justify-center items-center gap-2">
-                    <i class="fa-solid fa-lock text-xs"></i> Đăng nhập để tạo bài
-                </button>
-            </div>
-        </aside>
+    <!-- Main -->
+    <main class="max-w-4xl mx-auto p-6">
+        <div id="newsfeed-container" class="space-y-6"></div>
     </main>
 
-    <script type="module" src="./js/auth.js"></script>
-    <script type="module" src="./js/newsfeed.js"></script>
+    <!-- Modal Đăng nhập -->
+    <div id="auth-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center hidden">
+        <div class="bg-[#16181f] p-6 rounded-2xl w-80">
+            <input type="text" id="auth-username" placeholder="Tên hiển thị" class="w-full mb-3 bg-[#20232b] p-2 rounded hidden">
+            <input type="email" id="auth-email" placeholder="Email" class="w-full mb-3 bg-[#20232b] p-2 rounded">
+            <input type="password" id="auth-password" placeholder="Mật khẩu" class="w-full mb-3 bg-[#20232b] p-2 rounded">
+            <button id="btnAuthSubmit" class="w-full bg-blue-600 p-2 rounded">Đăng Nhập</button>
+        </div>
+    </div>
+
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/newsfeed.js"></script>
 </body>
 </html>
