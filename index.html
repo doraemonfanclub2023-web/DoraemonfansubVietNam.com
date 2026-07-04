@@ -44,17 +44,25 @@
 <button id="btn-forgot-password" class="text-xs text-blue-400 mt-1 mb-3 w-full text-center hover:text-white transition">
     Quên mật khẩu?
 </button>
-    <!-- Modal Auth -->
-    <div id="auth-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center hidden z-[100]">
-        <div class="bg-[#16181f] p-6 rounded-2xl w-80">
-            <input type="text" id="auth-username" placeholder="Tên hiển thị" class="w-full mb-3 bg-[#20232b] p-2 rounded hidden">
-            <input type="email" id="auth-email" placeholder="Email" class="w-full mb-3 bg-[#20232b] p-2 rounded">
-            <input type="password" id="auth-password" placeholder="Mật khẩu" class="w-full mb-3 bg-[#20232b] p-2 rounded">
-            <div id="recaptcha-container" class="mb-3"></div>
-            <button id="btnAuthSubmit" class="w-full bg-blue-600 p-2 rounded">Đăng Nhập</button>
-            <button id="btn-toggle-auth" class="text-xs text-gray-400 mt-3 w-full text-center hover:text-white transition">Chưa có tài khoản? Đăng ký ngay</button>
-        </div>
+  <!-- Modal Auth -->
+<div id="auth-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center hidden z-[100]">
+    <div class="bg-[#16181f] p-6 rounded-2xl w-80 border border-gray-700 shadow-2xl">
+        <h2 id="auth-title" class="text-white text-xl font-bold mb-4">Đăng Nhập</h2>
+        
+        <input type="text" id="auth-username" placeholder="Tên hiển thị" class="w-full mb-3 bg-[#20232b] p-2 rounded hidden border border-gray-600">
+        <input type="email" id="auth-email" placeholder="Email" class="w-full mb-3 bg-[#20232b] p-2 rounded border border-gray-600">
+        <input type="password" id="auth-password" placeholder="Mật khẩu" class="w-full mb-3 bg-[#20232b] p-2 rounded border border-gray-600">
+        
+        <!-- Nút Quên mật khẩu nằm ĐÚNG chỗ bên trong modal -->
+        <button id="btn-forgot-password" class="text-xs text-blue-400 mb-4 w-full text-center hover:text-white transition">
+            Quên mật khẩu?
+        </button>
+
+        <div id="recaptcha-container" class="mb-3"></div>
+        <button id="btnAuthSubmit" class="w-full bg-blue-600 p-2 rounded font-bold hover:bg-blue-700">Đăng Nhập</button>
+        <button id="btn-toggle-auth" class="text-xs text-gray-400 mt-3 w-full text-center hover:text-white transition">Chưa có tài khoản? Đăng ký ngay</button>
     </div>
+</div>
 
     <!-- Modal xem ảnh full -->
     <div id="image-modal" class="fixed inset-0 bg-black/90 hidden z-[200] flex items-center justify-center p-4">
