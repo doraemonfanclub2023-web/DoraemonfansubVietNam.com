@@ -49,13 +49,17 @@ if (btnSubmitPost) {
 
 // 3. Render danh sách bài viết
 const newsfeedContainer = getEl('newsfeed-container');
+const popup = getEl('comment-popup');
+const commentList = getEl('comment-list');
+const commentInput = getEl('comment-input');
+const sendBtn = getEl('send-comment-btn');
+
 if (newsfeedContainer) {
     const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
     
     onSnapshot(q, async (snapshot) => {
         newsfeedContainer.innerHTML = '';
         
-        // Lấy danh sách ID các bài mà user hiện tại đã like
         let likedPosts = [];
         if (auth.currentUser) {
             const qLikes = query(collection(db, "likes"), where("uid", "==", auth.currentUser.uid));
@@ -69,7 +73,6 @@ if (newsfeedContainer) {
             const isOwner = auth.currentUser && auth.currentUser.uid === post.uid;
             const isLiked = likedPosts.includes(docSnap.id);
 
-            // Giao diện bài viết
             const postCard = `
                 <div class="post-item bg-[#16181f] rounded-2xl p-4 border border-gray-800/50 space-y-3">
                     <div class="flex items-center space-x-3">
@@ -81,11 +84,7 @@ if (newsfeedContainer) {
                         <div class="relative group">
                             <button class="text-gray-400 hover:text-white p-2"><i class="fa-solid fa-ellipsis"></i></button>
                             <div class="absolute right-0 mt-0 w-32 bg-[#20232b] rounded-lg shadow-xl hidden group-hover:block z-50 border border-gray-700">
-                                ${isOwner ? `
-                                    <button data-id="${docSnap.id}" class="delete-btn w-full text-left px-4 py-2 text-sm hover:bg-gray-700 text-red-400">Xóa</button>
-                                ` : `
-                                    <button onclick="alert('Đã báo cáo!')" class="w-full text-left px-4 py-2 text-sm hover:bg-gray-700 text-yellow-400 rounded-lg">Báo cáo</button>
-                                `}
+                                ${isOwner ? `<button data-id="${docSnap.id}" class="delete-btn w-full text-left px-4 py-2 text-sm hover:bg-gray-700 text-red-400">Xóa</button>` : `<button onclick="alert('Đã báo cáo!')" class="w-full text-left px-4 py-2 text-sm hover:bg-gray-700 text-yellow-400 rounded-lg">Báo cáo</button>`}
                             </div>
                         </div>
                     </div>
@@ -104,28 +103,45 @@ if (newsfeedContainer) {
             newsfeedContainer.insertAdjacentHTML('beforeend', postCard);
         });
 
-        // Gắn sự kiện (phải nằm trong onSnapshot)
+        // Gắn sự kiện Like/Delete/Comment
         newsfeedContainer.querySelectorAll('.like-btn').forEach(btn => {
             btn.onclick = async () => {
                 if (!auth.currentUser) return alert("Đăng nhập mới like được!");
                 const postId = btn.dataset.id;
                 const likeRef = doc(db, "likes", `${postId}_${auth.currentUser.uid}`);
                 const likeSnap = await getDoc(likeRef);
-
                 if (likeSnap.exists()) {
                     await deleteDoc(likeRef);
                     btn.className = "like-btn text-sm transition text-gray-400";
-                    btn.querySelector('i').className = "fa-regular fa-thumbs-up mr-1";
                 } else {
                     await setDoc(likeRef, { postId, uid: auth.currentUser.uid, createdAt: serverTimestamp() });
                     btn.className = "like-btn text-sm transition text-blue-500";
-                    btn.querySelector('i').className = "fa-solid fa-thumbs-up mr-1";
                 }
             };
         });
 
         newsfeedContainer.querySelectorAll('.comment-btn').forEach(btn => {
-            btn.onclick = () => alert("Tính năng bình luận đang được phát triển!");
+            btn.onclick = async () => {
+                const postId = btn.dataset.id;
+                popup.classList.remove('hidden');
+                commentList.innerHTML = 'Đang tải...';
+
+                const qComments = query(collection(db, "comments"), where("postId", "==", postId), orderBy("createdAt", "asc"));
+                const commentsSnap = await getDocs(qComments);
+                commentList.innerHTML = '';
+                commentsSnap.forEach(c => {
+                    const com = c.data();
+                    commentList.innerHTML += `<p class="text-sm text-gray-300"><span class="font-bold text-blue-400">${com.username}:</span> ${com.content}</p>`;
+                });
+
+                sendBtn.onclick = async () => {
+                    if (!auth.currentUser) return alert("Đăng nhập mới bình luận được!");
+                    if (!commentInput.value.trim()) return;
+                    await addDoc(collection(db, "comments"), { postId, uid: auth.currentUser.uid, username: auth.currentUser.displayName || "Thành viên", content: commentInput.value.trim(), createdAt: serverTimestamp() });
+                    commentInput.value = '';
+                    popup.classList.add('hidden');
+                };
+            };
         });
 
         newsfeedContainer.querySelectorAll('.delete-btn').forEach(btn => {
