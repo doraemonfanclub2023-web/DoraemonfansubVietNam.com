@@ -44,6 +44,8 @@ if (btnSubmitPost) {
     });
 }
 
+// ... (các phần trên giữ nguyên)
+
 // 3. Render danh sách bài viết
 const newsfeedContainer = getEl('newsfeed-container');
 if (newsfeedContainer) {
@@ -63,11 +65,8 @@ if (newsfeedContainer) {
                             <h4 class="font-semibold text-sm text-white">${post.username}</h4>
                             <p class="text-[10px] text-gray-500">${date}</p>
                         </div>
-                        
-                        <!-- Menu 3 chấm -->
                         <div class="relative group">
                             <button class="text-gray-400 hover:text-white p-2"><i class="fa-solid fa-ellipsis"></i></button>
-                            <!-- mt-0 giúp menu bung ra dính liền -->
                             <div class="absolute right-0 mt-0 w-32 bg-[#20232b] rounded-lg shadow-xl hidden group-hover:block z-50 border border-gray-700">
                                 ${isOwner ? `
                                     <button onclick="alert('Tính năng sửa đang phát triển!')" class="w-full text-left px-4 py-2 text-sm hover:bg-gray-700 text-blue-400 rounded-t-lg">Sửa</button>
@@ -81,10 +80,10 @@ if (newsfeedContainer) {
                     <p class="text-sm text-gray-200 whitespace-pre-line">${post.content}</p>
                     ${post.mediaUrl ? `<img src="${post.mediaUrl}" class="post-image max-h-96 w-full object-cover rounded-xl mt-2 cursor-pointer">` : ''}
                     <div class="flex gap-6 mt-3 border-t border-gray-800 pt-3">
-                        <button class="like-btn text-gray-400 hover:text-blue-500 transition text-sm">
+                        <button data-id="${docSnap.id}" class="like-btn text-gray-400 hover:text-blue-500 transition text-sm">
                             <i class="fa-regular fa-thumbs-up mr-1"></i> Like
                         </button>
-                        <button class="comment-btn text-gray-400 hover:text-blue-500 transition text-sm">
+                        <button data-id="${docSnap.id}" class="comment-btn text-gray-400 hover:text-blue-500 transition text-sm">
                             <i class="fa-regular fa-comment mr-1"></i> Bình luận
                         </button>
                     </div>
@@ -104,10 +103,27 @@ if (newsfeedContainer) {
 
         // Xử lý Like
         newsfeedContainer.querySelectorAll('.like-btn').forEach(btn => {
-            btn.onclick = () => {
-                btn.classList.toggle('text-blue-500'); btn.classList.toggle('text-gray-400');
+            btn.onclick = async () => {
+                const postId = btn.dataset.id;
+                btn.classList.toggle('text-blue-500');
+                btn.classList.toggle('text-gray-400');
                 const icon = btn.querySelector('i');
-                icon.classList.toggle('fa-regular'); icon.classList.toggle('fa-solid');
+                icon.classList.toggle('fa-regular');
+                icon.classList.toggle('fa-solid');
+                // Tại đây bồ có thể thêm logic lưu vào Firestore: addDoc(collection(db, "likes"), { postId: postId, ... })
+                console.log("Đã tương tác với bài:", postId);
+            };
+        });
+
+        // Xử lý Bình luận
+        newsfeedContainer.querySelectorAll('.comment-btn').forEach(btn => {
+            btn.onclick = () => {
+                const postId = btn.dataset.id;
+                const commentText = prompt("Nhập bình luận của bồ:");
+                if (commentText) {
+                    alert("Bồ đã bình luận: " + commentText + " vào bài " + postId);
+                    // Tại đây bồ có thể thêm logic lưu vào Firestore: addDoc(collection(db, "posts", postId, "comments"), { text: commentText, ... })
+                }
             };
         });
     });
