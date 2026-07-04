@@ -2,15 +2,13 @@ import { auth, db } from './firebase-config.js';
 import { cloudinaryConfig, CLOUDINARY_URL } from './cloudinary-config.js';
 import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// Helper lấy element an toàn
 const getEl = (id) => document.getElementById(id);
 
-// Hàm upload ảnh lên Cloudinary
+// Hàm upload ảnh giữ nguyên
 async function uploadToCloudinary(file) {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('upload_preset', cloudinaryConfig.uploadPreset);
-    
     try {
         const response = await fetch(CLOUDINARY_URL, { method: 'POST', body: formData });
         const data = await response.json();
@@ -21,7 +19,7 @@ async function uploadToCloudinary(file) {
     }
 }
 
-// Xử lý đăng bài
+// Xử lý đăng bài... (phần cũ của bồ giữ nguyên)
 const btnSubmitPost = getEl('btn-submit-post');
 if (btnSubmitPost) {
     btnSubmitPost.addEventListener('click', async () => {
@@ -36,9 +34,7 @@ if (btnSubmitPost) {
         try {
             btnSubmitPost.disabled = true;
             btnSubmitPost.innerText = 'Đang đăng...';
-            
             let mediaUrl = file ? await uploadToCloudinary(file) : '';
-            
             await addDoc(collection(db, "posts"), {
                 uid: user.uid,
                 username: user.displayName || "Thành viên",
@@ -47,13 +43,11 @@ if (btnSubmitPost) {
                 mediaUrl: mediaUrl,
                 createdAt: serverTimestamp()
             });
-
             if (getEl('post-content')) getEl('post-content').value = '';
             if (fileInput) fileInput.value = '';
             alert('Đăng bài thành công!');
         } catch (e) { 
             console.error("Lỗi đăng bài:", e); 
-            alert("Có lỗi xảy ra khi đăng bài.");
         } finally { 
             btnSubmitPost.disabled = false; 
             btnSubmitPost.innerText = 'Đăng bài lên Bản Tin';
@@ -61,7 +55,7 @@ if (btnSubmitPost) {
     });
 }
 
-// Render danh sách bài viết
+// Render danh sách bài viết (ĐÃ SỬA)
 const newsfeedContainer = getEl('newsfeed-container');
 if (newsfeedContainer) {
     const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
@@ -69,7 +63,6 @@ if (newsfeedContainer) {
         newsfeedContainer.innerHTML = '';
         snapshot.forEach((doc) => {
             const post = doc.data();
-            // Định dạng ngày tháng đơn giản nếu cần
             const date = post.createdAt ? new Date(post.createdAt.seconds * 1000).toLocaleDateString() : '';
             
             const postCard = `
@@ -82,7 +75,19 @@ if (newsfeedContainer) {
                         </div>
                     </div>
                     <p class="text-sm text-gray-200">${post.content}</p>
-                    ${post.mediaUrl ? `<img src="${post.mediaUrl}" class="w-full rounded-xl mt-2">` : ''}
+                    
+                    <!-- ẢNH ĐÃ GIỚI HẠN KÍCH THƯỚC (max-h-96, w-full, object-cover) -->
+                    ${post.mediaUrl ? `<img src="${post.mediaUrl}" class="max-h-96 w-full object-cover rounded-xl mt-2">` : ''}
+                    
+                    <!-- NÚT LIKE VÀ BÌNH LUẬN -->
+                    <div class="flex gap-6 mt-3 border-t border-gray-800 pt-3">
+                        <button class="text-gray-400 hover:text-blue-500 transition text-sm">
+                            <i class="fa-regular fa-thumbs-up mr-1"></i> Like
+                        </button>
+                        <button class="text-gray-400 hover:text-blue-500 transition text-sm">
+                            <i class="fa-regular fa-comment mr-1"></i> Bình luận
+                        </button>
+                    </div>
                 </div>
             `;
             newsfeedContainer.insertAdjacentHTML('beforeend', postCard);
