@@ -7,9 +7,18 @@ import {
     updateProfile 
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-// Helper để lấy element an toàn hơn
-const getEl = (id) => document.getElementById(id);
+// Bộ quét ID thông minh để kiểm tra lỗi HTML
+const getEl = (id) => {
+    const el = document.getElementById(id);
+    if (el) {
+        console.log(`✅ [auth.js] Đã kết nối thành công với ID: "${id}"`);
+    } else {
+        console.error(`❌ [auth.js] KHÔNG tìm thấy ID: "${id}" trong file HTML của bồ!`);
+    }
+    return el;
+};
 
+console.log("====== 🔍 BẮT ĐẦU QUÉT LỖI GIAO DIỆN ĐĂNG NHẬP ======");
 const authModal = getEl('auth-modal');
 const btnOpenAuth = getEl('btn-open-auth-modal');
 const btnCloseAuth = getEl('btn-close-auth-modal');
@@ -25,6 +34,7 @@ const btnLogout = getEl('btn-logout');
 const sideUserAvatar = getEl('side-user-avatar');
 const sideUserName = getEl('side-user-name');
 const btnPost = getEl('btn-open-post-modal');
+console.log("====================================================");
 
 let isSignUpMode = false;
 
@@ -52,9 +62,9 @@ if (btnToggleMode) {
 
 if (btnAuthSubmit) {
     btnAuthSubmit.addEventListener('click', async () => {
-        const email = getEl('auth-email')?.value.trim();
-        const password = getEl('auth-password')?.value.trim();
-        const username = getEl('auth-username')?.value.trim();
+        const email = document.getElementById('auth-email')?.value.trim();
+        const password = document.getElementById('auth-password')?.value.trim();
+        const username = document.getElementById('auth-username')?.value.trim();
 
         if (!email || !password || (isSignUpMode && !username)) {
             alert("Bồ ơi, vui lòng điền đầy đủ thông tin nha!");
@@ -77,7 +87,7 @@ if (btnAuthSubmit) {
             }
             authModal?.classList.add('hidden');
         } catch (error) {
-            alert("Lỗi: " + error.message);
+            alert("Lỗi đăng nhập/đăng ký: " + error.message);
         } finally {
             btnAuthSubmit.disabled = false;
             btnAuthSubmit.innerText = isSignUpMode ? "Đăng Ký Tài Khoản" : "Đăng Nhập";
