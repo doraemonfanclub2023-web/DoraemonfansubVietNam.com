@@ -120,47 +120,18 @@ if (newsfeedContainer) {
             };
         });
 
-        // Gắn sự kiện Bình luận (Popup)
-        newsfeedContainer.querySelectorAll('.comment-btn').forEach(btn => {
-            btn.onclick = async () => {
-                const postId = btn.dataset.id;
-                popup.classList.remove('hidden');
-                
-                const loadComments = async () => {
-                    commentList.innerHTML = 'Đang tải...';
-                    const qComments = query(collection(db, "comments"), where("postId", "==", postId), orderBy("createdAt", "asc"));
-                    const commentsSnap = await getDocs(qComments);
-                    commentList.innerHTML = '';
-                    commentsSnap.forEach(c => {
-                        const com = c.data();
-                        commentList.innerHTML += `<p class="text-sm text-gray-300"><span class="font-bold text-blue-400">${com.username}:</span> ${com.content}</p>`;
-                    });
-                };
-
-                await loadComments();
-
-                sendBtn.onclick = async () => {
-                    if (!auth.currentUser) return alert("Đăng nhập mới bình luận được!");
-                    if (!commentInput.value.trim()) return;
-                    
-                    try {
-                        await addDoc(collection(db, "comments"), { 
-                            postId, 
-                            uid: auth.currentUser.uid, 
-                            username: auth.currentUser.displayName || "Thành viên", 
-                            content: commentInput.value.trim(), 
-                            createdAt: serverTimestamp() 
-                        });
-                        commentInput.value = '';
-                        loadComments();
-                    } catch (err) {
-                        console.error("Lỗi:", err);
-                        alert("Không gửi được bình luận, kiểm tra lại Rules Firebase!");
-                    }
-                };
-            };
-        });
-
+        <!-- Khung Popup Bình Luận -->
+<div id="comment-popup" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center">
+    <div class="bg-[#20232b] p-6 rounded-2xl w-96 border border-gray-700">
+        <h3 class="text-white font-bold mb-4">Bình luận bài viết</h3>
+        <div id="comment-list" class="max-h-60 overflow-y-auto mb-4 space-y-2 text-white"></div>
+        <input type="text" id="comment-input" placeholder="Viết bình luận..." class="w-full bg-[#16181f] text-white p-2 rounded-lg border border-gray-700 mb-2">
+        <div class="flex justify-end gap-2">
+            <button onclick="document.getElementById('comment-popup').classList.add('hidden')" class="px-4 py-2 text-gray-400">Đóng</button>
+            <button id="send-comment-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Gửi</button>
+        </div>
+    </div>
+</div>
         // Gắn sự kiện Xóa
         newsfeedContainer.querySelectorAll('.delete-btn').forEach(btn => {
             btn.onclick = async () => {
