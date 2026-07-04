@@ -1,8 +1,6 @@
-// Sử dụng đường dẫn tương đối ổn định hơn cho GitHub Pages
-import { auth, db } from './firebase-config.js';
-import { cloudinaryConfig, CLOUDINARY_URL } from '../cloudinary-config.js';
-import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, doc, deleteDoc, setDoc, getDoc, getDocs, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
+// Sử dụng đường dẫn tuyệt đối để GitHub Pages không bị lạc đường
+import { auth, db } from '/firebase-config.js';
+import { cloudinaryConfig, CLOUDINARY_URL } from '/cloudinary-config.js';
 const getEl = (id) => document.getElementById(id);
 
 async function uploadToCloudinary(file) {
