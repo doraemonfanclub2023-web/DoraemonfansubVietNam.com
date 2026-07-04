@@ -4,7 +4,7 @@ import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot } from 
 
 const getEl = (id) => document.getElementById(id);
 
-// Hàm upload ảnh
+// 1. Hàm upload ảnh lên Cloudinary
 async function uploadToCloudinary(file) {
     const formData = new FormData();
     formData.append('file', file);
@@ -19,7 +19,7 @@ async function uploadToCloudinary(file) {
     }
 }
 
-// Xử lý đăng bài
+// 2. Xử lý logic Đăng bài
 const btnSubmitPost = getEl('btn-submit-post');
 if (btnSubmitPost) {
     btnSubmitPost.addEventListener('click', async () => {
@@ -45,7 +45,6 @@ if (btnSubmitPost) {
             });
             if (getEl('post-content')) getEl('post-content').value = '';
             if (fileInput) fileInput.value = '';
-            alert('Đăng bài thành công!');
         } catch (e) { 
             console.error("Lỗi đăng bài:", e); 
         } finally { 
@@ -55,7 +54,7 @@ if (btnSubmitPost) {
     });
 }
 
-// Render danh sách bài viết
+// 3. Render danh sách bài viết và xử lý tương tác
 const newsfeedContainer = getEl('newsfeed-container');
 if (newsfeedContainer) {
     const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
@@ -76,10 +75,8 @@ if (newsfeedContainer) {
                     </div>
                     <p class="text-sm text-gray-200">${post.content}</p>
                     
-                    <!-- Ảnh đã thêm class post-image để bấm xem full -->
                     ${post.mediaUrl ? `<img src="${post.mediaUrl}" class="post-image max-h-96 w-full object-cover rounded-xl mt-2 cursor-pointer">` : ''}
                     
-                    <!-- Nút Like và Bình luận -->
                     <div class="flex gap-6 mt-3 border-t border-gray-800 pt-3">
                         <button class="like-btn text-gray-400 hover:text-blue-500 transition text-sm">
                             <i class="fa-regular fa-thumbs-up mr-1"></i> Like
@@ -93,18 +90,22 @@ if (newsfeedContainer) {
             newsfeedContainer.insertAdjacentHTML('beforeend', postCard);
         });
 
-        // Gán sự kiện phản hồi sau khi đã render xong
-        document.querySelectorAll('.like-btn').forEach(btn => {
+        // Xử lý nút Like (Chuyển xanh/xám, đặc/viền)
+        newsfeedContainer.querySelectorAll('.like-btn').forEach(btn => {
             btn.onclick = () => {
                 btn.classList.toggle('text-blue-500');
-                alert("Bồ đã thích bài này!");
+                btn.classList.toggle('text-gray-400');
+                const icon = btn.querySelector('i');
+                icon.classList.toggle('fa-regular');
+                icon.classList.toggle('fa-solid');
             };
         });
 
-        document.querySelectorAll('.comment-btn').forEach(btn => {
+        // Xử lý nút Bình luận (Prompt hiện ra)
+        newsfeedContainer.querySelectorAll('.comment-btn').forEach(btn => {
             btn.onclick = () => {
                 const cmt = prompt("Bình luận gì đi bồ:");
-                if(cmt) alert("Bồ đã bình luận: " + cmt);
+                if(cmt) console.log("Đã bình luận:", cmt);
             };
         });
     });
