@@ -1,27 +1,27 @@
-// Đảm bảo bồ đã import sendPasswordResetEmail ở đầu file auth.js
-import { 
-    signInWithEmailAndPassword, createUserWithEmailAndPassword, 
-    updateProfile, onAuthStateChanged, signOut, sendPasswordResetEmail 
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+// Đảm bảo bồ đã import sendPasswordResetEmail từ firebase/auth
+import { sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-// ... các phần code khác của bồ ...
+// ... code khác của bồ ...
 
-// Đoạn xử lý cho nút Quên mật khẩu
+// Xử lý nút Quên mật khẩu
 const btnForgotPassword = document.getElementById('btn-forgot-password');
 
 if (btnForgotPassword) {
     btnForgotPassword.addEventListener('click', async () => {
-        const email = document.getElementById('auth-email').value;
+        const emailInput = document.getElementById('auth-email');
+        const email = emailInput.value.trim();
+        
         if (!email) {
-            alert("Bồ nhập email vào ô trên trước nha!");
+            alert("Bồ vui lòng nhập email vào ô trên trước nhé!");
             return;
         }
+        
         try {
             await sendPasswordResetEmail(auth, email);
             alert("Đã gửi email khôi phục mật khẩu. Bồ kiểm tra hộp thư nhé!");
         } catch (error) {
-            console.error(error);
-            alert("Lỗi: " + error.message);
+            console.error("Lỗi gửi email:", error);
+            alert("Có lỗi xảy ra: " + error.message);
         }
     });
 }
