@@ -1,6 +1,6 @@
 import { auth, db } from './firebase-config.js';
 import { cloudinaryConfig, CLOUDINARY_URL } from './cloudinary-config.js';
-import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, doc, deleteDoc, setDoc, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, doc, deleteDoc, setDoc, getDoc, getDocs, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const getEl = (id) => document.getElementById(id);
 
@@ -13,7 +13,10 @@ async function uploadToCloudinary(file) {
         const response = await fetch(CLOUDINARY_URL, { method: 'POST', body: formData });
         const data = await response.json();
         return data.secure_url;
-    } catch (error) { console.error("Lỗi upload:", error); return null; }
+    } catch (error) { 
+        console.error("Lỗi upload:", error); 
+        return null; 
+    }
 }
 
 // 2. Xử lý đăng bài
@@ -52,15 +55,12 @@ if (newsfeedContainer) {
     onSnapshot(q, async (snapshot) => {
         newsfeedContainer.innerHTML = '';
         
-        // Lấy danh sách ID các bài mà user hiện tại đã like
+        // Tối ưu lấy danh sách like của user hiện tại
         let likedPosts = [];
         if (auth.currentUser) {
-            const likesQuery = await getDocs(collection(db, "likes"));
-            likesQuery.forEach(doc => {
-                if (doc.data().uid === auth.currentUser.uid) {
-                    likedPosts.push(doc.data().postId);
-                }
-            });
+            const qLikes = query(collection(db, "likes"), where("uid", "==", auth.currentUser.uid));
+            const likesSnap = await getDocs(qLikes);
+            likesSnap.forEach(d => likedPosts.push(d.data().postId));
         }
 
         snapshot.forEach((docSnap) => {
@@ -100,8 +100,8 @@ if (newsfeedContainer) {
             newsfeedContainer.insertAdjacentHTML('beforeend', postCard);
         });
 
-        // Xử lý sự kiện sau khi render
-        document.querySelectorAll('.like-btn').forEach(btn => {
+        // Xử lý sự kiện click
+        newsfeedContainer.querySelectorAll('.like-btn').forEach(btn => {
             btn.onclick = async () => {
                 if (!auth.currentUser) return alert("Đăng nhập mới like được!");
                 const postId = btn.dataset.id;
@@ -120,7 +120,7 @@ if (newsfeedContainer) {
             };
         });
 
-        document.querySelectorAll('.delete-btn').forEach(btn => {
+        newsfeedContainer.querySelectorAll('.delete-btn').forEach(btn => {
             btn.onclick = async () => {
                 if(confirm("Xóa bài này?")) await deleteDoc(doc(db, "posts", btn.dataset.id));
             };
