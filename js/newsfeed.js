@@ -2,7 +2,6 @@
 import { db } from './firebase-config.js';
 import { collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const newsfeedContainer = document.getElementById('newsfeed-container');
 
 // Dùng onSnapshot để dữ liệu luôn tự động cập nhật ngay khi có bài mới
 const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
