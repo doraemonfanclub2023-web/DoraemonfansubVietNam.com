@@ -49,10 +49,6 @@ if (btnSubmitPost) {
 
 // 3. Render danh sách bài viết
 const newsfeedContainer = getEl('newsfeed-container');
-const popup = getEl('comment-popup');
-const commentList = getEl('comment-list');
-const commentInput = getEl('comment-input');
-const sendBtn = getEl('send-comment-btn');
 
 if (newsfeedContainer) {
     const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
@@ -103,7 +99,7 @@ if (newsfeedContainer) {
             newsfeedContainer.insertAdjacentHTML('beforeend', postCard);
         });
 
-        // Gắn sự kiện Like
+        // Gắn sự kiện Like và Xóa
         newsfeedContainer.querySelectorAll('.like-btn').forEach(btn => {
             btn.onclick = async () => {
                 if (!auth.currentUser) return alert("Đăng nhập mới like được!");
@@ -120,17 +116,6 @@ if (newsfeedContainer) {
             };
         });
 
-    <div class="bg-[#20232b] p-6 rounded-2xl w-96 border border-gray-700">
-        <h3 class="text-white font-bold mb-4">Bình luận bài viết</h3>
-        <div id="comment-list" class="max-h-60 overflow-y-auto mb-4 space-y-2 text-white"></div>
-        <input type="text" id="comment-input" placeholder="Viết bình luận..." class="w-full bg-[#16181f] text-white p-2 rounded-lg border border-gray-700 mb-2">
-        <div class="flex justify-end gap-2">
-            <button onclick="document.getElementById('comment-popup').classList.add('hidden')" class="px-4 py-2 text-gray-400">Đóng</button>
-            <button id="send-comment-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Gửi</button>
-        </div>
-    </div>
-</div>
-        // Gắn sự kiện Xóa
         newsfeedContainer.querySelectorAll('.delete-btn').forEach(btn => {
             btn.onclick = async () => {
                 if(confirm("Xóa bài này?")) await deleteDoc(doc(db, "posts", btn.dataset.id));
