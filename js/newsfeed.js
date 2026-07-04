@@ -63,14 +63,20 @@ if (newsfeedContainer) {
                             <h4 class="font-semibold text-sm text-white">${post.username}</h4>
                             <p class="text-[10px] text-gray-500">${date}</p>
                         </div>
-                        ${isOwner ? `
+                        
+                        <!-- Menu 3 chấm -->
                         <div class="relative group">
                             <button class="text-gray-400 hover:text-white p-2"><i class="fa-solid fa-ellipsis"></i></button>
-                            <div class="absolute right-0 mt-2 w-32 bg-[#20232b] rounded-lg shadow-xl hidden group-hover:block z-10 border border-gray-700">
-                                <button onclick="alert('Tính năng sửa đang phát triển!')" class="w-full text-left px-4 py-2 text-sm hover:bg-gray-700 text-blue-400">Sửa</button>
-                                <button data-id="${docSnap.id}" class="delete-btn w-full text-left px-4 py-2 text-sm hover:bg-gray-700 text-red-400">Xóa</button>
+                            <!-- mt-0 giúp menu bung ra dính liền -->
+                            <div class="absolute right-0 mt-0 w-32 bg-[#20232b] rounded-lg shadow-xl hidden group-hover:block z-50 border border-gray-700">
+                                ${isOwner ? `
+                                    <button onclick="alert('Tính năng sửa đang phát triển!')" class="w-full text-left px-4 py-2 text-sm hover:bg-gray-700 text-blue-400 rounded-t-lg">Sửa</button>
+                                    <button data-id="${docSnap.id}" class="delete-btn w-full text-left px-4 py-2 text-sm hover:bg-gray-700 text-red-400">Xóa</button>
+                                ` : `
+                                    <button onclick="alert('Đã gửi báo cáo bài viết!')" class="w-full text-left px-4 py-2 text-sm hover:bg-gray-700 text-yellow-400 rounded-lg">Báo cáo</button>
+                                `}
                             </div>
-                        </div>` : ''}
+                        </div>
                     </div>
                     <p class="text-sm text-gray-200">${post.content}</p>
                     ${post.mediaUrl ? `<img src="${post.mediaUrl}" class="post-image max-h-96 w-full object-cover rounded-xl mt-2 cursor-pointer">` : ''}
@@ -96,7 +102,7 @@ if (newsfeedContainer) {
             };
         });
 
-        // Xử lý Like & Comment
+        // Xử lý Like
         newsfeedContainer.querySelectorAll('.like-btn').forEach(btn => {
             btn.onclick = () => {
                 btn.classList.toggle('text-blue-500'); btn.classList.toggle('text-gray-400');
