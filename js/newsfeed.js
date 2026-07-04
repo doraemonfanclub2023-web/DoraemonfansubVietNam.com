@@ -103,7 +103,7 @@ if (newsfeedContainer) {
             newsfeedContainer.insertAdjacentHTML('beforeend', postCard);
         });
 
-        // Gắn sự kiện Like/Delete/Comment
+        // Gắn sự kiện Like
         newsfeedContainer.querySelectorAll('.like-btn').forEach(btn => {
             btn.onclick = async () => {
                 if (!auth.currentUser) return alert("Đăng nhập mới like được!");
@@ -120,12 +120,12 @@ if (newsfeedContainer) {
             };
         });
 
+        // Gắn sự kiện Bình luận (Popup)
         newsfeedContainer.querySelectorAll('.comment-btn').forEach(btn => {
             btn.onclick = async () => {
                 const postId = btn.dataset.id;
                 popup.classList.remove('hidden');
                 
-                // Hàm load bình luận riêng để gọi lại sau khi gửi
                 const loadComments = async () => {
                     commentList.innerHTML = 'Đang tải...';
                     const qComments = query(collection(db, "comments"), where("postId", "==", postId), orderBy("createdAt", "asc"));
@@ -139,34 +139,29 @@ if (newsfeedContainer) {
 
                 await loadComments();
 
-                // Gán sự kiện gửi - dùng arrow function để không bị ghi đè chồng chéo
                 sendBtn.onclick = async () => {
                     if (!auth.currentUser) return alert("Đăng nhập mới bình luận được!");
                     if (!commentInput.value.trim()) return;
                     
-                    await addDoc(collection(db, "comments"), { 
-                        postId, 
-                        uid: auth.currentUser.uid, 
-                        username: auth.currentUser.displayName || "Thành viên", 
-                        content: commentInput.value.trim(), 
-                        createdAt: serverTimestamp() 
-                    });
-                    
-                    commentInput.value = '';
-                    loadComments(); // Tải lại danh sách sau khi gửi thành công
-                };
-            };
-        });
-                sendBtn.onclick = async () => {
-                    if (!auth.currentUser) return alert("Đăng nhập mới bình luận được!");
-                    if (!commentInput.value.trim()) return;
-                    await addDoc(collection(db, "comments"), { postId, uid: auth.currentUser.uid, username: auth.currentUser.displayName || "Thành viên", content: commentInput.value.trim(), createdAt: serverTimestamp() });
-                    commentInput.value = '';
-                    popup.classList.add('hidden');
+                    try {
+                        await addDoc(collection(db, "comments"), { 
+                            postId, 
+                            uid: auth.currentUser.uid, 
+                            username: auth.currentUser.displayName || "Thành viên", 
+                            content: commentInput.value.trim(), 
+                            createdAt: serverTimestamp() 
+                        });
+                        commentInput.value = '';
+                        loadComments();
+                    } catch (err) {
+                        console.error("Lỗi:", err);
+                        alert("Không gửi được bình luận, kiểm tra lại Rules Firebase!");
+                    }
                 };
             };
         });
 
+        // Gắn sự kiện Xóa
         newsfeedContainer.querySelectorAll('.delete-btn').forEach(btn => {
             btn.onclick = async () => {
                 if(confirm("Xóa bài này?")) await deleteDoc(doc(db, "posts", btn.dataset.id));
