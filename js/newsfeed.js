@@ -65,5 +65,6 @@ if (newsfeedContainer) {
         });
     } catch (e) {
         console.error("Lỗi tải newsfeed:", e);
+								<script type="module" src="js/newsfeed.js"></script>
     }
 }
