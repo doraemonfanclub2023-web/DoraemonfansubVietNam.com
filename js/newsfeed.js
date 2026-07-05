@@ -11,8 +11,6 @@ if (btnSubmitPost) {
         const content = getEl('post-content')?.value.trim();
         const user = auth.currentUser;
 
-        console.log("User hiện tại:", user); // Kiểm tra xem đã đăng nhập chưa
-
         if (!user) {
             alert("Bồ chưa đăng nhập kìa!");
             return;
@@ -35,7 +33,6 @@ if (btnSubmitPost) {
             });
 
             getEl('post-content').value = '';
-            console.log("Đăng bài thành công!");
         } catch (e) {
             console.error("Lỗi khi đăng bài:", e);
             alert("Có lỗi xảy ra: " + e.message);
@@ -54,9 +51,8 @@ if (newsfeedContainer) {
             newsfeedContainer.innerHTML = '';
             snapshot.forEach((docSnap) => {
                 const post = docSnap.data();
-                // Bọc trong thẻ div có class cho đẹp
                 const postCard = `
-                    <div class="bg-[#16181f] p-4 rounded-xl border border-gray-800">
+                    <div class="bg-[#16181f] p-4 rounded-xl border border-gray-800 mb-4">
                         <p class="font-bold text-blue-400">${post.username || "Thành viên"}</p>
                         <p class="text-white mt-1">${post.content}</p>
                     </div>`;
@@ -65,6 +61,5 @@ if (newsfeedContainer) {
         });
     } catch (e) {
         console.error("Lỗi tải newsfeed:", e);
-								<script type="module" src="js/newsfeed.js"></script>
     }
 }
