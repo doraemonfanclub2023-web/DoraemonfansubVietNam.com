@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard - Doraemon Fansub VN</title>
 
+    <!-- Firebase compat -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js">
     </script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js">
@@ -12,10 +13,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js">
     </script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js">
-    </script>
-
-    <!-- Cloudinary Upload Widget -->
-    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript">
     </script>
 
     <style>
@@ -345,6 +342,22 @@
             font-size: 12px;
         }
 
+        .btn-success {
+            background: #34a853;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: 0.3s;
+        }
+
+        .btn-success:hover {
+            background: #2d9248;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -406,7 +419,7 @@
             background: white;
             border-radius: 20px;
             padding: 28px 30px;
-            max-width: 550px;
+            max-width: 580px;
             width: 92%;
             max-height: 90vh;
             overflow-y: auto;
@@ -460,6 +473,12 @@
             color: #1a1a2e;
         }
 
+        .modal-box .form-group label .hint {
+            font-weight: 400;
+            font-size: 12px;
+            color: #999;
+        }
+
         .modal-box .form-group input,
         .modal-box .form-group textarea {
             width: 100%;
@@ -479,77 +498,73 @@
         .modal-box .form-group textarea {
             resize: vertical;
             min-height: 60px;
+            font-family: inherit;
         }
 
-        .modal-box .form-group .file-upload-area {
-            border: 2px dashed #e4e6eb;
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.3s;
-            background: #fafafa;
-        }
-
-        .modal-box .form-group .file-upload-area:hover {
-            border-color: #1a73e8;
-            background: #f0f2f5;
-        }
-
-        .modal-box .form-group .file-upload-area .icon {
-            font-size: 32px;
-            margin-bottom: 8px;
-        }
-
-        .modal-box .form-group .file-upload-area p {
+        /* Embed code textarea */
+        .modal-box .form-group textarea.embed-code {
+            min-height: 80px;
+            font-family: 'Courier New', monospace;
             font-size: 13px;
-            color: #666;
-        }
-
-        .modal-box .form-group .file-upload-area .hint {
-            font-size: 11px;
-            color: #999;
-            margin-top: 4px;
-        }
-
-        .modal-box .form-group .upload-preview {
-            display: none;
-            margin-top: 8px;
-            padding: 8px;
             background: #f8f9fa;
-            border-radius: 8px;
+        }
+
+        .modal-box .form-group .embed-preview {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f0f2f5;
+            border-radius: 10px;
             border: 1px solid #e4e6eb;
             position: relative;
         }
 
-        .modal-box .form-group .upload-preview video {
+        .modal-box .form-group .embed-preview iframe,
+        .modal-box .form-group .embed-preview video {
             width: 100%;
-            max-height: 150px;
-            border-radius: 6px;
+            border-radius: 8px;
+            max-height: 250px;
             background: #000;
         }
 
-        .modal-box .form-group .upload-preview .remove-btn {
+        .modal-box .form-group .embed-preview .remove-btn {
             position: absolute;
-            top: 4px;
-            right: 4px;
+            top: 6px;
+            right: 6px;
             background: rgba(0, 0, 0, 0.6);
             color: white;
             border: none;
             border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            font-size: 14px;
+            width: 28px;
+            height: 28px;
+            font-size: 16px;
             cursor: pointer;
             transition: 0.3s;
         }
 
-        .modal-box .form-group .upload-preview .remove-btn:hover {
+        .modal-box .form-group .embed-preview .remove-btn:hover {
             background: #e94560;
         }
 
-        .modal-box .form-group .video-url-input {
+        .modal-box .form-group .embed-url-input {
             margin-top: 8px;
+        }
+
+        .modal-box .form-group .embed-help {
+            font-size: 12px;
+            color: #999;
+            margin-top: 6px;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px dashed #e4e6eb;
+        }
+
+        .modal-box .form-group .embed-help code {
+            background: #e4e6eb;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
         }
 
         .modal-box .btn-submit {
@@ -573,33 +588,6 @@
         .modal-box .btn-submit:disabled {
             opacity: 0.6;
             cursor: not-allowed;
-        }
-
-        /* Upload progress */
-        .upload-progress {
-            display: none;
-            margin: 8px 0;
-            padding: 10px 14px;
-            background: #e8f0fe;
-            border-radius: 10px;
-            font-size: 13px;
-            color: #1a73e8;
-        }
-
-        .upload-progress .progress-bar {
-            width: 100%;
-            height: 4px;
-            background: #d2e3fc;
-            border-radius: 2px;
-            margin-top: 6px;
-            overflow: hidden;
-        }
-
-        .upload-progress .progress-bar .fill {
-            height: 100%;
-            background: #1a73e8;
-            width: 0%;
-            transition: width 0.3s;
         }
 
         /* Toast */
@@ -702,8 +690,10 @@
 </head>
 <body>
 
+    <!-- Mobile toggle -->
     <button class="mobile-menu-btn" id="menuToggle">☰</button>
 
+    <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <h2>🎬 <span>Doraemon</span> VN</h2>
@@ -726,12 +716,14 @@
         </div>
     </aside>
 
+    <!-- Main -->
     <main class="main">
         <div class="page-header">
             <h1 id="pageTitle">📊 Tổng quan</h1>
             <span class="admin-badge">👑 Admin</span>
         </div>
 
+        <!-- Stats -->
         <div class="stats-grid" id="statsGrid">
             <div class="stat-card">
                 <div class="icon">📝</div>
@@ -755,6 +747,7 @@
             </div>
         </div>
 
+        <!-- Tabs -->
         <div class="tab-container">
             <div class="tab-header">
                 <button class="tab-btn active" data-tab="overview">📊 Tổng quan</button>
@@ -764,6 +757,7 @@
                 <button class="tab-btn" data-tab="settings">⚙️ Cài đặt</button>
             </div>
 
+            <!-- TAB: Overview -->
             <div class="tab-content active" id="tab-overview">
                 <div style="padding:10px 0;">
                     <h3 style="margin-bottom:8px;">👋 Chào mừng Admin!</h3>
@@ -779,6 +773,7 @@
                 </div>
             </div>
 
+            <!-- TAB: Posts -->
             <div class="tab-content" id="tab-posts">
                 <div class="table-toolbar">
                     <span class="title">📝 Danh sách bài viết</span>
@@ -796,6 +791,7 @@
                 </div>
             </div>
 
+            <!-- TAB: Movies -->
             <div class="tab-content" id="tab-movies">
                 <div class="table-toolbar">
                     <span class="title">🎬 Danh sách phim</span>
@@ -816,6 +812,7 @@
                 </div>
             </div>
 
+            <!-- TAB: Users -->
             <div class="tab-content" id="tab-users">
                 <div class="table-toolbar">
                     <span class="title">👥 Danh sách người dùng</span>
@@ -833,6 +830,7 @@
                 </div>
             </div>
 
+            <!-- TAB: Settings -->
             <div class="tab-content" id="tab-settings">
                 <div style="max-width:500px;">
                     <h3 style="margin-bottom:16px;">⚙️ Cài đặt Admin</h3>
@@ -879,28 +877,34 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Video *</label>
-                    <div class="file-upload-area" id="videoUploadArea">
-                        <div class="icon">🎬</div>
-                        <p>Nhấn để tải video lên Cloudinary</p>
-                        <span class="hint">Hỗ trợ MP4, WebM, AVI, MOV</span>
+                    <label>
+                        🎬 Mã nhúng video 
+                        <span class="hint">(Dán mã nhúng từ YouTube, Cloudinary, Vimeo, Facebook, v.v.)</span>
+                    </label>
+                    <textarea class="embed-code" id="movieEmbed" placeholder='<iframe src="https://www.youtube.com/embed/xxxxx" frameborder="0" allowfullscreen></iframe>'></textarea>
+
+                    <div class="embed-preview" id="embedPreview">
+                        <div id="embedPreviewContent"></div>
+                        <button class="remove-btn" id="removeEmbedBtn">✕</button>
                     </div>
 
-                    <div class="upload-progress" id="uploadProgress">
-                        <span id="uploadStatus">📤 Đang tải video lên Cloudinary...</span>
-                        <div class="progress-bar">
-                            <div class="fill" id="progressFill"></div>
-                        </div>
+                    <div class="embed-help">
+                        💡 <strong>Hướng dẫn:</strong> Dán mã nhúng từ nguồn video bên dưới:
+                        <br>
+                        • <strong>YouTube:</strong> Nhấn "Chia sẻ" → "Nhúng" → Copy code <code>&lt;iframe&gt;</code>
+                        <br>
+                        • <strong>Cloudinary:</strong> Vào Media Library → Chọn video → "Embed" → Copy code
+                        <br>
+                        • <strong>Vimeo:</strong> Nhấn "Chia sẻ" → "Nhúng" → Copy code
+                        <br>
+                        • <strong>Facebook:</strong> Nhấn "..." → "Nhúng" → Copy code
                     </div>
+                </div>
 
-                    <div class="upload-preview" id="videoPreview">
-                        <video id="previewVideo" controls></video>
-                        <button class="remove-btn" id="removeVideoBtn">✕</button>
-                    </div>
-
-                    <div class="video-url-input">
-                        <input type="url" id="movieVideo" placeholder="Hoặc nhập link video trực tiếp (URL)" />
-                    </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label>Hoặc nhập link video trực tiếp (URL)</label>
+                    <input type="url" id="movieVideo" placeholder="https://example.com/video.mp4" />
+                    <span style="font-size:12px;color:#999;margin-top:4px;display:block;">* Nếu có mã nhúng, link này không cần nhập</span>
                 </div>
 
                 <button type="button" class="btn-submit" id="submitMovieBtn">💾 Lưu phim</button>
@@ -908,11 +912,12 @@
         </div>
     </div>
 
+    <!-- Toast -->
     <div class="toast" id="toast"></div>
 
     <script>
         // ============================================================
-        // FIREBASE
+        // FIREBASE CONFIG
         // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyBt3G9n5JYu3EsvqJR9IoW2vRAc_Es3-ws",
@@ -928,18 +933,8 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        // ADMIN EMAIL
         const ADMIN_EMAIL = 'tuankhaimoi12345@gmail.com';
-
-        // ============================================================
-        // CLOUDINARY
-        // ============================================================
-        const CLOUDINARY_CONFIG = {
-            cloudName: 'gntkeeno',
-            uploadPreset: 'doraemon_fansub_vn',
-            folder: 'doraemon_fansub_videos'
-        };
-
-        let uploadedVideoUrl = '';
 
         // ============================================================
         // DOM REFS
@@ -957,17 +952,15 @@
         const closeModalBtn = document.getElementById('closeModal');
         const pageTitle = document.getElementById('pageTitle');
 
-        const videoUploadArea = document.getElementById('videoUploadArea');
-        const uploadProgress = document.getElementById('uploadProgress');
-        const progressFill = document.getElementById('progressFill');
-        const uploadStatus = document.getElementById('uploadStatus');
-        const videoPreview = document.getElementById('videoPreview');
-        const previewVideo = document.getElementById('previewVideo');
-        const removeVideoBtn = document.getElementById('removeVideoBtn');
+        // Embed elements
+        const movieEmbed = document.getElementById('movieEmbed');
+        const embedPreview = document.getElementById('embedPreview');
+        const embedPreviewContent = document.getElementById('embedPreviewContent');
+        const removeEmbedBtn = document.getElementById('removeEmbedBtn');
         const movieVideoInput = document.getElementById('movieVideo');
 
         // ============================================================
-        // AUTH
+        // AUTH CHECK
         // ============================================================
         auth.onAuthStateChanged(async (user) => {
             if (!user) {
@@ -1086,89 +1079,32 @@
         }
 
         // ============================================================
-        // VIDEO UPLOAD
+        // EMBED PREVIEW
         // ============================================================
-        function openVideoUpload() {
-            const widget = cloudinary.createUploadWidget({
-                    cloudName: CLOUDINARY_CONFIG.cloudName,
-                    uploadPreset: CLOUDINARY_CONFIG.uploadPreset,
-                    folder: CLOUDINARY_CONFIG.folder,
-                    sources: ['local', 'url', 'google_drive'],
-                    multiple: false,
-                    maxFileSize: 50000000,
-                    resourceType: 'video',
-                    clientAllowedFormats: ['mp4', 'webm', 'avi', 'mov', 'mkv'],
-                    styles: {
-                        palette: {
-                            window: '#FFFFFF',
-                            sourceBg: '#f0f2f5',
-                            windowBorder: '#e4e6eb',
-                            tabIcon: '#1a73e8',
-                            inactiveTabIcon: '#65676b',
-                            menuIcons: '#1a73e8',
-                            link: '#1a73e8',
-                            action: '#1a73e8',
-                            inProgress: '#1a73e8',
-                            complete: '#34a853',
-                            error: '#e94560',
-                            textDark: '#1a1a2e',
-                            textLight: '#65676b'
-                        }
-                    }
-                },
-                (error, result) => {
-                    if (error) {
-                        showToast('❌ Upload video thất bại!', true);
-                        uploadProgress.style.display = 'none';
-                        return;
-                    }
-
-                    if (result.event === 'success') {
-                        uploadedVideoUrl = result.info.secure_url;
-                        movieVideoInput.value = uploadedVideoUrl;
-                        previewVideo.src = uploadedVideoUrl;
-                        videoPreview.style.display = 'block';
-                        uploadStatus.textContent = '✅ Đã tải video lên Cloudinary thành công!';
-                        progressFill.style.width = '100%';
-                        setTimeout(() => {
-                            uploadProgress.style.display = 'none';
-                            progressFill.style.width = '0%';
-                        }, 2000);
-                        showToast('✅ Video đã được tải lên!');
-                    }
-
-                    if (result.event === 'progress') {
-                        uploadProgress.style.display = 'block';
-                        const progress = Math.round((result.info.bytesUploaded / result.info.totalBytes) * 100);
-                        progressFill.style.width = progress + '%';
-                        uploadStatus.textContent = `📤 Đang tải video lên Cloudinary... ${progress}%`;
-                    }
-
-                    if (result.event === 'close') {
-                        uploadProgress.style.display = 'none';
-                    }
+        function updateEmbedPreview() {
+            const embedCode = movieEmbed.value.trim();
+            if (embedCode) {
+                embedPreviewContent.innerHTML = embedCode;
+                embedPreview.style.display = 'block';
+                // Nếu là link video trực tiếp, tạo thẻ video
+                if (embedCode.startsWith('http') && !embedCode.includes('<')) {
+                    embedPreviewContent.innerHTML = `<video controls style="width:100%;max-height:200px;border-radius:8px;background:#000;">
+                        <source src="${embedCode}">
+                        Trình duyệt không hỗ trợ video
+                    </video>`;
                 }
-            );
-            widget.open();
+            } else {
+                embedPreview.style.display = 'none';
+                embedPreviewContent.innerHTML = '';
+            }
         }
 
-        videoUploadArea.addEventListener('click', openVideoUpload);
+        movieEmbed.addEventListener('input', updateEmbedPreview);
 
-        removeVideoBtn.addEventListener('click', () => {
-            uploadedVideoUrl = '';
-            movieVideoInput.value = '';
-            videoPreview.style.display = 'none';
-            previewVideo.src = '';
-        });
-
-        movieVideoInput.addEventListener('input', function() {
-            if (this.value.trim()) {
-                uploadedVideoUrl = this.value.trim();
-                previewVideo.src = this.value.trim();
-                videoPreview.style.display = 'block';
-            } else {
-                videoPreview.style.display = 'none';
-            }
+        removeEmbedBtn.addEventListener('click', () => {
+            movieEmbed.value = '';
+            embedPreview.style.display = 'none';
+            embedPreviewContent.innerHTML = '';
         });
 
         // ============================================================
@@ -1223,7 +1159,7 @@
         };
 
         // ============================================================
-        // MOVIES
+        // MOVIES CRUD
         // ============================================================
         async function loadMovies() {
             const tbody = document.getElementById('moviesTableBody');
@@ -1240,6 +1176,13 @@
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     count++;
+                    // Hiển thị preview embed trong table
+                    let videoPreview = '📹 Có video';
+                    if (data.embed) {
+                        videoPreview = '🔗 Mã nhúng';
+                    } else if (data.video) {
+                        videoPreview = '🔗 Link video';
+                    }
                     html += `
                         <tr>
                             <td>${count}</td>
@@ -1283,16 +1226,10 @@
                 document.getElementById('movieGenre').value = data.genre || '';
                 document.getElementById('movieDesc').value = data.desc || '';
                 document.getElementById('moviePoster').value = data.poster || '';
-                if (data.video) {
-                    movieVideoInput.value = data.video;
-                    uploadedVideoUrl = data.video;
-                    previewVideo.src = data.video;
-                    videoPreview.style.display = 'block';
-                } else {
-                    movieVideoInput.value = '';
-                    uploadedVideoUrl = '';
-                    videoPreview.style.display = 'none';
-                }
+                document.getElementById('movieVideo').value = data.video || '';
+                document.getElementById('movieEmbed').value = data.embed || '';
+                updateEmbedPreview();
+
                 modalTitle.textContent = '✏️ Sửa phim';
                 submitBtn.textContent = '💾 Cập nhật';
                 submitBtn.dataset.mode = 'edit';
@@ -1308,10 +1245,10 @@
             document.getElementById('movieGenre').value = '';
             document.getElementById('movieDesc').value = '';
             document.getElementById('moviePoster').value = '';
-            movieVideoInput.value = '';
-            uploadedVideoUrl = '';
-            videoPreview.style.display = 'none';
-            previewVideo.src = '';
+            document.getElementById('movieVideo').value = '';
+            document.getElementById('movieEmbed').value = '';
+            embedPreview.style.display = 'none';
+            embedPreviewContent.innerHTML = '';
             modalTitle.textContent = '➕ Thêm phim mới';
             submitBtn.textContent = '💾 Lưu phim';
             submitBtn.dataset.mode = 'add';
@@ -1329,14 +1266,23 @@
             const genre = document.getElementById('movieGenre').value.trim();
             const desc = document.getElementById('movieDesc').value.trim();
             const poster = document.getElementById('moviePoster').value.trim();
-            const video = movieVideoInput.value.trim() || uploadedVideoUrl;
+            const video = document.getElementById('movieVideo').value.trim();
+            const embed = document.getElementById('movieEmbed').value.trim();
 
-            if (!title || !genre || !desc || !poster || !video) {
+            if (!title || !genre || !desc || !poster) {
                 showToast('⚠️ Vui lòng nhập đầy đủ thông tin!', true);
                 return;
             }
 
-            const data = { title, genre, desc, poster, video, views: 0 };
+            if (!video && !embed) {
+                showToast('⚠️ Vui lòng nhập link video hoặc mã nhúng!', true);
+                return;
+            }
+
+            const data = { title, genre, desc, poster, views: 0 };
+            if (video) data.video = video;
+            if (embed) data.embed = embed;
+
             const mode = this.dataset.mode;
             const id = this.dataset.id;
 
@@ -1435,8 +1381,14 @@
             }
         });
 
+        // ============================================================
+        // CẬP NHẬT FIRESTORE RULES (hướng dẫn)
+        // ============================================================
         console.log('🔥 Dashboard admin đã sẵn sàng!');
         console.log('👑 Admin:', ADMIN_EMAIL);
+        console.log('📌 Nếu gặp lỗi "Missing or insufficient permissions":');
+        console.log('   Vào Firebase Console → Firestore → Rules');
+        console.log('   Thay bằng: allow read, write: if request.auth != null && request.auth.token.email == "tuankhaimoi12345@gmail.com";');
     </script>
 </body>
 </html>
