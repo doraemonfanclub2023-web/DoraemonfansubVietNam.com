@@ -19,7 +19,6 @@
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
 
-        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyBt3G9n5JYu3EsvqJR9IoW2vRAc_Es3-ws",
             authDomain: "doraemon-fansub-vietnam.firebaseapp.com",
@@ -30,13 +29,12 @@
             measurementId: "G-0S2Z4XRK0B"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const analytics = getAnalytics(app);
         const provider = new GoogleAuthProvider();
 
-        // ============= DOM ELEMENTS =============
+        // DOM Elements
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
         const forgotForm = document.getElementById('forgotForm');
@@ -59,7 +57,7 @@
         const backToLogin = document.getElementById('backToLogin');
         const backToLogin2 = document.getElementById('backToLogin2');
 
-        // ============= TOGGLE FORMS =============
+        // ===== TOGGLE FORMS =====
         function showForm(formToShow) {
             loginForm.style.display = 'none';
             registerForm.style.display = 'none';
@@ -93,7 +91,7 @@
             showForm(loginForm);
         });
 
-        // ============= MESSAGES =============
+        // ===== MESSAGES =====
         function showError(message) {
             errorMessage.textContent = message;
             errorMessage.style.display = 'block';
@@ -125,7 +123,7 @@
             loadingOverlay.style.display = 'none';
         }
 
-        // ============= LOGIN WITH EMAIL =============
+        // ===== LOGIN =====
         loginBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             const email = emailInput.value.trim();
@@ -138,14 +136,12 @@
 
             showLoading();
             try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                console.log('✅ Đăng nhập thành công:', userCredential.user.email);
+                await signInWithEmailAndPassword(auth, email, password);
                 showSuccess('Đăng nhập thành công! Đang chuyển hướng...');
                 setTimeout(() => {
                     window.location.href = 'index.html';
                 }, 1500);
             } catch (error) {
-                console.error('❌ Lỗi đăng nhập:', error);
                 let message = 'Đăng nhập thất bại! ';
                 switch (error.code) {
                     case 'auth/user-not-found':
@@ -168,23 +164,21 @@
             hideLoading();
         });
 
-        // ============= LOGIN WITH GOOGLE =============
+        // ===== GOOGLE LOGIN =====
         googleBtn.addEventListener('click', async () => {
             showLoading();
             try {
-                const result = await signInWithPopup(auth, provider);
-                console.log('✅ Đăng nhập Google thành công:', result.user.displayName);
+                await signInWithPopup(auth, provider);
                 showSuccess('Đăng nhập thành công! Đang chuyển hướng...');
                 setTimeout(() => {
                     window.location.href = 'index.html';
                 }, 1500);
             } catch (error) {
-                console.error('❌ Lỗi đăng nhập Google:', error);
                 let message = 'Đăng nhập Google thất bại! ';
                 if (error.code === 'auth/popup-closed-by-user') {
                     message += 'Bạn đã đóng cửa sổ đăng nhập.';
                 } else if (error.code === 'auth/unauthorized-domain') {
-                    message += 'Domain chưa được ủy quyền. Vui lòng liên hệ quản trị viên.';
+                    message += 'Domain chưa được ủy quyền.';
                 } else {
                     message += error.message;
                 }
@@ -193,7 +187,7 @@
             hideLoading();
         });
 
-        // ============= REGISTER =============
+        // ===== REGISTER =====
         registerBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             const email = registerEmail.value.trim();
@@ -217,14 +211,12 @@
 
             showLoading();
             try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                console.log('✅ Đăng ký thành công:', userCredential.user.email);
+                await createUserWithEmailAndPassword(auth, email, password);
                 showSuccess('Đăng ký thành công! Đang chuyển hướng...');
                 setTimeout(() => {
                     window.location.href = 'index.html';
                 }, 1500);
             } catch (error) {
-                console.error('❌ Lỗi đăng ký:', error);
                 let message = 'Đăng ký thất bại! ';
                 switch (error.code) {
                     case 'auth/email-already-in-use':
@@ -244,7 +236,7 @@
             hideLoading();
         });
 
-        // ============= FORGOT PASSWORD =============
+        // ===== FORGOT PASSWORD =====
         forgotBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             const email = forgotEmail.value.trim();
@@ -257,14 +249,12 @@
             showLoading();
             try {
                 await sendPasswordResetEmail(auth, email);
-                console.log('✅ Đã gửi email đặt lại mật khẩu');
-                showSuccess('Email đặt lại mật khẩu đã được gửi! Vui lòng kiểm tra hộp thư.');
+                showSuccess('Email đặt lại mật khẩu đã được gửi!');
                 forgotEmail.value = '';
                 setTimeout(() => {
                     showForm(loginForm);
                 }, 3000);
             } catch (error) {
-                console.error('❌ Lỗi gửi email:', error);
                 let message = 'Gửi email thất bại! ';
                 if (error.code === 'auth/user-not-found') {
                     message += 'Email chưa được đăng ký.';
@@ -276,7 +266,7 @@
             hideLoading();
         });
 
-        // ============= ENTER KEY SUPPORT =============
+        // ===== ENTER KEY =====
         emailInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -291,45 +281,12 @@
             }
         });
 
-        registerEmail.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                registerPassword.focus();
-            }
-        });
-
-        registerPassword.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                registerConfirmPassword.focus();
-            }
-        });
-
-        registerConfirmPassword.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                registerBtn.click();
-            }
-        });
-
-        forgotEmail.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                forgotBtn.click();
-            }
-        });
-
-        // ============= CHECK AUTH STATE =============
+        // ===== CHECK AUTH =====
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // Nếu đã đăng nhập, chuyển về trang chủ
-                console.log('👤 Đã đăng nhập:', user.email);
                 window.location.href = 'index.html';
             }
         });
-
-        console.log('🔥 Firebase Auth đã sẵn sàng!');
-        console.log('📝 Doraemon Fansub Việt Nam - Login Page');
     </script>
 
     <style>
@@ -372,7 +329,7 @@
             }
         }
 
-        /* ===== LOADING OVERLAY ===== */
+        /* Loading */
         .loading-overlay {
             display: none;
             position: absolute;
@@ -408,7 +365,7 @@
             font-size: 15px;
         }
 
-        /* ===== LOGO ===== */
+        /* Logo */
         .logo {
             text-align: center;
             margin-bottom: 28px;
@@ -438,7 +395,7 @@
             margin-top: 4px;
         }
 
-        /* ===== MESSAGES ===== */
+        /* Messages */
         .message {
             padding: 12px 16px;
             border-radius: 12px;
@@ -462,7 +419,7 @@
             display: block;
         }
 
-        /* ===== FORMS ===== */
+        /* Forms */
         .form-group {
             margin-bottom: 16px;
         }
@@ -492,10 +449,6 @@
             box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.1);
         }
 
-        .form-group input::placeholder {
-            color: #999;
-        }
-
         .btn-primary {
             width: 100%;
             padding: 14px;
@@ -512,10 +465,6 @@
         .btn-primary:hover {
             background: #1557b0;
             transform: scale(1.02);
-        }
-
-        .btn-primary:active {
-            transform: scale(0.98);
         }
 
         .btn-google {
@@ -597,13 +546,11 @@
             text-decoration: underline;
         }
 
-        /* ===== HIDE FORMS ===== */
         #registerForm,
         #forgotForm {
             display: none;
         }
 
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 480px) {
             .login-container {
                 padding: 30px 20px;
@@ -618,12 +565,6 @@
                 height: 50px;
             }
 
-            .btn-primary,
-            .btn-google {
-                font-size: 15px;
-                padding: 12px;
-            }
-
             .form-links {
                 flex-direction: column;
                 gap: 8px;
@@ -636,24 +577,21 @@
 
 <div class="login-container">
 
-    <!-- ===== LOADING OVERLAY ===== -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="spinner"></div>
         <p>⏳ Đang xử lý...</p>
     </div>
 
-    <!-- ===== LOGO ===== -->
     <div class="logo">
         <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23ffeb3b'/%3E%3Ccircle cx='35' cy='40' r='8' fill='%231a1a2e'/%3E%3Ccircle cx='65' cy='40' r='8' fill='%231a1a2e'/%3E%3Cellipse cx='50' cy='60' rx='18' ry='12' fill='%231a1a2e'/%3E%3Ccircle cx='50' cy='55' r='6' fill='%23e94560'/%3E%3C/svg%3E" alt="Doraemon">
         <h1>Doraemon <span>Fansub VN</span></h1>
         <p>Đăng nhập để tham gia cộng đồng</p>
     </div>
 
-    <!-- ===== MESSAGES ===== -->
     <div class="message error" id="errorMessage"></div>
     <div class="message success" id="successMessage"></div>
 
-    <!-- ===== LOGIN FORM ===== -->
+    <!-- LOGIN -->
     <form id="loginForm">
         <div class="form-group">
             <label>📧 Email</label>
@@ -664,14 +602,13 @@
             <input type="password" id="password" placeholder="••••••••" required>
         </div>
         <button type="submit" class="btn-primary" id="loginBtn">Đăng nhập</button>
-
         <div class="form-links">
             <a href="#" id="showForgot">Quên mật khẩu?</a>
             <a href="#" id="showRegister">Chưa có tài khoản? Đăng ký</a>
         </div>
     </form>
 
-    <!-- ===== REGISTER FORM ===== -->
+    <!-- REGISTER -->
     <form id="registerForm">
         <div class="form-group">
             <label>📧 Email</label>
@@ -691,7 +628,7 @@
         </div>
     </form>
 
-    <!-- ===== FORGOT PASSWORD FORM ===== -->
+    <!-- FORGOT -->
     <form id="forgotForm">
         <div class="form-group">
             <label>📧 Email</label>
@@ -703,10 +640,8 @@
         </div>
     </form>
 
-    <!-- ===== DIVIDER ===== -->
     <div class="divider">Hoặc</div>
 
-    <!-- ===== GOOGLE BUTTON ===== -->
     <button class="btn-google" id="googleBtn">
         <svg width="24" height="24" viewBox="0 0 48 48">
             <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
