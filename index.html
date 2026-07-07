@@ -607,6 +607,31 @@
             margin-top: 4px;
         }
 
+        .loading-spinner {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .loading-spinner .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f0f2f5;
+            border-top: 4px solid #1a73e8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
         /* Colors */
         .color-1 {
             background: #e94560;
@@ -727,12 +752,22 @@
                 </div>
 
                 <!-- Post List -->
-                <div id="postList"></div>
+                <div id="postList">
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                        <p>Đang tải bài viết...</p>
+                    </div>
+                </div>
             </div>
 
             <!-- Movies Tab -->
             <div id="tab-movies" style="display:none;">
-                <div id="movieList"></div>
+                <div id="movieList">
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                        <p>Đang tải phim...</p>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -769,6 +804,8 @@
         const dashboardLink = document.getElementById('dashboardLink');
         const createPostBox = document.getElementById('createPostBox');
         const postInput = document.getElementById('postInput');
+        const postList = document.getElementById('postList');
+        const movieList = document.getElementById('movieList');
 
         // ============================================================
         // AUTH STATE
@@ -791,8 +828,8 @@
                     dashboardLink.style.display = 'none';
                 }
 
-                loadPosts();
-                loadMovies();
+                await loadPosts();
+                await loadMovies();
             } else {
                 authStatus.style.display = 'none';
                 loginBtn.style.display = 'block';
@@ -802,8 +839,8 @@
                 createPostBox.style.pointerEvents = 'none';
                 postInput.placeholder = '🔑 Vui lòng đăng nhập để viết bài';
 
-                loadPosts();
-                loadMovies();
+                await loadPosts();
+                await loadMovies();
             }
         });
 
@@ -870,11 +907,12 @@
                 });
 
                 postInput.value = '';
-                loadPosts();
+                await loadPosts();
                 const btn = document.querySelector('.post-btn');
                 btn.textContent = '✅ Đã đăng!';
                 setTimeout(() => btn.textContent = 'Đăng', 1500);
             } catch (e) {
+                console.error('Lỗi đăng bài:', e);
                 alert('❌ Lỗi đăng bài: ' + e.message);
             }
         }
@@ -883,14 +921,15 @@
         // LOAD POSTS
         // ============================================================
         async function loadPosts() {
-            const container = document.getElementById('postList');
+            if (!postList) return;
+
             try {
                 const snapshot = await db.collection('posts')
                     .orderBy('timestamp', 'desc')
                     .get();
 
                 if (snapshot.empty) {
-                    container.innerHTML = `
+                    postList.innerHTML = `
                         <div class="empty-state">
                             <div class="icon">📝</div>
                             <h3>Chưa có bài viết nào</h3>
@@ -949,14 +988,16 @@
                         </div>
                     `;
                 });
-                container.innerHTML = html;
+                postList.innerHTML = html;
             } catch (e) {
-                console.error(e);
-                container.innerHTML = `
+                console.error('Lỗi tải bài viết:', e);
+                postList.innerHTML = `
                     <div class="empty-state">
                         <div class="icon">❌</div>
                         <h3>Lỗi tải bài viết</h3>
                         <p>${e.message}</p>
+                        <br>
+                        <button onclick="loadPosts()" style="padding:8px 20px;background:#1a73e8;color:white;border:none;border-radius:20px;cursor:pointer;">🔄 Thử lại</button>
                     </div>
                 `;
             }
@@ -976,7 +1017,7 @@
                     liked: newLiked,
                     likes: newLikes
                 });
-                loadPosts();
+                await loadPosts();
             } catch (e) {
                 console.error(e);
             }
@@ -1017,7 +1058,7 @@
                 });
                 await db.collection('posts').doc(postId).update({ comments });
                 input.value = '';
-                loadPosts();
+                await loadPosts();
             } catch (e) {
                 console.error(e);
             }
@@ -1052,7 +1093,7 @@
             if (choice === '1') {
                 if (confirm('Xóa bài viết này?')) {
                     await db.collection('posts').doc(postId).delete();
-                    loadPosts();
+                    await loadPosts();
                     alert('✅ Đã xóa!');
                 }
             }
@@ -1062,14 +1103,15 @@
         // LOAD MOVIES
         // ============================================================
         async function loadMovies() {
-            const container = document.getElementById('movieList');
+            if (!movieList) return;
+
             try {
                 const snapshot = await db.collection('movies')
                     .orderBy('timestamp', 'desc')
                     .get();
 
                 if (snapshot.empty) {
-                    container.innerHTML = `
+                    movieList.innerHTML = `
                         <div class="empty-state">
                             <div class="icon">🎬</div>
                             <h3>Chưa có phim nào</h3>
@@ -1082,17 +1124,6 @@
                 let html = `<div class="movie-grid">`;
                 snapshot.forEach(doc => {
                     const m = doc.data();
-                    // Xử lý embed hoặc video
-                    let videoHtml = '';
-                    if (m.embed) {
-                        videoHtml = m.embed;
-                    } else if (m.video) {
-                        videoHtml = `<video controls style="width:100%;max-height:150px;border-radius:8px;background:#000;">
-                            <source src="${m.video}">
-                            Trình duyệt không hỗ trợ video
-                        </video>`;
-                    }
-
                     html += `
                         <div class="movie-card" onclick="openMovieModal('${doc.id}')">
                             <img src="${m.poster || 'https://via.placeholder.com/400x250/1a73e8/FFFFFF?text=Doraemon'}" 
@@ -1108,14 +1139,16 @@
                     `;
                 });
                 html += `</div>`;
-                container.innerHTML = html;
+                movieList.innerHTML = html;
             } catch (e) {
-                console.error(e);
-                container.innerHTML = `
+                console.error('Lỗi tải phim:', e);
+                movieList.innerHTML = `
                     <div class="empty-state">
                         <div class="icon">❌</div>
                         <h3>Lỗi tải phim</h3>
                         <p>${e.message}</p>
+                        <br>
+                        <button onclick="loadMovies()" style="padding:8px 20px;background:#1a73e8;color:white;border:none;border-radius:20px;cursor:pointer;">🔄 Thử lại</button>
                     </div>
                 `;
             }
@@ -1178,11 +1211,9 @@
                 });
                 document.body.appendChild(modal);
 
-                // Tự động phát video nếu có video tag
                 const video = modal.querySelector('video');
                 if (video) setTimeout(() => video.play(), 500);
 
-                // Reload để cập nhật lượt xem
                 setTimeout(loadMovies, 2000);
             } catch (e) {
                 console.error(e);
@@ -1212,6 +1243,10 @@
         // ============================================================
         console.log('🎬 Doraemon Fansub VN đã sẵn sàng!');
         console.log('👑 Admin:', ADMIN_EMAIL);
+        console.log('📌 Nếu gặp lỗi "Missing or insufficient permissions":');
+        console.log('   Vào Firebase Console → Firestore → Rules');
+        console.log('   Thay bằng: allow read: if true;');
+        console.log('   allow write: if request.auth != null && request.auth.token.email == "' + ADMIN_EMAIL + '";');
     </script>
 </body>
 </html>
