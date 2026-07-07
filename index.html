@@ -4,6 +4,69 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Doraemon Fansub Việt Nam</title>
+    
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBt3G9n5JYu3EsvqJR9IoW2vRAc_Es3-ws",
+            authDomain: "doraemon-fansub-vietnam.firebaseapp.com",
+            projectId: "doraemon-fansub-vietnam",
+            storageBucket: "doraemon-fansub-vietnam.firebasestorage.app",
+            messagingSenderId: "380840935390",
+            appId: "1:380840935390:web:60fab4722a9fba5053a74f",
+            measurementId: "G-0S2Z4XRK0B"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const analytics = getAnalytics(app);
+
+        // DOM Elements
+        const authStatus = document.getElementById('authStatus');
+        const userAvatar = document.getElementById('userAvatar');
+        const userName = document.getElementById('userName');
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const createPostBox = document.getElementById('createPostBox');
+        const postInput = document.getElementById('postInput');
+
+        // ===== AUTH STATE =====
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                authStatus.style.display = 'flex';
+                loginBtn.style.display = 'none';
+                logoutBtn.style.display = 'block';
+                userAvatar.src = user.photoURL || 'https://ui-avatars.com/api/?name=' + user.displayName;
+                userName.textContent = user.displayName || user.email;
+                createPostBox.style.opacity = '1';
+                createPostBox.style.pointerEvents = 'auto';
+                postInput.placeholder = `${user.displayName || 'Bạn'} đang nghĩ gì thế?`;
+            } else {
+                authStatus.style.display = 'none';
+                loginBtn.style.display = 'block';
+                logoutBtn.style.display = 'none';
+                createPostBox.style.opacity = '0.5';
+                createPostBox.style.pointerEvents = 'none';
+                postInput.placeholder = 'Vui lòng đăng nhập để viết bài';
+            }
+        });
+
+        // ===== LOGOUT =====
+        window.logoutUser = async function() {
+            try {
+                await signOut(auth);
+                window.location.reload();
+            } catch (error) {
+                console.error('Lỗi đăng xuất:', error);
+                alert('Đăng xuất thất bại!');
+            }
+        };
+    </script>
+
     <style>
         * {
             margin: 0;
@@ -67,22 +130,29 @@
             gap: 12px;
         }
 
-        .header-actions .avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: #ffeb3b;
-            display: flex;
+        #authStatus {
+            display: none;
             align-items: center;
-            justify-content: center;
-            color: #0d47a1;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            border: 2px solid white;
+            gap: 10px;
+            background: rgba(255,255,255,0.15);
+            padding: 4px 16px 4px 4px;
+            border-radius: 30px;
         }
 
-        .header-actions .login-btn {
+        #authStatus img {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 2px solid #ffeb3b;
+        }
+
+        #authStatus .user-name {
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .login-btn {
             background: #ffeb3b;
             color: #0d47a1;
             border: none;
@@ -92,10 +162,29 @@
             font-size: 13px;
             cursor: pointer;
             transition: 0.3s;
+            text-decoration: none;
         }
 
-        .header-actions .login-btn:hover {
+        .login-btn:hover {
             transform: scale(1.05);
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: none;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,0,0,0.3);
+            border-color: #ff4444;
         }
 
         /* ===== MAIN ===== */
@@ -143,6 +232,7 @@
             padding: 16px;
             margin-bottom: 16px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            transition: 0.3s;
         }
 
         .create-post-top {
@@ -375,11 +465,7 @@
             color: #1a73e8;
         }
 
-        .post-footer button.liked .heart-icon {
-            color: #e94560;
-        }
-
-        /* ===== COMMENT SECTION ===== */
+        /* ===== COMMENT ===== */
         .comments-section {
             margin-top: 12px;
             padding-top: 12px;
@@ -532,12 +618,8 @@
                 font-size: 14px;
             }
 
-            .empty-state {
-                padding: 40px 16px;
-            }
-
-            .empty-state .icon {
-                font-size: 48px;
+            #authStatus .user-name {
+                display: none;
             }
         }
     </style>
@@ -553,8 +635,12 @@
                 Doraemon Fansub <span>VN</span>
             </a>
             <div class="header-actions">
-                <div class="avatar" onclick="alert('👤 Trang cá nhân')">D</div>
-                <button class="login-btn" onclick="alert('🔑 Chức năng đăng nhập đang phát triển!')">Đăng nhập</button>
+                <div id="authStatus">
+                    <img id="userAvatar" src="" alt="Avatar">
+                    <span class="user-name" id="userName">User</span>
+                </div>
+                <a href="login.html" class="login-btn" id="loginBtn">🔑 Đăng nhập</a>
+                <button class="logout-btn" id="logoutBtn" onclick="logoutUser()">🚪 Đăng xuất</button>
             </div>
         </div>
     </div>
@@ -571,7 +657,7 @@
         </div>
 
         <!-- CREATE POST -->
-        <div class="create-post">
+        <div class="create-post" id="createPostBox">
             <div class="create-post-top">
                 <div class="avatar">D</div>
                 <input type="text" id="postInput" placeholder="Bạn đang nghĩ gì thế?">
@@ -596,7 +682,7 @@
 
 <script>
     // =============================================
-    // DATA - KHÔNG CÓ BÀI VIẾT MẪU
+    // DATA
     // =============================================
 
     const postsData = [];
@@ -843,7 +929,7 @@
     }
 
     // =============================================
-    // ENTER TO POST
+    // ENTER KEY
     // =============================================
 
     document.getElementById('postInput').addEventListener('keydown', (e) => {
@@ -878,7 +964,6 @@
 
     renderPosts();
     console.log('🎬 Doraemon Fansub Việt Nam đã sẵn sàng!');
-    console.log('📝 Bắt đầu tạo bài viết đầu tiên nào!');
 </script>
 
 </body>
