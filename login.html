@@ -14,8 +14,7 @@
             signInWithEmailAndPassword,
             createUserWithEmailAndPassword,
             sendPasswordResetEmail,
-            onAuthStateChanged,
-            fetchSignInMethodsForEmail
+            onAuthStateChanged
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
 
@@ -29,22 +28,12 @@
             measurementId: "G-0S2Z4XRK0B"
         };
 
-        // Initialize Firebase
-        let app, auth, analytics, provider;
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const analytics = getAnalytics(app);
+        const provider = new GoogleAuthProvider();
 
-        try {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            analytics = getAnalytics(app);
-            provider = new GoogleAuthProvider();
-            console.log('✅ Firebase initialized successfully!');
-        } catch (error) {
-            console.error('❌ Firebase init error:', error);
-            document.getElementById('errorMessage').textContent = '❌ Lỗi khởi tạo Firebase: ' + error.message;
-            document.getElementById('errorMessage').style.display = 'block';
-        }
-
-        // DOM Elements
+        // DOM elements
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
         const forgotForm = document.getElementById('forgotForm');
@@ -68,58 +57,35 @@
         const backToLogin2 = document.getElementById('backToLogin2');
         const domainInfo = document.getElementById('domainInfo');
 
-        // Hiển thị domain hiện tại
+        // Hiển thị domain
         domainInfo.textContent = window.location.hostname;
 
-        function showForm(formToShow) {
+        function showForm(form) {
             loginForm.style.display = 'none';
             registerForm.style.display = 'none';
             forgotForm.style.display = 'none';
-            formToShow.style.display = 'block';
+            form.style.display = 'block';
             clearMessages();
         }
 
-        showRegister.addEventListener('click', (e) => {
-            e.preventDefault();
-            showForm(registerForm);
-        });
+        showRegister.addEventListener('click', (e) => { e.preventDefault(); showForm(registerForm); });
+        showLogin.addEventListener('click', (e) => { e.preventDefault(); showForm(loginForm); });
+        showForgot.addEventListener('click', (e) => { e.preventDefault(); showForm(forgotForm); });
+        backToLogin.addEventListener('click', (e) => { e.preventDefault(); showForm(loginForm); });
+        backToLogin2.addEventListener('click', (e) => { e.preventDefault(); showForm(loginForm); });
 
-        showLogin.addEventListener('click', (e) => {
-            e.preventDefault();
-            showForm(loginForm);
-        });
-
-        showForgot.addEventListener('click', (e) => {
-            e.preventDefault();
-            showForm(forgotForm);
-        });
-
-        backToLogin.addEventListener('click', (e) => {
-            e.preventDefault();
-            showForm(loginForm);
-        });
-
-        backToLogin2.addEventListener('click', (e) => {
-            e.preventDefault();
-            showForm(loginForm);
-        });
-
-        function showError(message) {
-            errorMessage.textContent = message;
+        function showError(msg) {
+            errorMessage.textContent = msg;
             errorMessage.style.display = 'block';
             successMessage.style.display = 'none';
-            setTimeout(() => {
-                errorMessage.style.display = 'none';
-            }, 8000);
+            setTimeout(() => errorMessage.style.display = 'none', 8000);
         }
 
-        function showSuccess(message) {
-            successMessage.textContent = message;
+        function showSuccess(msg) {
+            successMessage.textContent = msg;
             successMessage.style.display = 'block';
             errorMessage.style.display = 'none';
-            setTimeout(() => {
-                successMessage.style.display = 'none';
-            }, 5000);
+            setTimeout(() => successMessage.style.display = 'none', 5000);
         }
 
         function clearMessages() {
@@ -127,13 +93,8 @@
             successMessage.style.display = 'none';
         }
 
-        function showLoading() {
-            loadingOverlay.style.display = 'flex';
-        }
-
-        function hideLoading() {
-            loadingOverlay.style.display = 'none';
-        }
+        function showLoading() { loadingOverlay.style.display = 'flex'; }
+        function hideLoading() { loadingOverlay.style.display = 'none'; }
 
         // ===== LOGIN =====
         loginBtn.addEventListener('click', async (e) => {
@@ -147,87 +108,48 @@
             }
 
             showLoading();
+            loginBtn.disabled = true;
             try {
                 await signInWithEmailAndPassword(auth, email, password);
                 showSuccess('✅ Đăng nhập thành công! Đang chuyển hướng...');
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1500);
+                setTimeout(() => { window.location.href = 'index.html'; }, 1500);
             } catch (error) {
                 console.error('❌ Lỗi đăng nhập:', error);
-                let message = '❌ Đăng nhập thất bại! ';
+                let msg = '❌ Đăng nhập thất bại! ';
                 switch (error.code) {
-                    case 'auth/user-not-found':
-                        message += 'Email chưa được đăng ký. Vui lòng đăng ký tài khoản mới.';
-                        break;
-                    case 'auth/wrong-password':
-                        message += 'Mật khẩu không đúng. Vui lòng thử lại.';
-                        break;
-                    case 'auth/invalid-email':
-                        message += 'Email không hợp lệ. Vui lòng kiểm tra lại.';
-                        break;
-                    case 'auth/too-many-requests':
-                        message += 'Quá nhiều yêu cầu, vui lòng thử lại sau.';
-                        break;
-                    case 'auth/user-disabled':
-                        message += 'Tài khoản đã bị vô hiệu hóa.';
-                        break;
-                    default:
-                        message += error.message;
+                    case 'auth/user-not-found': msg += 'Email chưa được đăng ký.'; break;
+                    case 'auth/wrong-password': msg += 'Mật khẩu không đúng.'; break;
+                    case 'auth/invalid-email': msg += 'Email không hợp lệ.'; break;
+                    case 'auth/too-many-requests': msg += 'Quá nhiều yêu cầu, thử lại sau.'; break;
+                    default: msg += error.message;
                 }
-                showError(message);
+                showError(msg);
             }
+            loginBtn.disabled = false;
             hideLoading();
         });
 
         // ===== GOOGLE LOGIN =====
         googleBtn.addEventListener('click', async () => {
-            if (!auth) {
-                showError('❌ Firebase chưa được khởi tạo!');
-                return;
-            }
-
             showLoading();
             googleBtn.disabled = true;
-            
             try {
-                const result = await signInWithPopup(auth, provider);
-                console.log('✅ Đăng nhập Google thành công:', result.user.displayName);
+                await signInWithPopup(auth, provider);
                 showSuccess('✅ Đăng nhập thành công! Đang chuyển hướng...');
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1500);
+                setTimeout(() => { window.location.href = 'index.html'; }, 1500);
             } catch (error) {
-                console.error('❌ Lỗi đăng nhập Google:', error);
-                let message = '❌ Đăng nhập Google thất bại! ';
-                
+                console.error('❌ Lỗi Google:', error);
+                let msg = '❌ Đăng nhập Google thất bại! ';
                 switch (error.code) {
-                    case 'auth/popup-closed-by-user':
-                        message += 'Bạn đã đóng cửa sổ đăng nhập. Vui lòng thử lại.';
-                        break;
-                    case 'auth/popup-blocked':
-                        message += 'Trình duyệt đã chặn cửa sổ bật lên. Vui lòng cho phép popup và thử lại.';
-                        break;
+                    case 'auth/popup-closed-by-user': msg += 'Bạn đã đóng cửa sổ đăng nhập.'; break;
+                    case 'auth/popup-blocked': msg += 'Trình duyệt chặn popup, vui lòng cho phép.'; break;
                     case 'auth/unauthorized-domain':
-                        message += `
-                            ⚠️ Domain chưa được ủy quyền!
-                            
-                            🔧 Hướng dẫn sửa:
-                            1. Vào Firebase Console → Authentication → Settings
-                            2. Thêm domain: ${window.location.hostname}
-                            3. Lưu lại và đợi 5-10 phút
-                            4. Thử lại!
-                        `;
+                        msg += `\n⚠️ Domain chưa được ủy quyền!\n\n🔧 Hướng dẫn:\n1. Firebase Console → Authentication → Settings\n2. Thêm domain: ${window.location.hostname}\n3. Lưu và đợi 5-10 phút`;
                         break;
-                    case 'auth/account-exists-with-different-credential':
-                        message += 'Email này đã được đăng ký bằng phương thức khác. Vui lòng đăng nhập bằng email/mật khẩu.';
-                        break;
-                    default:
-                        message += error.message;
+                    default: msg += error.message;
                 }
-                showError(message);
+                showError(msg);
             }
-            
             googleBtn.disabled = false;
             hideLoading();
         });
@@ -237,143 +159,86 @@
             e.preventDefault();
             const email = registerEmail.value.trim();
             const password = registerPassword.value.trim();
-            const confirmPassword = registerConfirmPassword.value.trim();
+            const confirm = registerConfirmPassword.value.trim();
 
-            if (!email || !password || !confirmPassword) {
+            if (!email || !password || !confirm) {
                 showError('📝 Vui lòng nhập đầy đủ thông tin!');
                 return;
             }
-
             if (password.length < 6) {
                 showError('🔒 Mật khẩu phải có ít nhất 6 ký tự!');
                 return;
             }
-
-            if (password !== confirmPassword) {
+            if (password !== confirm) {
                 showError('❌ Mật khẩu xác nhận không khớp!');
                 return;
             }
 
             showLoading();
+            registerBtn.disabled = true;
             try {
                 await createUserWithEmailAndPassword(auth, email, password);
                 showSuccess('✅ Đăng ký thành công! Đang chuyển hướng...');
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1500);
+                setTimeout(() => { window.location.href = 'index.html'; }, 1500);
             } catch (error) {
                 console.error('❌ Lỗi đăng ký:', error);
-                let message = '❌ Đăng ký thất bại! ';
+                let msg = '❌ Đăng ký thất bại! ';
                 switch (error.code) {
-                    case 'auth/email-already-in-use':
-                        message += 'Email đã được sử dụng. Vui lòng đăng nhập hoặc dùng email khác.';
-                        break;
-                    case 'auth/invalid-email':
-                        message += 'Email không hợp lệ. Vui lòng kiểm tra lại.';
-                        break;
-                    case 'auth/weak-password':
-                        message += 'Mật khẩu quá yếu. Vui lòng chọn mật khẩu mạnh hơn.';
-                        break;
-                    default:
-                        message += error.message;
+                    case 'auth/email-already-in-use': msg += 'Email đã được sử dụng.'; break;
+                    case 'auth/invalid-email': msg += 'Email không hợp lệ.'; break;
+                    case 'auth/weak-password': msg += 'Mật khẩu quá yếu.'; break;
+                    default: msg += error.message;
                 }
-                showError(message);
+                showError(msg);
             }
+            registerBtn.disabled = false;
             hideLoading();
         });
 
-        // ===== FORGOT PASSWORD =====
+        // ===== FORGOT =====
         forgotBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             const email = forgotEmail.value.trim();
-
             if (!email) {
                 showError('📝 Vui lòng nhập email của bạn!');
                 return;
             }
-
             showLoading();
+            forgotBtn.disabled = true;
             try {
                 await sendPasswordResetEmail(auth, email);
-                showSuccess('✅ Email đặt lại mật khẩu đã được gửi! Vui lòng kiểm tra hộp thư.');
+                showSuccess('✅ Email đặt lại mật khẩu đã được gửi!');
                 forgotEmail.value = '';
-                setTimeout(() => {
-                    showForm(loginForm);
-                }, 3000);
+                setTimeout(() => showForm(loginForm), 3000);
             } catch (error) {
                 console.error('❌ Lỗi gửi email:', error);
-                let message = '❌ Gửi email thất bại! ';
-                if (error.code === 'auth/user-not-found') {
-                    message += 'Email chưa được đăng ký.';
-                } else {
-                    message += error.message;
-                }
-                showError(message);
+                let msg = '❌ Gửi email thất bại! ';
+                if (error.code === 'auth/user-not-found') msg += 'Email chưa được đăng ký.';
+                else msg += error.message;
+                showError(msg);
             }
+            forgotBtn.disabled = false;
             hideLoading();
         });
 
         // ===== ENTER KEY =====
-        emailInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                passwordInput.focus();
+        emailInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); passwordInput.focus(); } });
+        passwordInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); loginBtn.click(); } });
+        registerEmail.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); registerPassword.focus(); } });
+        registerPassword.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); registerConfirmPassword.focus(); } });
+        registerConfirmPassword.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); registerBtn.click(); } });
+        forgotEmail.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); forgotBtn.click(); } });
+
+        // ===== AUTH STATE =====
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Nếu đã đăng nhập, chuyển về index
+                window.location.href = 'index.html';
             }
         });
 
-        passwordInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                loginBtn.click();
-            }
-        });
-
-        registerEmail.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                registerPassword.focus();
-            }
-        });
-
-        registerPassword.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                registerConfirmPassword.focus();
-            }
-        });
-
-        registerConfirmPassword.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                registerBtn.click();
-            }
-        });
-
-        forgotEmail.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                forgotBtn.click();
-            }
-        });
-
-        // ===== CHECK AUTH STATE =====
-        if (auth) {
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    console.log('👤 Đã đăng nhập:', user.email);
-                    // Chỉ chuyển hướng nếu đang ở trang login
-                    if (window.location.pathname.includes('login.html')) {
-                        window.location.href = 'index.html';
-                    }
-                } else {
-                    console.log('👤 Chưa đăng nhập');
-                }
-            });
-        }
-
-        console.log('🔥 Firebase Auth đã sẵn sàng!');
-        console.log('🌐 Domain hiện tại:', window.location.hostname);
-        console.log('📋 Domain Firebase:', firebaseConfig.authDomain);
+        console.log('🔥 Firebase Auth sẵn sàng!');
+        console.log('🌐 Domain:', window.location.hostname);
     </script>
 
     <style>
@@ -406,14 +271,8 @@
         }
 
         @keyframes slideUp {
-            from {
-                transform: translateY(30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         .loading-overlay {
@@ -607,11 +466,6 @@
             transform: none;
         }
 
-        .btn-google img {
-            width: 24px;
-            height: 24px;
-        }
-
         .divider {
             display: flex;
             align-items: center;
@@ -684,29 +538,11 @@
         }
 
         @media (max-width: 480px) {
-            .login-container {
-                padding: 30px 20px;
-            }
-
-            .logo h1 {
-                font-size: 20px;
-            }
-
-            .logo img {
-                width: 50px;
-                height: 50px;
-            }
-
-            .form-links {
-                flex-direction: column;
-                gap: 8px;
-                align-items: center;
-            }
-
-            .help-box {
-                font-size: 12px;
-                padding: 12px;
-            }
+            .login-container { padding: 30px 20px; }
+            .logo h1 { font-size: 20px; }
+            .logo img { width: 50px; height: 50px; }
+            .form-links { flex-direction: column; gap: 8px; align-items: center; }
+            .help-box { font-size: 12px; padding: 12px; }
         }
     </style>
 </head>
@@ -714,25 +550,21 @@
 
 <div class="login-container">
 
-    <!-- Loading -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="spinner"></div>
         <p>⏳ Đang xử lý...</p>
     </div>
 
-    <!-- Logo -->
     <div class="logo">
         <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23ffeb3b'/%3E%3Ccircle cx='35' cy='40' r='8' fill='%231a1a2e'/%3E%3Ccircle cx='65' cy='40' r='8' fill='%231a1a2e'/%3E%3Cellipse cx='50' cy='60' rx='18' ry='12' fill='%231a1a2e'/%3E%3Ccircle cx='50' cy='55' r='6' fill='%23e94560'/%3E%3C/svg%3E" alt="Doraemon">
         <h1>Doraemon <span>Fansub VN</span></h1>
         <p>Đăng nhập để tham gia cộng đồng</p>
     </div>
 
-    <!-- Domain Info -->
     <div class="domain-info">
         🌐 Domain hiện tại: <strong id="domainInfo">loading...</strong>
     </div>
 
-    <!-- Messages -->
     <div class="message error" id="errorMessage"></div>
     <div class="message success" id="successMessage"></div>
 
@@ -749,7 +581,7 @@
         <button type="submit" class="btn-primary" id="loginBtn">Đăng nhập</button>
         <div class="form-links">
             <a href="#" id="showForgot">Quên mật khẩu?</a>
-            <a href="#" id="showRegister">Chưa có tài khoản? Đăng ký</a>
+            <a href="#" id="showRegister">Đăng ký</a>
         </div>
     </form>
 
@@ -785,10 +617,8 @@
         </div>
     </form>
 
-    <!-- Divider -->
     <div class="divider">Hoặc</div>
 
-    <!-- Google Button -->
     <button class="btn-google" id="googleBtn">
         <svg width="24" height="24" viewBox="0 0 48 48">
             <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
@@ -799,16 +629,13 @@
         Đăng nhập với Google
     </button>
 
-    <!-- Help Box -->
     <div class="help-box">
         <strong>⚠️ Lỗi "unauthorized-domain"?</strong><br>
         Thêm domain <strong id="domainInfo2">...</strong> vào Firebase Console:
         <br><br>
-        <strong>1.</strong> Vào <strong>Firebase Console</strong> → Authentication → Settings<br>
+        <strong>1.</strong> Firebase Console → Authentication → Settings<br>
         <strong>2.</strong> Mục <strong>Authorized domains</strong> → Thêm domain<br>
-        <strong>3.</strong> Lưu và đợi <strong>5-10 phút</strong> để cập nhật
-        <br><br>
-        <span style="font-size:12px;color:#999;">💡 Nếu đã thêm rồi, hãy thử xóa cache trình duyệt (Ctrl+Shift+Delete)</span>
+        <strong>3.</strong> Lưu và đợi <strong>5-10 phút</strong>
     </div>
 
     <div style="text-align:center;margin-top:16px;font-size:12px;color:#999;">
@@ -817,7 +644,6 @@
 </div>
 
 <script>
-    // Cập nhật domain
     document.getElementById('domainInfo').textContent = window.location.hostname;
     document.getElementById('domainInfo2').textContent = window.location.hostname;
 </script>
