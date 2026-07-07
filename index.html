@@ -3,19 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng nhập - Doraemon Fansub Việt Nam</title>
+    <title>Doraemon Fansub Việt Nam</title>
     
+    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { 
-            getAuth, 
-            signInWithPopup, 
-            GoogleAuthProvider, 
-            signInWithEmailAndPassword,
-            createUserWithEmailAndPassword,
-            sendPasswordResetEmail,
-            onAuthStateChanged 
-        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
 
         const firebaseConfig = {
@@ -31,256 +24,59 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const analytics = getAnalytics(app);
-        const provider = new GoogleAuthProvider();
 
-        // DOM Elements
-        const loginForm = document.getElementById('loginForm');
-        const registerForm = document.getElementById('registerForm');
-        const forgotForm = document.getElementById('forgotForm');
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
-        const registerEmail = document.getElementById('registerEmail');
-        const registerPassword = document.getElementById('registerPassword');
-        const registerConfirmPassword = document.getElementById('registerConfirmPassword');
-        const forgotEmail = document.getElementById('forgotEmail');
-        const errorMessage = document.getElementById('errorMessage');
-        const successMessage = document.getElementById('successMessage');
-        const loadingOverlay = document.getElementById('loadingOverlay');
+        // DOM
+        const authStatus = document.getElementById('authStatus');
+        const userAvatar = document.getElementById('userAvatar');
+        const userName = document.getElementById('userName');
         const loginBtn = document.getElementById('loginBtn');
-        const googleBtn = document.getElementById('googleBtn');
-        const registerBtn = document.getElementById('registerBtn');
-        const forgotBtn = document.getElementById('forgotBtn');
-        const showRegister = document.getElementById('showRegister');
-        const showLogin = document.getElementById('showLogin');
-        const showForgot = document.getElementById('showForgot');
-        const backToLogin = document.getElementById('backToLogin');
-        const backToLogin2 = document.getElementById('backToLogin2');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const createPostBox = document.getElementById('createPostBox');
+        const postInput = document.getElementById('postInput');
 
-        function showForm(formToShow) {
-            loginForm.style.display = 'none';
-            registerForm.style.display = 'none';
-            forgotForm.style.display = 'none';
-            formToShow.style.display = 'block';
-            clearMessages();
-        }
-
-        showRegister.addEventListener('click', (e) => {
-            e.preventDefault();
-            showForm(registerForm);
-        });
-
-        showLogin.addEventListener('click', (e) => {
-            e.preventDefault();
-            showForm(loginForm);
-        });
-
-        showForgot.addEventListener('click', (e) => {
-            e.preventDefault();
-            showForm(forgotForm);
-        });
-
-        backToLogin.addEventListener('click', (e) => {
-            e.preventDefault();
-            showForm(loginForm);
-        });
-
-        backToLogin2.addEventListener('click', (e) => {
-            e.preventDefault();
-            showForm(loginForm);
-        });
-
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.style.display = 'block';
-            successMessage.style.display = 'none';
-            setTimeout(() => {
-                errorMessage.style.display = 'none';
-            }, 5000);
-        }
-
-        function showSuccess(message) {
-            successMessage.textContent = message;
-            successMessage.style.display = 'block';
-            errorMessage.style.display = 'none';
-            setTimeout(() => {
-                successMessage.style.display = 'none';
-            }, 5000);
-        }
-
-        function clearMessages() {
-            errorMessage.style.display = 'none';
-            successMessage.style.display = 'none';
-        }
-
-        function showLoading() {
-            loadingOverlay.style.display = 'flex';
-        }
-
-        function hideLoading() {
-            loadingOverlay.style.display = 'none';
-        }
-
-        loginBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            const email = emailInput.value.trim();
-            const password = passwordInput.value.trim();
-
-            if (!email || !password) {
-                showError('Vui lòng nhập đầy đủ email và mật khẩu!');
-                return;
-            }
-
-            showLoading();
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                showSuccess('Đăng nhập thành công! Đang chuyển hướng...');
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1500);
-            } catch (error) {
-                let message = 'Đăng nhập thất bại! ';
-                switch (error.code) {
-                    case 'auth/user-not-found':
-                        message += 'Email chưa được đăng ký.';
-                        break;
-                    case 'auth/wrong-password':
-                        message += 'Mật khẩu không đúng.';
-                        break;
-                    case 'auth/invalid-email':
-                        message += 'Email không hợp lệ.';
-                        break;
-                    case 'auth/too-many-requests':
-                        message += 'Quá nhiều yêu cầu, vui lòng thử lại sau.';
-                        break;
-                    default:
-                        message += error.message;
-                }
-                showError(message);
-            }
-            hideLoading();
-        });
-
-        googleBtn.addEventListener('click', async () => {
-            showLoading();
-            try {
-                await signInWithPopup(auth, provider);
-                showSuccess('Đăng nhập thành công! Đang chuyển hướng...');
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1500);
-            } catch (error) {
-                let message = 'Đăng nhập Google thất bại! ';
-                if (error.code === 'auth/popup-closed-by-user') {
-                    message += 'Bạn đã đóng cửa sổ đăng nhập.';
-                } else if (error.code === 'auth/unauthorized-domain') {
-                    message += 'Domain chưa được ủy quyền.';
-                } else {
-                    message += error.message;
-                }
-                showError(message);
-            }
-            hideLoading();
-        });
-
-        registerBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            const email = registerEmail.value.trim();
-            const password = registerPassword.value.trim();
-            const confirmPassword = registerConfirmPassword.value.trim();
-
-            if (!email || !password || !confirmPassword) {
-                showError('Vui lòng nhập đầy đủ thông tin!');
-                return;
-            }
-
-            if (password.length < 6) {
-                showError('Mật khẩu phải có ít nhất 6 ký tự!');
-                return;
-            }
-
-            if (password !== confirmPassword) {
-                showError('Mật khẩu xác nhận không khớp!');
-                return;
-            }
-
-            showLoading();
-            try {
-                await createUserWithEmailAndPassword(auth, email, password);
-                showSuccess('Đăng ký thành công! Đang chuyển hướng...');
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1500);
-            } catch (error) {
-                let message = 'Đăng ký thất bại! ';
-                switch (error.code) {
-                    case 'auth/email-already-in-use':
-                        message += 'Email đã được sử dụng.';
-                        break;
-                    case 'auth/invalid-email':
-                        message += 'Email không hợp lệ.';
-                        break;
-                    case 'auth/weak-password':
-                        message += 'Mật khẩu quá yếu.';
-                        break;
-                    default:
-                        message += error.message;
-                }
-                showError(message);
-            }
-            hideLoading();
-        });
-
-        forgotBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            const email = forgotEmail.value.trim();
-
-            if (!email) {
-                showError('Vui lòng nhập email của bạn!');
-                return;
-            }
-
-            showLoading();
-            try {
-                await sendPasswordResetEmail(auth, email);
-                showSuccess('Email đặt lại mật khẩu đã được gửi!');
-                forgotEmail.value = '';
-                setTimeout(() => {
-                    showForm(loginForm);
-                }, 3000);
-            } catch (error) {
-                let message = 'Gửi email thất bại! ';
-                if (error.code === 'auth/user-not-found') {
-                    message += 'Email chưa được đăng ký.';
-                } else {
-                    message += error.message;
-                }
-                showError(message);
-            }
-            hideLoading();
-        });
-
-        emailInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                passwordInput.focus();
-            }
-        });
-
-        passwordInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                loginBtn.click();
-            }
-        });
-
+        // ===== AUTH STATE =====
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                window.location.href = 'index.html';
+                // Đã đăng nhập
+                authStatus.style.display = 'flex';
+                loginBtn.style.display = 'none';
+                logoutBtn.style.display = 'block';
+                userAvatar.src = user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || user.email);
+                userName.textContent = user.displayName || user.email;
+                createPostBox.style.opacity = '1';
+                createPostBox.style.pointerEvents = 'auto';
+                postInput.placeholder = `${user.displayName || 'Bạn'} đang nghĩ gì thế?`;
+                console.log('✅ Đã đăng nhập:', user.email);
+            } else {
+                // Chưa đăng nhập
+                authStatus.style.display = 'none';
+                loginBtn.style.display = 'block';
+                logoutBtn.style.display = 'none';
+                createPostBox.style.opacity = '0.5';
+                createPostBox.style.pointerEvents = 'none';
+                postInput.placeholder = '🔑 Vui lòng đăng nhập để viết bài';
+                console.log('👤 Chưa đăng nhập');
             }
         });
+
+        // ===== LOGOUT =====
+        window.logoutUser = async function() {
+            try {
+                await signOut(auth);
+                console.log('✅ Đã đăng xuất');
+                window.location.reload();
+            } catch (error) {
+                console.error('❌ Lỗi đăng xuất:', error);
+                alert('Đăng xuất thất bại! Vui lòng thử lại.');
+            }
+        };
     </script>
 
+    <!-- Cloudinary Upload Widget -->
+    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+
     <style>
+        /* ... (giữ nguyên CSS như trước) ... */
         * {
             margin: 0;
             padding: 0;
@@ -289,360 +85,945 @@
         }
 
         body {
-            background: linear-gradient(135deg, #1a73e8, #0d47a1);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .login-container {
-            background: white;
-            border-radius: 24px;
-            padding: 40px 35px;
-            max-width: 440px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            animation: slideUp 0.5s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .loading-overlay {
-            display: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255,255,255,0.9);
-            z-index: 10;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .loading-overlay .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #f0f2f5;
-            border-top: 4px solid #1a73e8;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loading-overlay p {
+            background: #f0f2f5;
             color: #1a1a2e;
-            font-weight: 600;
-            font-size: 15px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1a73e8, #0d47a1);
+            padding: 12px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .container {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .logo {
-            text-align: center;
-            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 800;
+            color: white;
+            text-decoration: none;
         }
 
         .logo img {
-            width: 64px;
-            height: 64px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            background: #ffeb3b;
-            padding: 8px;
-            margin-bottom: 10px;
-        }
-
-        .logo h1 {
-            font-size: 24px;
-            color: #1a1a2e;
-        }
-
-        .logo h1 span {
-            color: #1a73e8;
-        }
-
-        .logo p {
-            color: #666;
-            font-size: 14px;
-            margin-top: 4px;
-        }
-
-        .message {
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 16px;
-            display: none;
-        }
-
-        .message.error {
-            background: #fce8e6;
-            color: #e94560;
-            border: 1px solid #f5c6cb;
-            display: block;
-        }
-
-        .message.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-            display: block;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            font-size: 14px;
-            color: #1a1a2e;
-            margin-bottom: 6px;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e4e6eb;
-            border-radius: 12px;
-            font-size: 15px;
-            transition: 0.3s;
-            outline: none;
-            background: #fafafa;
-        }
-
-        .form-group input:focus {
-            border-color: #1a73e8;
             background: white;
-            box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.1);
+            padding: 4px;
         }
 
-        .btn-primary {
-            width: 100%;
-            padding: 14px;
-            background: #1a73e8;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.3s;
+        .logo span {
+            color: #ffeb3b;
         }
 
-        .btn-primary:hover {
-            background: #1557b0;
-            transform: scale(1.02);
-        }
-
-        .btn-google {
-            width: 100%;
-            padding: 14px;
-            background: white;
-            color: #1a1a2e;
-            border: 2px solid #e4e6eb;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
+        .header-actions {
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 12px;
         }
 
-        .btn-google:hover {
-            background: #f0f2f5;
-            border-color: #1a73e8;
-            transform: scale(1.02);
-        }
-
-        .btn-google img {
-            width: 24px;
-            height: 24px;
-        }
-
-        .divider {
-            display: flex;
+        #authStatus {
+            display: none;
             align-items: center;
-            gap: 15px;
-            margin: 20px 0;
-            color: #999;
-            font-size: 13px;
+            gap: 10px;
+            background: rgba(255,255,255,0.15);
+            padding: 4px 16px 4px 4px;
+            border-radius: 30px;
         }
 
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: #e4e6eb;
+        #authStatus img {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 2px solid #ffeb3b;
+            object-fit: cover;
         }
 
-        .form-footer {
-            text-align: center;
-            margin-top: 16px;
-            font-size: 14px;
-            color: #666;
-        }
-
-        .form-footer a {
-            color: #1a73e8;
-            text-decoration: none;
+        #authStatus .user-name {
+            color: white;
             font-weight: 600;
-        }
-
-        .form-footer a:hover {
-            text-decoration: underline;
-        }
-
-        .form-links {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 12px;
             font-size: 14px;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
-        .form-links a {
-            color: #1a73e8;
+        .login-btn {
+            background: #ffeb3b;
+            color: #0d47a1;
+            border: none;
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.3s;
             text-decoration: none;
-            font-weight: 500;
         }
 
-        .form-links a:hover {
-            text-decoration: underline;
+        .login-btn:hover {
+            transform: scale(1.05);
         }
 
-        #registerForm,
-        #forgotForm {
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.3s;
             display: none;
         }
 
-        @media (max-width: 480px) {
-            .login-container {
-                padding: 30px 20px;
-            }
+        .logout-btn:hover {
+            background: rgba(255,0,0,0.3);
+            border-color: #ff4444;
+        }
 
-            .logo h1 {
-                font-size: 20px;
-            }
+        .main-content {
+            padding: 16px 0 40px;
+        }
 
-            .logo img {
-                width: 50px;
-                height: 50px;
-            }
+        .tabs {
+            display: flex;
+            gap: 0;
+            background: white;
+            border-radius: 16px;
+            padding: 4px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
 
-            .form-links {
-                flex-direction: column;
-                gap: 8px;
-                align-items: center;
-            }
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            font-weight: 600;
+            color: #65676b;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: 0.3s;
+        }
+
+        .tab-btn:hover {
+            background: #f0f2f5;
+        }
+
+        .tab-btn.active {
+            background: #1a73e8;
+            color: white;
+        }
+
+        .create-post {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            transition: 0.3s;
+        }
+
+        .create-post-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .create-post-top .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1a73e8, #0d47a1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .create-post-top input {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            background: #f0f2f5;
+            border-radius: 25px;
+            font-size: 15px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .create-post-top input:focus {
+            background: #e4e6eb;
+        }
+
+        .create-post-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e4e6eb;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 16px;
+        }
+
+        .post-actions button {
+            background: none;
+            border: none;
+            color: #65676b;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .post-actions button:hover {
+            background: #f0f2f5;
+        }
+
+        .post-btn {
+            background: #1a73e8;
+            color: white;
+            border: none;
+            padding: 8px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .post-btn:hover {
+            background: #1557b0;
+        }
+
+        .upload-progress {
+            display: none;
+            margin: 8px 0;
+            padding: 10px 14px;
+            background: #e8f0fe;
+            border-radius: 10px;
+            font-size: 13px;
+            color: #1a73e8;
+        }
+
+        .upload-progress .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #d2e3fc;
+            border-radius: 2px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+
+        .upload-progress .progress-bar .fill {
+            height: 100%;
+            background: #1a73e8;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .upload-preview {
+            display: none;
+            margin: 8px 0;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 1px solid #e4e6eb;
+            position: relative;
+        }
+
+        .upload-preview img {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .upload-preview .remove-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .upload-preview .remove-btn:hover {
+            background: #e94560;
+        }
+
+        .post-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            transition: 0.3s;
+        }
+
+        .post-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .post-header .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .post-header .info {
+            flex: 1;
+        }
+
+        .post-header .info .name {
+            font-weight: 700;
+            font-size: 15px;
+            color: #1a1a2e;
+        }
+
+        .post-header .info .name .badge {
+            display: inline-block;
+            background: #1a73e8;
+            color: white;
+            font-size: 10px;
+            padding: 1px 8px;
+            border-radius: 10px;
+            margin-left: 4px;
+            font-weight: 600;
+        }
+
+        .post-header .info .time {
+            font-size: 13px;
+            color: #65676b;
+        }
+
+        .post-header .more-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #65676b;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .post-header .more-btn:hover {
+            background: #f0f2f5;
+        }
+
+        .post-content {
+            font-size: 15px;
+            line-height: 1.6;
+            margin: 8px 0 12px;
+            color: #1a1a2e;
+        }
+
+        .post-image {
+            width: 100%;
+            border-radius: 12px;
+            margin: 10px 0;
+            max-height: 400px;
+            object-fit: cover;
+        }
+
+        .post-stats {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e4e6eb;
+            font-size: 14px;
+            color: #65676b;
+        }
+
+        .post-stats .likes {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .post-stats .likes .heart {
+            color: #e94560;
+        }
+
+        .post-stats .comments-count {
+            cursor: pointer;
+        }
+
+        .post-stats .comments-count:hover {
+            text-decoration: underline;
+        }
+
+        .post-footer {
+            display: flex;
+            justify-content: space-around;
+            padding-top: 8px;
+        }
+
+        .post-footer button {
+            background: none;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #65676b;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .post-footer button:hover {
+            background: #f0f2f5;
+        }
+
+        .post-footer button.liked {
+            color: #1a73e8;
+        }
+
+        .comments-section {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e4e6eb;
+            display: none;
+        }
+
+        .comments-section.open {
+            display: block;
+        }
+
+        .comment-item {
+            display: flex;
+            gap: 10px;
+            padding: 8px 0;
+        }
+
+        .comment-item .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .comment-item .comment-body {
+            background: #f0f2f5;
+            padding: 8px 14px;
+            border-radius: 16px;
+            flex: 1;
+        }
+
+        .comment-item .comment-body .name {
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .comment-item .comment-body .text {
+            font-size: 14px;
+            color: #1a1a2e;
+        }
+
+        .comment-item .comment-body .time {
+            font-size: 11px;
+            color: #65676b;
+        }
+
+        .comment-input {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .comment-input input {
+            flex: 1;
+            padding: 8px 14px;
+            border: none;
+            background: #f0f2f5;
+            border-radius: 20px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .comment-input button {
+            background: #1a73e8;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .comment-input button:hover {
+            background: #1557b0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+
+        .empty-state .icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: #65676b;
+            font-size: 15px;
+        }
+
+        .color-1 { background: #e94560; }
+        .color-2 { background: #f59e0b; }
+        .color-3 { background: #10b981; }
+        .color-4 { background: #3b82f6; }
+        .color-5 { background: #8b5cf6; }
+        .color-6 { background: #ec4899; }
+        .color-7 { background: #14b8a6; }
+        .color-8 { background: #1a73e8; }
+
+        @media (max-width: 640px) {
+            .container { padding: 0 12px; }
+            .logo { font-size: 16px; }
+            .logo img { width: 30px; height: 30px; }
+            .post-footer button { padding: 8px 12px; font-size: 13px; }
+            .post-actions { gap: 8px; flex-wrap: wrap; }
+            .post-actions button { font-size: 13px; padding: 4px 8px; }
+            .create-post-top input { font-size: 14px; }
+            #authStatus .user-name { display: none; }
         }
     </style>
 </head>
 <body>
 
-<div class="login-container">
-
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="spinner"></div>
-        <p>⏳ Đang xử lý...</p>
+<!-- HEADER -->
+<header>
+    <div class="container">
+        <div class="header-content">
+            <a href="#" class="logo">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23ffeb3b'/%3E%3Ccircle cx='35' cy='40' r='8' fill='%231a1a2e'/%3E%3Ccircle cx='65' cy='40' r='8' fill='%231a1a2e'/%3E%3Cellipse cx='50' cy='60' rx='18' ry='12' fill='%231a1a2e'/%3E%3Ccircle cx='50' cy='55' r='6' fill='%23e94560'/%3E%3C/svg%3E" alt="Doraemon">
+                Doraemon Fansub <span>VN</span>
+            </a>
+            <div class="header-actions">
+                <div id="authStatus">
+                    <img id="userAvatar" src="" alt="Avatar">
+                    <span class="user-name" id="userName">User</span>
+                </div>
+                <a href="login.html" class="login-btn" id="loginBtn">🔑 Đăng nhập</a>
+                <button class="logout-btn" id="logoutBtn" onclick="logoutUser()">🚪 Đăng xuất</button>
+            </div>
+        </div>
     </div>
+</header>
 
-    <div class="logo">
-        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23ffeb3b'/%3E%3Ccircle cx='35' cy='40' r='8' fill='%231a1a2e'/%3E%3Ccircle cx='65' cy='40' r='8' fill='%231a1a2e'/%3E%3Cellipse cx='50' cy='60' rx='18' ry='12' fill='%231a1a2e'/%3E%3Ccircle cx='50' cy='55' r='6' fill='%23e94560'/%3E%3C/svg%3E" alt="Doraemon">
-        <h1>Doraemon <span>Fansub VN</span></h1>
-        <p>Đăng nhập để tham gia cộng đồng</p>
+<!-- MAIN -->
+<main class="main-content">
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab(this, 'latest')">📰 Mới nhất</button>
+            <button class="tab-btn" onclick="switchTab(this, 'following')">👤 Đang theo dõi</button>
+        </div>
+
+        <div class="create-post" id="createPostBox">
+            <div class="create-post-top">
+                <div class="avatar">D</div>
+                <input type="text" id="postInput" placeholder="Bạn đang nghĩ gì thế?">
+            </div>
+            <div class="upload-preview" id="uploadPreview">
+                <img id="previewImage" src="" alt="Preview">
+                <button class="remove-btn" onclick="removeUploadedImage()">✕</button>
+            </div>
+            <div class="upload-progress" id="uploadProgress">
+                <span id="uploadStatus">📤 Đang tải ảnh lên Cloudinary...</span>
+                <div class="progress-bar">
+                    <div class="fill" id="progressFill"></div>
+                </div>
+            </div>
+            <div class="create-post-bottom">
+                <div class="post-actions">
+                    <button onclick="openUploadWidget()">📎 Ảnh/Video</button>
+                    <button onclick="alert('😊 Chức năng đang phát triển!')">😊 Cảm xúc</button>
+                </div>
+                <button class="post-btn" onclick="createPost()">Đăng</button>
+            </div>
+        </div>
+
+        <div id="postList"></div>
     </div>
+</main>
 
-    <div class="message error" id="errorMessage"></div>
-    <div class="message success" id="successMessage"></div>
+<script>
+    // ===== CLOUDINARY CONFIG =====
+    const CLOUDINARY_CONFIG = {
+        cloudName: 'gntkeeno',
+        uploadPreset: 'doraemon_fansub_vn',
+        folder: 'doraemon_fansub_vn'
+    };
 
-    <!-- LOGIN -->
-    <form id="loginForm">
-        <div class="form-group">
-            <label>📧 Email</label>
-            <input type="email" id="email" placeholder="example@email.com" required>
-        </div>
-        <div class="form-group">
-            <label>🔒 Mật khẩu</label>
-            <input type="password" id="password" placeholder="••••••••" required>
-        </div>
-        <button type="submit" class="btn-primary" id="loginBtn">Đăng nhập</button>
-        <div class="form-links">
-            <a href="#" id="showForgot">Quên mật khẩu?</a>
-            <a href="#" id="showRegister">Chưa có tài khoản? Đăng ký</a>
-        </div>
-    </form>
+    let uploadedImageUrl = '';
 
-    <!-- REGISTER -->
-    <form id="registerForm">
-        <div class="form-group">
-            <label>📧 Email</label>
-            <input type="email" id="registerEmail" placeholder="example@email.com" required>
-        </div>
-        <div class="form-group">
-            <label>🔒 Mật khẩu</label>
-            <input type="password" id="registerPassword" placeholder="Tối thiểu 6 ký tự" required>
-        </div>
-        <div class="form-group">
-            <label>✅ Xác nhận mật khẩu</label>
-            <input type="password" id="registerConfirmPassword" placeholder="Nhập lại mật khẩu" required>
-        </div>
-        <button type="submit" class="btn-primary" id="registerBtn">Đăng ký</button>
-        <div class="form-footer">
-            Đã có tài khoản? <a href="#" id="backToLogin">Đăng nhập</a>
-        </div>
-    </form>
+    // ===== OPEN UPLOAD WIDGET =====
+    function openUploadWidget() {
+        const isLoggedIn = document.getElementById('authStatus').style.display === 'flex';
+        if (!isLoggedIn) {
+            alert('🔑 Vui lòng đăng nhập để đăng ảnh!');
+            window.location.href = 'login.html';
+            return;
+        }
 
-    <!-- FORGOT -->
-    <form id="forgotForm">
-        <div class="form-group">
-            <label>📧 Email</label>
-            <input type="email" id="forgotEmail" placeholder="example@email.com" required>
-        </div>
-        <button type="submit" class="btn-primary" id="forgotBtn">Gửi email đặt lại</button>
-        <div class="form-footer">
-            <a href="#" id="backToLogin2">← Quay lại đăng nhập</a>
-        </div>
-    </form>
+        const widget = cloudinary.createUploadWidget(
+            {
+                cloudName: CLOUDINARY_CONFIG.cloudName,
+                uploadPreset: CLOUDINARY_CONFIG.uploadPreset,
+                folder: CLOUDINARY_CONFIG.folder,
+                sources: ['local', 'url', 'camera', 'google_drive'],
+                multiple: false,
+                maxFileSize: 10000000,
+                resourceType: 'auto',
+                clientAllowedFormats: ['image/*', 'video/*'],
+                cropping: true,
+                croppingAspectRatio: 1.91,
+                styles: {
+                    palette: {
+                        window: '#FFFFFF',
+                        sourceBg: '#f0f2f5',
+                        windowBorder: '#e4e6eb',
+                        tabIcon: '#1a73e8',
+                        inactiveTabIcon: '#65676b',
+                        menuIcons: '#1a73e8',
+                        link: '#1a73e8',
+                        action: '#1a73e8',
+                        inProgress: '#1a73e8',
+                        complete: '#34a853',
+                        error: '#e94560',
+                        textDark: '#1a1a2e',
+                        textLight: '#65676b'
+                    }
+                }
+            },
+            (error, result) => {
+                if (error) {
+                    console.error('❌ Lỗi upload:', error);
+                    alert('Upload thất bại! Vui lòng thử lại.');
+                    document.getElementById('uploadProgress').style.display = 'none';
+                    return;
+                }
 
-    <div class="divider">Hoặc</div>
+                if (result.event === 'success') {
+                    uploadedImageUrl = result.info.secure_url;
+                    const preview = document.getElementById('uploadPreview');
+                    const previewImg = document.getElementById('previewImage');
+                    previewImg.src = uploadedImageUrl;
+                    preview.style.display = 'block';
+                    document.getElementById('uploadStatus').textContent = '✅ Đã tải lên Cloudinary thành công!';
+                    document.getElementById('progressFill').style.width = '100%';
+                    setTimeout(() => {
+                        document.getElementById('uploadProgress').style.display = 'none';
+                        document.getElementById('progressFill').style.width = '0%';
+                    }, 2000);
+                }
 
-    <button class="btn-google" id="googleBtn">
-        <svg width="24" height="24" viewBox="0 0 48 48">
-            <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
-            <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
-            <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
-            <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
-        </svg>
-        Đăng nhập với Google
-    </button>
+                if (result.event === 'progress') {
+                    document.getElementById('uploadProgress').style.display = 'block';
+                    const progress = Math.round((result.info.bytesUploaded / result.info.totalBytes) * 100);
+                    document.getElementById('progressFill').style.width = progress + '%';
+                    document.getElementById('uploadStatus').textContent = `📤 Đang tải lên Cloudinary... ${progress}%`;
+                }
 
-    <div style="text-align:center;margin-top:16px;font-size:12px;color:#999;">
-        🔒 Bảo mật bởi Firebase
-    </div>
-</div>
+                if (result.event === 'close') {
+                    document.getElementById('uploadProgress').style.display = 'none';
+                }
+            }
+        );
+        widget.open();
+    }
 
+    function removeUploadedImage() {
+        uploadedImageUrl = '';
+        document.getElementById('uploadPreview').style.display = 'none';
+        document.getElementById('previewImage').src = '';
+    }
+
+    // ===== POST DATA =====
+    const postsData = [];
+    let postIdCounter = 1;
+
+    function renderPosts() {
+        const container = document.getElementById('postList');
+        if (postsData.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="icon">📝</div>
+                    <h3>Chưa có bài viết nào</h3>
+                    <p>Hãy là người đầu tiên chia sẻ điều gì đó!</p>
+                </div>
+            `;
+            return;
+        }
+        container.innerHTML = '';
+        postsData.forEach(post => {
+            const card = document.createElement('div');
+            card.className = 'post-card';
+            const commentsHtml = post.comments.map(c => `
+                <div class="comment-item">
+                    <div class="avatar ${c.color}">${c.avatar}</div>
+                    <div class="comment-body">
+                        <div class="name">${c.user}</div>
+                        <div class="text">${c.text}</div>
+                        <div class="time">${c.time}</div>
+                    </div>
+                </div>
+            `).join('');
+            card.innerHTML = `
+                <div class="post-header">
+                    <div class="avatar ${post.color}">${post.avatar}</div>
+                    <div class="info">
+                        <div class="name">${post.user} <span class="badge">●</span></div>
+                        <div class="time">${post.time}</div>
+                    </div>
+                    <button class="more-btn" onclick="showPostOptions(${post.id})">⋯</button>
+                </div>
+                <div class="post-content">${post.content}</div>
+                ${post.image ? `<img src="${post.image}" alt="Post image" class="post-image">` : ''}
+                <div class="post-stats">
+                    <span class="likes"><span class="heart">❤️</span> ${post.likes}</span>
+                    <span class="comments-count" onclick="toggleComments(${post.id})">${post.comments.length} bình luận</span>
+                </div>
+                <div class="post-footer">
+                    <button onclick="toggleLike(${post.id})" class="${post.liked ? 'liked' : ''}">${post.liked ? '❤️' : '🤍'} Thích</button>
+                    <button onclick="toggleComments(${post.id})">💬 Bình luận</button>
+                    <button onclick="sharePost(${post.id})">📤 Chia sẻ</button>
+                </div>
+                <div class="comments-section ${post.showComments ? 'open' : ''}" id="comments-${post.id}">
+                    ${commentsHtml}
+                    <div class="comment-input">
+                        <input type="text" id="commentInput-${post.id}" placeholder="Viết bình luận...">
+                        <button onclick="addComment(${post.id})">Gửi</button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function createPost() {
+        const isLoggedIn = document.getElementById('authStatus').style.display === 'flex';
+        if (!isLoggedIn) {
+            alert('🔑 Vui lòng đăng nhập để đăng bài!');
+            window.location.href = 'login.html';
+            return;
+        }
+        const input = document.getElementById('postInput');
+        const content = input.value.trim();
+        if (!content && !uploadedImageUrl) {
+            alert('📝 Vui lòng nhập nội dung hoặc chọn ảnh/video!');
+            return;
+        }
+        const newPost = {
+            id: postIdCounter++,
+            user: 'Doraemon Fansub VN',
+            avatar: 'D',
+            color: 'color-1',
+            content: content || '📸 Chia sẻ hình ảnh',
+            image: uploadedImageUrl || '',
+            time: 'Vừa xong',
+            likes: 0,
+            liked: false,
+            comments: [],
+            showComments: false
+        };
+        postsData.unshift(newPost);
+        renderPosts();
+        input.value = '';
+        uploadedImageUrl = '';
+        document.getElementById('uploadPreview').style.display = 'none';
+        document.getElementById('previewImage').src = '';
+        const btn = document.querySelector('.post-btn');
+        btn.textContent = '✅ Đã đăng!';
+        setTimeout(() => btn.textContent = 'Đăng', 1500);
+    }
+
+    function toggleLike(postId) {
+        const post = postsData.find(p => p.id === postId);
+        if (post) {
+            post.liked = !post.liked;
+            post.likes += post.liked ? 1 : -1;
+            renderPosts();
+        }
+    }
+
+    function toggleComments(postId) {
+        const post = postsData.find(p => p.id === postId);
+        if (post) {
+            post.showComments = !post.showComments;
+            renderPosts();
+            setTimeout(() => {
+                const input = document.getElementById(`commentInput-${postId}`);
+                if (input && post.showComments) input.focus();
+            }, 100);
+        }
+    }
+
+    function addComment(postId) {
+        const input = document.getElementById(`commentInput-${postId}`);
+        const text = input.value.trim();
+        if (!text) return;
+        const post = postsData.find(p => p.id === postId);
+        if (post) {
+            post.comments.push({
+                user: 'Doraemon Fansub VN',
+                avatar: 'D',
+                color: 'color-1',
+                text: text,
+                time: 'Vừa xong'
+            });
+            post.showComments = true;
+            input.value = '';
+            renderPosts();
+        }
+    }
+
+    function sharePost(postId) {
+        const post = postsData.find(p => p.id === postId);
+        if (post) {
+            if (navigator.share) {
+                navigator.share({ title: post.user, text: post.content }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(`${post.user}: ${post.content}`)
+                    .then(() => alert('📤 Đã sao chép nội dung!'))
+                    .catch(() => alert('📤 Chia sẻ: ' + post.content));
+            }
+        }
+    }
+
+    function showPostOptions(postId) {
+        const options = ['📝 Sửa', '🗑️ Xóa', '🔕 Ẩn'];
+        const choice = prompt('Chọn hành động:\n' + options.map((o, i) => `${i+1}. ${o}`).join('\n'));
+        if (choice === '2' || choice === '🗑️ Xóa') {
+            if (confirm('Bạn có chắc muốn xóa bài viết này?')) {
+                const index = postsData.findIndex(p => p.id === postId);
+                if (index !== -1) {
+                    postsData.splice(index, 1);
+                    renderPosts();
+                }
+            }
+        } else if (choice === '3' || choice === '🔕 Ẩn') {
+            alert('🔕 Đã ẩn bài viết');
+        } else if (choice === '1' || choice === '📝 Sửa') {
+            const post = postsData.find(p => p.id === postId);
+            if (post) {
+                const newContent = prompt('Sửa nội dung:', post.content);
+                if (newContent !== null && newContent.trim()) {
+                    post.content = newContent.trim();
+                    renderPosts();
+                }
+            }
+        }
+    }
+
+    function switchTab(btn, tab) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if (tab === 'following') {
+            const container = document.getElementById('postList');
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="icon">👤</div>
+                    <h3>Bạn chưa theo dõi ai</h3>
+                    <p>Khám phá những người dùng thú vị và theo dõi họ!</p>
+                </div>
+            `;
+        } else {
+            renderPosts();
+        }
+    }
+
+    document.getElementById('postInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            createPost();
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && e.target.id && e.target.id.startsWith('commentInput-')) {
+            const postId = parseInt(e.target.id.split('-')[1]);
+            addComment(postId);
+        }
+    });
+
+    renderPosts();
+    console.log('🎬 Doraemon Fansub Việt Nam đã sẵn sàng!');
+</script>
 </body>
 </html>
