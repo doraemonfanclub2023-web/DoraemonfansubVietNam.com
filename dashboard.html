@@ -21,6 +21,7 @@
             box-sizing: border-box;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
         }
+
         body {
             background: #f0f2f5;
             display: flex;
@@ -43,31 +44,37 @@
             transition: 0.3s;
             overflow-y: auto;
         }
+
         .sidebar-brand {
             padding: 0 20px 20px 20px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             margin-bottom: 16px;
         }
+
         .sidebar-brand h2 {
             font-size: 20px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
+
         .sidebar-brand h2 span {
             color: #ffeb3b;
         }
+
         .sidebar-brand small {
             font-size: 11px;
             color: rgba(255, 255, 255, 0.4);
             display: block;
             margin-top: 4px;
         }
+
         .sidebar-menu {
             list-style: none;
             padding: 0 10px;
             flex: 1;
         }
+
         .sidebar-menu li {
             padding: 10px 14px;
             border-radius: 10px;
@@ -80,20 +87,24 @@
             color: rgba(255, 255, 255, 0.6);
             font-size: 14px;
         }
+
         .sidebar-menu li:hover {
             background: rgba(255, 255, 255, 0.08);
             color: white;
         }
+
         .sidebar-menu li.active {
             background: rgba(255, 255, 255, 0.12);
             color: white;
             border-left: 3px solid #ffeb3b;
         }
+
         .sidebar-menu li .icon {
             font-size: 18px;
             width: 28px;
             text-align: center;
         }
+
         .sidebar-footer {
             padding: 14px 20px;
             border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -101,6 +112,7 @@
             align-items: center;
             gap: 12px;
         }
+
         .sidebar-footer img {
             width: 36px;
             height: 36px;
@@ -108,18 +120,22 @@
             border: 2px solid #ffeb3b;
             object-fit: cover;
         }
+
         .sidebar-footer .info {
             flex: 1;
         }
+
         .sidebar-footer .info .name {
             font-weight: 600;
             font-size: 13px;
         }
+
         .sidebar-footer .info .email {
             font-size: 11px;
             color: rgba(255, 255, 255, 0.4);
             word-break: break-all;
         }
+
         .sidebar-footer .logout-btn {
             background: rgba(255, 255, 255, 0.1);
             border: none;
@@ -130,6 +146,7 @@
             font-size: 12px;
             transition: 0.3s;
         }
+
         .sidebar-footer .logout-btn:hover {
             background: rgba(255, 0, 0, 0.3);
         }
@@ -141,6 +158,7 @@
             flex: 1;
             width: calc(100% - 250px);
         }
+
         .page-header {
             display: flex;
             justify-content: space-between;
@@ -149,10 +167,12 @@
             flex-wrap: wrap;
             gap: 12px;
         }
+
         .page-header h1 {
             font-size: 26px;
             color: #1a1a2e;
         }
+
         .page-header .admin-badge {
             background: #ffeb3b;
             color: #1a1a2e;
@@ -168,6 +188,7 @@
             gap: 14px;
             margin-bottom: 24px;
         }
+
         .stat-card {
             background: white;
             border-radius: 14px;
@@ -175,20 +196,24 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
             transition: 0.3s;
         }
+
         .stat-card:hover {
             transform: translateY(-3px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
         }
+
         .stat-card .number {
             font-size: 28px;
             font-weight: 800;
             color: #1a73e8;
         }
+
         .stat-card .label {
             font-size: 13px;
             color: #666;
             margin-top: 4px;
         }
+
         .stat-card .icon {
             font-size: 22px;
             margin-bottom: 4px;
@@ -200,6 +225,7 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
             overflow: hidden;
         }
+
         .tab-header {
             display: flex;
             border-bottom: 1px solid #e4e6eb;
@@ -207,6 +233,7 @@
             overflow-x: auto;
             flex-wrap: nowrap;
         }
+
         .tab-btn {
             padding: 12px 20px;
             border: none;
@@ -219,17 +246,21 @@
             transition: 0.3s;
             white-space: nowrap;
         }
+
         .tab-btn:hover {
             background: #f0f2f5;
         }
+
         .tab-btn.active {
             color: #1a73e8;
             border-bottom-color: #1a73e8;
         }
+
         .tab-content {
             padding: 20px 24px;
             display: none;
         }
+
         .tab-content.active {
             display: block;
         }
@@ -242,6 +273,7 @@
             flex-wrap: wrap;
             gap: 10px;
         }
+
         .table-toolbar .title {
             font-weight: 600;
             font-size: 16px;
@@ -262,10 +294,12 @@
             align-items: center;
             gap: 6px;
         }
+
         .btn-primary:hover {
             background: #1557b0;
             transform: scale(1.02);
         }
+
         .btn-danger {
             background: #e94560;
             color: white;
@@ -277,9 +311,11 @@
             font-size: 12px;
             transition: 0.3s;
         }
+
         .btn-danger:hover {
             background: #c62828;
         }
+
         .btn-edit {
             background: #f59e0b;
             color: white;
@@ -292,9 +328,11 @@
             transition: 0.3s;
             margin-right: 4px;
         }
+
         .btn-edit:hover {
             background: #d97706;
         }
+
         .btn-sm {
             padding: 4px 12px;
             font-size: 12px;
@@ -304,6 +342,7 @@
             width: 100%;
             border-collapse: collapse;
         }
+
         table th {
             text-align: left;
             padding: 10px 12px;
@@ -314,20 +353,24 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
+
         table td {
             padding: 10px 12px;
             border-bottom: 1px solid #f0f2f5;
             font-size: 14px;
             vertical-align: middle;
         }
+
         table tr:hover td {
             background: #f8f9fa;
         }
+
         .empty-state {
             text-align: center;
             padding: 40px 20px;
             color: #999;
         }
+
         .empty-state .icon {
             font-size: 40px;
             margin-bottom: 8px;
@@ -347,9 +390,11 @@
             align-items: center;
             backdrop-filter: blur(4px);
         }
+
         .modal-overlay.active {
             display: flex;
         }
+
         .modal-box {
             background: white;
             border-radius: 20px;
@@ -361,6 +406,7 @@
             position: relative;
             animation: slideUp 0.3s ease;
         }
+
         @keyframes slideUp {
             from {
                 transform: translateY(20px);
@@ -371,6 +417,7 @@
                 opacity: 1;
             }
         }
+
         .modal-box .close {
             position: absolute;
             top: 12px;
@@ -382,18 +429,22 @@
             background: none;
             transition: 0.3s;
         }
+
         .modal-box .close:hover {
             transform: rotate(90deg);
             color: #1a1a2e;
         }
+
         .modal-box h2 {
             font-size: 20px;
             margin-bottom: 16px;
             color: #1a1a2e;
         }
+
         .modal-box .form-group {
             margin-bottom: 14px;
         }
+
         .modal-box .form-group label {
             display: block;
             font-weight: 600;
@@ -401,11 +452,13 @@
             margin-bottom: 4px;
             color: #1a1a2e;
         }
+
         .modal-box .form-group label .hint {
             font-weight: 400;
             font-size: 12px;
             color: #999;
         }
+
         .modal-box .form-group input,
         .modal-box .form-group textarea {
             width: 100%;
@@ -416,20 +469,24 @@
             outline: none;
             transition: 0.3s;
         }
+
         .modal-box .form-group input:focus,
         .modal-box .form-group textarea:focus {
             border-color: #1a73e8;
         }
+
         .modal-box .form-group textarea {
             resize: vertical;
             min-height: 60px;
         }
+
         .modal-box .form-group textarea.embed-code {
-            min-height: 80px;
+            min-height: 100px;
             font-family: 'Courier New', monospace;
             font-size: 13px;
             background: #f8f9fa;
         }
+
         .modal-box .form-group .embed-preview {
             display: none;
             margin-top: 10px;
@@ -438,7 +495,9 @@
             border-radius: 10px;
             border: 1px solid #e4e6eb;
             position: relative;
+            overflow: hidden;
         }
+
         .modal-box .form-group .embed-preview iframe,
         .modal-box .form-group .embed-preview video {
             width: 100%;
@@ -446,6 +505,7 @@
             max-height: 250px;
             background: #000;
         }
+
         .modal-box .form-group .embed-preview .remove-btn {
             position: absolute;
             top: 6px;
@@ -460,9 +520,11 @@
             cursor: pointer;
             transition: 0.3s;
         }
+
         .modal-box .form-group .embed-preview .remove-btn:hover {
             background: #e94560;
         }
+
         .modal-box .form-group .embed-help {
             font-size: 12px;
             color: #999;
@@ -472,12 +534,14 @@
             border-radius: 8px;
             border: 1px dashed #e4e6eb;
         }
+
         .modal-box .form-group .embed-help code {
             background: #e4e6eb;
             padding: 2px 8px;
             border-radius: 4px;
             font-size: 12px;
         }
+
         .modal-box .btn-submit {
             width: 100%;
             padding: 12px;
@@ -491,6 +555,7 @@
             transition: 0.3s;
             margin-top: 8px;
         }
+
         .modal-box .btn-submit:hover {
             background: #1557b0;
         }
@@ -512,6 +577,7 @@
             font-size: 14px;
             max-width: 90%;
         }
+
         .toast.show {
             opacity: 1;
             transform: translateY(0);
@@ -568,6 +634,7 @@
                 font-size: 20px;
             }
         }
+
         @media (max-width: 480px) {
             .stats-grid {
                 grid-template-columns: 1fr;
@@ -576,6 +643,7 @@
                 padding: 20px;
             }
         }
+
         ::-webkit-scrollbar {
             width: 5px;
         }
@@ -640,11 +708,6 @@
                 <div style="padding:10px 0;">
                     <h3 style="margin-bottom:8px;">👋 Chào mừng Admin!</h3>
                     <p style="color:#666;font-size:15px;line-height:1.6;">Quản lý nội dung Doraemon Fansub VN tại đây.</p>
-                    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;">
-                        <span style="background:#e8f0fe;padding:6px 14px;border-radius:8px;font-size:13px;">✅ Thêm phim</span>
-                        <span style="background:#e8f0fe;padding:6px 14px;border-radius:8px;font-size:13px;">✅ Xóa bài viết</span>
-                        <span style="background:#e8f0fe;padding:6px 14px;border-radius:8px;font-size:13px;">✅ Quản lý user</span>
-                    </div>
                 </div>
             </div>
 
@@ -713,41 +776,48 @@
             <button class="close" id="closeModal">✕</button>
             <h2 id="modalTitle">Thêm phim mới</h2>
             <form id="movieForm" onsubmit="return false;">
+
                 <div class="form-group">
                     <label>Tên phim *</label>
                     <input type="text" id="movieTitle" placeholder="VD: Doraemon: Nobita và đảo giấu vàng" />
                 </div>
+
                 <div class="form-group">
                     <label>Thể loại *</label>
                     <input type="text" id="movieGenre" placeholder="Phiêu lưu, Hài hước" />
                 </div>
+
                 <div class="form-group">
                     <label>Mô tả *</label>
                     <textarea id="movieDesc" placeholder="Mô tả ngắn về phim..."></textarea>
                 </div>
+
                 <div class="form-group">
                     <label>URL Poster *</label>
                     <input type="url" id="moviePoster" placeholder="https://example.com/poster.jpg" />
                 </div>
+
                 <div class="form-group">
-                    <label>🎬 Mã nhúng video <span class="hint">(Từ YouTube, Cloudinary, Vimeo...)</span></label>
-                    <textarea class="embed-code" id="movieEmbed" placeholder='<iframe src="https://www.youtube.com/embed/xxxxx" frameborder="0" allowfullscreen></iframe>'></textarea>
+                    <label>
+                        🎬 Mã nhúng video 
+                        <span class="hint">(Từ YouTube, Cloudinary, Vimeo, AbyssPlayer...)</span>
+                    </label>
+                    <textarea class="embed-code" id="movieEmbed" placeholder='<iframe width="640" height="360" src="https://abyssplayer.com/d9wfiN-31" frameborder="0" scrolling="0" allowfullscreen></iframe>'></textarea>
+
                     <div class="embed-preview" id="embedPreview">
                         <div id="embedPreviewContent"></div>
                         <button class="remove-btn" id="removeEmbedBtn">✕</button>
                     </div>
+
                     <div class="embed-help">
                         💡 <strong>Hướng dẫn:</strong> Dán mã nhúng từ nguồn video:
-                        <br>• YouTube: Chia sẻ → Nhúng → Copy <code>&lt;iframe&gt;</code>
-                        <br>• Cloudinary: Media Library → Chọn video → Embed
-                        <br>• Vimeo: Chia sẻ → Nhúng → Copy code
+                        <br>• <strong>YouTube:</strong> Chia sẻ → Nhúng → Copy <code>&lt;iframe&gt;</code>
+                        <br>• <strong>Cloudinary:</strong> Media Library → Chọn video → Embed
+                        <br>• <strong>Vimeo:</strong> Chia sẻ → Nhúng → Copy code
+                        <br>• <strong>AbyssPlayer / các nguồn khác:</strong> Copy mã nhúng <code>&lt;iframe&gt;</code>
                     </div>
                 </div>
-                <div class="form-group" style="margin-bottom:0;">
-                    <label>Hoặc nhập link video trực tiếp (URL)</label>
-                    <input type="url" id="movieVideo" placeholder="https://example.com/video.mp4" />
-                    <span style="font-size:12px;color:#999;margin-top:4px;display:block;">* Nếu có mã nhúng, link này không cần nhập</span>
-                </div>
+
                 <button type="button" class="btn-submit" id="submitMovieBtn">💾 Lưu phim</button>
             </form>
         </div>
@@ -795,7 +865,6 @@
         const embedPreview = document.getElementById('embedPreview');
         const embedPreviewContent = document.getElementById('embedPreviewContent');
         const removeEmbedBtn = document.getElementById('removeEmbedBtn');
-        const movieVideoInput = document.getElementById('movieVideo');
 
         // ============================================================
         // TOAST
@@ -830,17 +899,13 @@
         }
 
         // ============================================================
-        // EMBED PREVIEW
+        // EMBED PREVIEW (Chỉ mã nhúng)
         // ============================================================
         function updateEmbedPreview() {
             const embedCode = movieEmbed.value.trim();
             if (embedCode) {
                 embedPreviewContent.innerHTML = embedCode;
                 embedPreview.style.display = 'block';
-                if (embedCode.startsWith('http') && !embedCode.includes('<')) {
-                    embedPreviewContent.innerHTML =
-                        `<video controls style="width:100%;max-height:200px;border-radius:8px;background:#000;"><source src="${embedCode}">Trình duyệt không hỗ trợ video</video>`;
-                }
             } else {
                 embedPreview.style.display = 'none';
                 embedPreviewContent.innerHTML = '';
@@ -897,9 +962,6 @@
             }
         }
 
-        // ============================================================
-        // DELETE POST
-        // ============================================================
         window.deletePost = async function(id) {
             if (!confirm('Xóa bài viết này?')) return;
             try {
@@ -952,9 +1014,6 @@
             }
         }
 
-        // ============================================================
-        // DELETE MOVIE
-        // ============================================================
         window.deleteMovie = async function(id) {
             if (!confirm('Xóa phim này?')) return;
             try {
@@ -966,9 +1025,6 @@
             }
         };
 
-        // ============================================================
-        // EDIT MOVIE
-        // ============================================================
         window.editMovie = async function(id) {
             try {
                 const doc = await db.collection('movies').doc(id).get();
@@ -978,7 +1034,6 @@
                 document.getElementById('movieGenre').value = data.genre || '';
                 document.getElementById('movieDesc').value = data.desc || '';
                 document.getElementById('moviePoster').value = data.poster || '';
-                document.getElementById('movieVideo').value = data.video || '';
                 document.getElementById('movieEmbed').value = data.embed || '';
                 setTimeout(updateEmbedPreview, 100);
 
@@ -992,16 +1047,12 @@
             }
         };
 
-        // ============================================================
-        // ADD MOVIE - Mở modal
-        // ============================================================
         if (addMovieBtn) {
             addMovieBtn.addEventListener('click', function() {
                 document.getElementById('movieTitle').value = '';
                 document.getElementById('movieGenre').value = '';
                 document.getElementById('movieDesc').value = '';
                 document.getElementById('moviePoster').value = '';
-                document.getElementById('movieVideo').value = '';
                 document.getElementById('movieEmbed').value = '';
                 embedPreview.style.display = 'none';
                 embedPreviewContent.innerHTML = '';
@@ -1013,9 +1064,6 @@
             });
         }
 
-        // ============================================================
-        // CLOSE MODAL
-        // ============================================================
         if (closeModalBtn) {
             closeModalBtn.addEventListener('click', function() {
                 modal.classList.remove('active');
@@ -1028,31 +1076,24 @@
             });
         }
 
-        // ============================================================
-        // SUBMIT MOVIE
-        // ============================================================
         if (submitBtn) {
             submitBtn.addEventListener('click', async function() {
                 const title = document.getElementById('movieTitle').value.trim();
                 const genre = document.getElementById('movieGenre').value.trim();
                 const desc = document.getElementById('movieDesc').value.trim();
                 const poster = document.getElementById('moviePoster').value.trim();
-                const video = document.getElementById('movieVideo').value.trim();
                 const embed = document.getElementById('movieEmbed').value.trim();
 
                 if (!title || !genre || !desc || !poster) {
                     showToast('⚠️ Vui lòng nhập đầy đủ thông tin!', true);
                     return;
                 }
-                if (!video && !embed) {
-                    showToast('⚠️ Vui lòng nhập link video hoặc mã nhúng!', true);
+                if (!embed) {
+                    showToast('⚠️ Vui lòng nhập mã nhúng video!', true);
                     return;
                 }
 
-                const data = { title, genre, desc, poster, views: 0 };
-                if (video) data.video = video;
-                if (embed) data.embed = embed;
-
+                const data = { title, genre, desc, poster, embed, views: 0 };
                 const mode = this.dataset.mode;
                 const id = this.dataset.id;
 
@@ -1183,9 +1224,6 @@
             updateStats();
         });
 
-        // ============================================================
-        // LOGOUT
-        // ============================================================
         if (logoutBtn) {
             logoutBtn.addEventListener('click', async function() {
                 try {
@@ -1197,9 +1235,6 @@
             });
         }
 
-        // ============================================================
-        // MOBILE MENU
-        // ============================================================
         if (menuToggle) {
             menuToggle.addEventListener('click', function() {
                 sidebar.classList.toggle('open');
@@ -1253,6 +1288,7 @@
 
         console.log('🔥 Dashboard admin đã sẵn sàng!');
         console.log('👑 Admin:', ADMIN_EMAIL);
+        console.log('📌 Chỉ hỗ trợ mã nhúng video (embed code)');
     </script>
 </body>
 </html>
