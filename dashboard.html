@@ -1,399 +1,18 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - DoraemonFanSub Admin</title>
-    
-    <!-- Firebase SDKs -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
-        import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Doraemon Fansub VN</title>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBt3G9n5JYu3EsvqJR9IoW2vRAc_Es3-ws",
-            authDomain: "doraemon-fansub-vietnam.firebaseapp.com",
-            projectId: "doraemon-fansub-vietnam",
-            storageBucket: "doraemon-fansub-vietnam.firebasestorage.app",
-            messagingSenderId: "380840935390",
-            appId: "1:380840935390:web:60fab4722a9fba5053a74f",
-            measurementId: "G-0S2Z4XRK0B"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const analytics = getAnalytics(app);
-        const db = getFirestore(app);
-
-        // DOM Elements
-        const adminName = document.getElementById('adminName');
-        const adminAvatar = document.getElementById('adminAvatar');
-        const loginRequired = document.getElementById('loginRequired');
-        const dashboardContent = document.getElementById('dashboardContent');
-        const totalPosts = document.getElementById('totalPosts');
-        const totalUsers = document.getElementById('totalUsers');
-        const totalMovies = document.getElementById('totalMovies');
-        const totalViews = document.getElementById('totalViews');
-        const postsTable = document.getElementById('postsTable');
-        const moviesTable = document.getElementById('moviesTable');
-        const tabButtons = document.querySelectorAll('.tab-btn');
-        const tabContents = document.querySelectorAll('.tab-content');
-
-        // State
-        let currentUser = null;
-        let postsData = [];
-        let moviesData = [];
-
-        // ============= AUTH STATE =============
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user;
-                loginRequired.style.display = 'none';
-                dashboardContent.style.display = 'block';
-                adminName.textContent = user.displayName || user.email;
-                adminAvatar.src = user.photoURL || 'https://ui-avatars.com/api/?name=' + (user.displayName || 'Admin');
-                
-                // Check if user is admin (optional: check email)
-                if (user.email !== 'admin@doraemonfansub.com') {
-                    // Still allow access but show warning
-                    console.log('⚠️ User is not admin email');
-                }
-                
-                loadData();
-            } else {
-                loginRequired.style.display = 'flex';
-                dashboardContent.style.display = 'none';
-            }
-        });
-
-        // ============= LOGOUT =============
-        window.logoutAdmin = async function() {
-            try {
-                await signOut(auth);
-                window.location.href = 'index.html';
-            } catch (error) {
-                console.error('Lỗi đăng xuất:', error);
-                alert('Đăng xuất thất bại!');
-            }
-        };
-
-        // ============= LOAD DATA =============
-        async function loadData() {
-            await loadPosts();
-            await loadMovies();
-            updateStats();
-        }
-
-        // ============= LOAD POSTS =============
-        async function loadPosts() {
-            try {
-                const postsRef = collection(db, 'posts');
-                const q = query(postsRef, orderBy('timestamp', 'desc'));
-                const querySnapshot = await getDocs(q);
-                postsData = [];
-                querySnapshot.forEach((doc) => {
-                    postsData.push({ id: doc.id, ...doc.data() });
-                });
-                renderPosts();
-            } catch (error) {
-                console.error('Lỗi tải bài viết:', error);
-                // Fallback: load from localStorage
-                const saved = localStorage.getItem('doraemon_posts');
-                if (saved) {
-                    postsData = JSON.parse(saved);
-                    renderPosts();
-                }
-            }
-        }
-
-        // ============= LOAD MOVIES =============
-        async function loadMovies() {
-            try {
-                const moviesRef = collection(db, 'movies');
-                const querySnapshot = await getDocs(moviesRef);
-                moviesData = [];
-                querySnapshot.forEach((doc) => {
-                    moviesData.push({ id: doc.id, ...doc.data() });
-                });
-                renderMovies();
-            } catch (error) {
-                console.error('Lỗi tải phim:', error);
-                // Fallback
-                const saved = localStorage.getItem('doraemon_movies');
-                if (saved) {
-                    moviesData = JSON.parse(saved);
-                    renderMovies();
-                }
-            }
-        }
-
-        // ============= RENDER POSTS =============
-        function renderPosts() {
-            if (!postsTable) return;
-            
-            if (postsData.length === 0) {
-                postsTable.innerHTML = `
-                    <tr>
-                        <td colspan="5" style="text-align:center;padding:40px;color:#999;">
-                            📝 Chưa có bài viết nào
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-
-            postsTable.innerHTML = postsData.map((post, index) => `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>
-                        <div style="display:flex;align-items:center;gap:8px;">
-                            <div class="avatar-small">${post.user?.[0] || 'D'}</div>
-                            <div>
-                                <div style="font-weight:600;font-size:14px;">${post.user || 'Anonymous'}</div>
-                                <div style="font-size:12px;color:#999;">${post.time || 'Vừa xong'}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-                        ${post.content || ''}
-                    </td>
-                    <td>
-                        <span class="badge ${post.likes > 10 ? 'badge-hot' : 'badge-normal'}">
-                            ❤️ ${post.likes || 0}
-                        </span>
-                    </td>
-                    <td>
-                        <button class="btn-action btn-delete" onclick="deletePost('${post.id}')">🗑️ Xóa</button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        // ============= RENDER MOVIES =============
-        function renderMovies() {
-            if (!moviesTable) return;
-            
-            if (moviesData.length === 0) {
-                moviesTable.innerHTML = `
-                    <tr>
-                        <td colspan="6" style="text-align:center;padding:40px;color:#999;">
-                            🎬 Chưa có phim nào
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-
-            moviesTable.innerHTML = moviesData.map((movie, index) => `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>
-                        <div style="display:flex;align-items:center;gap:8px;">
-                            <img src="${movie.poster || 'https://picsum.photos/seed/default/50/50'}" 
-                                 style="width:40px;height:40px;border-radius:8px;object-fit:cover;">
-                            <span style="font-weight:600;font-size:14px;">${movie.title || 'Untitled'}</span>
-                        </div>
-                    </td>
-                    <td style="font-size:13px;color:#666;">${movie.genre || 'Chưa phân loại'}</td>
-                    <td style="font-size:13px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-                        ${movie.desc || ''}
-                    </td>
-                    <td>
-                        <span class="badge badge-movie">${movie.views || 0} 👁️</span>
-                    </td>
-                    <td>
-                        <button class="btn-action btn-edit" onclick="editMovie('${movie.id}')">✏️ Sửa</button>
-                        <button class="btn-action btn-delete" onclick="deleteMovie('${movie.id}')">🗑️ Xóa</button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        // ============= UPDATE STATS =============
-        function updateStats() {
-            totalPosts.textContent = postsData.length;
-            totalMovies.textContent = moviesData.length;
-            totalUsers.textContent = Math.floor(Math.random() * 100) + 50;
-            totalViews.textContent = moviesData.reduce((sum, m) => sum + (m.views || 0), 0);
-        }
-
-        // ============= DELETE POST =============
-        window.deletePost = async function(postId) {
-            if (!confirm('Bạn có chắc muốn xóa bài viết này?')) return;
-            
-            try {
-                await deleteDoc(doc(db, 'posts', postId));
-                postsData = postsData.filter(p => p.id !== postId);
-                renderPosts();
-                updateStats();
-                showToast('✅ Đã xóa bài viết thành công!');
-            } catch (error) {
-                console.error('Lỗi xóa bài viết:', error);
-                // Fallback: remove from localStorage
-                postsData = postsData.filter(p => p.id !== postId);
-                localStorage.setItem('doraemon_posts', JSON.stringify(postsData));
-                renderPosts();
-                updateStats();
-                showToast('✅ Đã xóa bài viết thành công!');
-            }
-        };
-
-        // ============= DELETE MOVIE =============
-        window.deleteMovie = async function(movieId) {
-            if (!confirm('Bạn có chắc muốn xóa phim này?')) return;
-            
-            try {
-                await deleteDoc(doc(db, 'movies', movieId));
-                moviesData = moviesData.filter(m => m.id !== movieId);
-                renderMovies();
-                updateStats();
-                showToast('✅ Đã xóa phim thành công!');
-            } catch (error) {
-                console.error('Lỗi xóa phim:', error);
-                moviesData = moviesData.filter(m => m.id !== movieId);
-                localStorage.setItem('doraemon_movies', JSON.stringify(moviesData));
-                renderMovies();
-                updateStats();
-                showToast('✅ Đã xóa phim thành công!');
-            }
-        };
-
-        // ============= EDIT MOVIE =============
-        window.editMovie = function(movieId) {
-            const movie = moviesData.find(m => m.id === movieId);
-            if (!movie) return;
-            
-            const title = prompt('Tên phim:', movie.title);
-            if (title === null) return;
-            
-            const genre = prompt('Thể loại:', movie.genre);
-            if (genre === null) return;
-            
-            const desc = prompt('Mô tả:', movie.desc);
-            if (desc === null) return;
-            
-            const poster = prompt('URL Poster:', movie.poster);
-            if (poster === null) return;
-            
-            const video = prompt('URL Video:', movie.video);
-            if (video === null) return;
-            
-            // Update in Firebase
-            updateMovieInFirebase(movieId, { title, genre, desc, poster, video });
-        };
-
-        async function updateMovieInFirebase(movieId, data) {
-            try {
-                await updateDoc(doc(db, 'movies', movieId), data);
-                const movie = moviesData.find(m => m.id === movieId);
-                if (movie) {
-                    Object.assign(movie, data);
-                    renderMovies();
-                    showToast('✅ Đã cập nhật phim thành công!');
-                }
-            } catch (error) {
-                console.error('Lỗi cập nhật phim:', error);
-                const movie = moviesData.find(m => m.id === movieId);
-                if (movie) {
-                    Object.assign(movie, data);
-                    localStorage.setItem('doraemon_movies', JSON.stringify(moviesData));
-                    renderMovies();
-                    showToast('✅ Đã cập nhật phim thành công!');
-                }
-            }
-        }
-
-        // ============= ADD MOVIE =============
-        window.showAddMovieModal = function() {
-            document.getElementById('addMovieModal').classList.add('active');
-        };
-
-        window.closeAddMovieModal = function() {
-            document.getElementById('addMovieModal').classList.remove('active');
-        };
-
-        window.addMovie = async function() {
-            const title = document.getElementById('movieTitle').value.trim();
-            const genre = document.getElementById('movieGenre').value.trim();
-            const desc = document.getElementById('movieDesc').value.trim();
-            const poster = document.getElementById('moviePoster').value.trim();
-            const video = document.getElementById('movieVideo').value.trim();
-
-            if (!title || !genre || !desc || !poster || !video) {
-                alert('Vui lòng nhập đầy đủ thông tin!');
-                return;
-            }
-
-            const newMovie = {
-                title,
-                genre,
-                desc,
-                poster,
-                video,
-                views: 0,
-                timestamp: new Date().toISOString()
-            };
-
-            try {
-                const docRef = await addDoc(collection(db, 'movies'), newMovie);
-                newMovie.id = docRef.id;
-                moviesData.push(newMovie);
-                renderMovies();
-                updateStats();
-                closeAddMovieModal();
-                showToast('✅ Đã thêm phim mới thành công!');
-                
-                // Clear form
-                document.getElementById('movieTitle').value = '';
-                document.getElementById('movieGenre').value = '';
-                document.getElementById('movieDesc').value = '';
-                document.getElementById('moviePoster').value = '';
-                document.getElementById('movieVideo').value = '';
-            } catch (error) {
-                console.error('Lỗi thêm phim:', error);
-                // Fallback: save to localStorage
-                newMovie.id = 'movie_' + Date.now();
-                moviesData.push(newMovie);
-                localStorage.setItem('doraemon_movies', JSON.stringify(moviesData));
-                renderMovies();
-                updateStats();
-                closeAddMovieModal();
-                showToast('✅ Đã thêm phim mới thành công!');
-            }
-        };
-
-        // ============= TOAST NOTIFICATION =============
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-        }
-
-        // ============= TAB SWITCHING =============
-        tabButtons.forEach(btn => {
-            btn.addEventListener('click', function() {
-                tabButtons.forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                
-                const tabName = this.dataset.tab;
-                tabContents.forEach(content => {
-                    content.classList.remove('active');
-                });
-                document.getElementById(tabName + 'Tab').classList.add('active');
-            });
-        });
-
-        // ============= EXPOSE FUNCTIONS TO GLOBAL =============
-        window.db = db;
-        window.auth = auth;
-
-        console.log('🔥 Dashboard Admin đã sẵn sàng!');
-        console.log('👑 Vui lòng đăng nhập với tài khoản admin');
+    <!-- Firebase compat -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js">
     </script>
 
     <style>
@@ -401,257 +20,202 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
         }
 
         body {
             background: #f0f2f5;
+            display: flex;
             min-height: 100vh;
         }
 
-        /* ===== SIDEBAR ===== */
+        /* Sidebar */
         .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 260px;
-            height: 100vh;
+            width: 240px;
             background: linear-gradient(180deg, #1a1a2e, #16213e);
             color: white;
             padding: 20px 0;
-            overflow-y: auto;
-            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 10;
             transition: 0.3s;
         }
 
         .sidebar-brand {
-            padding: 20px 25px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 0 24px 20px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             margin-bottom: 20px;
         }
 
-        .sidebar-brand .logo {
-            font-size: 24px;
-            font-weight: 800;
+        .sidebar-brand h2 {
+            font-size: 22px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .sidebar-brand .logo span {
+        .sidebar-brand h2 span {
             color: #ffeb3b;
         }
 
-        .sidebar-brand .subtitle {
+        .sidebar-brand small {
             font-size: 12px;
-            color: rgba(255,255,255,0.5);
+            color: rgba(255, 255, 255, 0.5);
+            display: block;
             margin-top: 4px;
         }
 
         .sidebar-menu {
             list-style: none;
-            padding: 0;
+            flex: 1;
+            padding: 0 12px;
         }
 
         .sidebar-menu li {
-            padding: 12px 25px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 4px;
             cursor: pointer;
             transition: 0.3s;
             display: flex;
             align-items: center;
             gap: 12px;
-            color: rgba(255,255,255,0.7);
-            border-left: 3px solid transparent;
+            color: rgba(255, 255, 255, 0.7);
         }
 
         .sidebar-menu li:hover {
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.08);
             color: white;
         }
 
         .sidebar-menu li.active {
-            background: rgba(255,255,255,0.08);
+            background: rgba(255, 255, 255, 0.12);
             color: white;
-            border-left-color: #ffeb3b;
-        }
-
-        .sidebar-menu li .icon {
-            font-size: 20px;
-            width: 30px;
-            text-align: center;
+            border-left: 3px solid #ffeb3b;
         }
 
         .sidebar-footer {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 20px 25px;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 16px 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
         .sidebar-footer img {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             border: 2px solid #ffeb3b;
         }
 
-        .sidebar-footer .user-info {
+        .sidebar-footer .info {
             flex: 1;
         }
 
-        .sidebar-footer .user-info .name {
+        .sidebar-footer .info .name {
             font-weight: 600;
             font-size: 14px;
         }
 
-        .sidebar-footer .user-info .email {
+        .sidebar-footer .info .email {
             font-size: 11px;
-            color: rgba(255,255,255,0.5);
+            color: rgba(255, 255, 255, 0.5);
         }
 
         .sidebar-footer .logout-btn {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             border: none;
             color: white;
-            padding: 6px 12px;
+            padding: 4px 12px;
             border-radius: 20px;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 12px;
             transition: 0.3s;
         }
 
         .sidebar-footer .logout-btn:hover {
-            background: rgba(255,0,0,0.3);
+            background: rgba(255, 0, 0, 0.3);
         }
 
-        /* ===== MAIN CONTENT ===== */
-        .main-content {
-            margin-left: 260px;
+        /* Main */
+        .main {
+            margin-left: 240px;
             padding: 30px;
-            min-height: 100vh;
+            flex: 1;
         }
 
-        /* ===== LOGIN REQUIRED ===== */
-        .login-required {
+        .page-header {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            min-height: 60vh;
-            text-align: center;
+            margin-bottom: 24px;
         }
 
-        .login-required .lock-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-        }
-
-        .login-required h2 {
+        .page-header h1 {
             font-size: 28px;
             color: #1a1a2e;
-            margin-bottom: 10px;
         }
 
-        .login-required p {
-            color: #666;
-            margin-bottom: 20px;
-        }
-
-        .login-required .btn-primary {
-            padding: 12px 40px;
-            background: #1a73e8;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            transition: 0.3s;
-        }
-
-        .login-required .btn-primary:hover {
-            background: #1557b0;
-            transform: scale(1.05);
-        }
-
-        /* ===== STATS CARDS ===== */
+        /* Stats */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
             margin-bottom: 30px;
         }
 
         .stat-card {
             background: white;
             border-radius: 16px;
-            padding: 20px 25px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            transition: 0.3s;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
         }
 
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-        }
-
-        .stat-card .stat-icon {
-            font-size: 32px;
-            margin-bottom: 8px;
-        }
-
-        .stat-card .stat-number {
+        .stat-card .number {
             font-size: 28px;
             font-weight: 800;
-            color: #1a1a2e;
+            color: #1a73e8;
         }
 
-        .stat-card .stat-label {
+        .stat-card .label {
             font-size: 14px;
             color: #666;
             margin-top: 4px;
         }
 
-        .stat-card.stat-blue .stat-number { color: #1a73e8; }
-        .stat-card.stat-green .stat-number { color: #34a853; }
-        .stat-card.stat-orange .stat-number { color: #fbbc04; }
-        .stat-card.stat-red .stat-number { color: #e94560; }
-
-        /* ===== TAB SECTION ===== */
+        /* Tab container */
         .tab-container {
             background: white;
             border-radius: 16px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
             overflow: hidden;
         }
 
         .tab-header {
             display: flex;
-            border-bottom: 2px solid #f0f2f5;
+            border-bottom: 1px solid #e4e6eb;
             background: #fafafa;
         }
 
         .tab-btn {
-            padding: 15px 30px;
+            padding: 14px 24px;
             border: none;
             background: none;
-            font-size: 15px;
             font-weight: 600;
+            font-size: 15px;
             color: #666;
             cursor: pointer;
-            transition: 0.3s;
             border-bottom: 3px solid transparent;
+            transition: 0.3s;
         }
 
         .tab-btn:hover {
-            color: #1a1a2e;
-            background: rgba(26, 115, 232, 0.05);
+            background: #f0f2f5;
         }
 
         .tab-btn.active {
@@ -660,50 +224,74 @@
         }
 
         .tab-content {
+            padding: 24px;
             display: none;
-            padding: 25px;
         }
 
         .tab-content.active {
             display: block;
         }
 
-        /* ===== TABLE ===== */
-        .table-header {
+        /* Table */
+        .table-toolbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
         }
 
-        .table-header h3 {
-            font-size: 18px;
-            color: #1a1a2e;
-        }
-
-        .btn-add {
-            padding: 10px 24px;
+        .btn-primary {
             background: #1a73e8;
             color: white;
             border: none;
+            padding: 8px 20px;
             border-radius: 25px;
             font-weight: 600;
             cursor: pointer;
             transition: 0.3s;
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
-        .btn-add:hover {
+        .btn-primary:hover {
             background: #1557b0;
             transform: scale(1.02);
         }
 
-        .table-responsive {
-            overflow-x: auto;
+        .btn-danger {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 4px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: 0.3s;
+        }
+
+        .btn-danger:hover {
+            background: #c62828;
+        }
+
+        .btn-edit {
+            background: #f59e0b;
+            color: white;
+            border: none;
+            padding: 4px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: 0.3s;
+            margin-right: 4px;
+        }
+
+        .btn-edit:hover {
+            background: #d97706;
         }
 
         table {
@@ -711,111 +299,46 @@
             border-collapse: collapse;
         }
 
-        table thead {
-            background: #f8f9fa;
-        }
-
         table th {
-            padding: 12px 15px;
             text-align: left;
+            padding: 10px 12px;
+            background: #f8f9fa;
             font-size: 13px;
-            font-weight: 700;
             color: #666;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         table td {
-            padding: 12px 15px;
+            padding: 10px 12px;
             border-bottom: 1px solid #f0f2f5;
             font-size: 14px;
+            vertical-align: middle;
         }
 
-        table tbody tr:hover {
+        table tr:hover td {
             background: #f8f9fa;
         }
 
-        .avatar-small {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #1a73e8, #0d47a1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 14px;
-            flex-shrink: 0;
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
         }
 
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .badge-hot {
-            background: #fce8e6;
-            color: #e94560;
-        }
-
-        .badge-normal {
-            background: #e8f0fe;
-            color: #1a73e8;
-        }
-
-        .badge-movie {
-            background: #f3e8ff;
-            color: #7c3aed;
-        }
-
-        .btn-action {
-            padding: 6px 14px;
-            border: none;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
-            margin: 2px;
-        }
-
-        .btn-delete {
-            background: #fce8e6;
-            color: #e94560;
-        }
-
-        .btn-delete:hover {
-            background: #e94560;
-            color: white;
-        }
-
-        .btn-edit {
-            background: #e8f0fe;
-            color: #1a73e8;
-        }
-
-        .btn-edit:hover {
-            background: #1a73e8;
-            color: white;
-        }
-
-        /* ===== MODAL ===== */
+        /* Modal */
         .modal-overlay {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 1000;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(5px);
         }
 
         .modal-overlay.active {
@@ -825,18 +348,18 @@
         .modal-box {
             background: white;
             border-radius: 20px;
-            padding: 35px;
+            padding: 30px;
             max-width: 500px;
             width: 92%;
-            position: relative;
-            animation: slideUp 0.3s ease;
             max-height: 90vh;
             overflow-y: auto;
+            position: relative;
+            animation: slideUp 0.3s ease;
         }
 
         @keyframes slideUp {
             from {
-                transform: translateY(30px);
+                transform: translateY(20px);
                 opacity: 0;
             }
             to {
@@ -845,10 +368,10 @@
             }
         }
 
-        .modal-box .close-modal {
+        .modal-box .close {
             position: absolute;
-            top: 15px;
-            right: 20px;
+            top: 12px;
+            right: 18px;
             font-size: 28px;
             cursor: pointer;
             color: #999;
@@ -857,27 +380,25 @@
             transition: 0.3s;
         }
 
-        .modal-box .close-modal:hover {
-            color: #1a1a2e;
+        .modal-box .close:hover {
             transform: rotate(90deg);
+            color: #1a1a2e;
         }
 
         .modal-box h2 {
             font-size: 22px;
-            color: #1a1a2e;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .modal-box .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 14px;
         }
 
         .modal-box .form-group label {
             display: block;
             font-weight: 600;
             font-size: 14px;
-            color: #1a1a2e;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
         .modal-box .form-group input,
@@ -887,8 +408,8 @@
             border: 2px solid #e4e6eb;
             border-radius: 10px;
             font-size: 14px;
-            transition: 0.3s;
             outline: none;
+            transition: 0.3s;
         }
 
         .modal-box .form-group input:focus,
@@ -898,7 +419,7 @@
 
         .modal-box .form-group textarea {
             resize: vertical;
-            min-height: 80px;
+            min-height: 60px;
         }
 
         .modal-box .btn-submit {
@@ -908,32 +429,32 @@
             color: white;
             border: none;
             border-radius: 12px;
-            font-size: 16px;
             font-weight: 700;
+            font-size: 16px;
             cursor: pointer;
             transition: 0.3s;
-            margin-top: 10px;
+            margin-top: 8px;
         }
 
         .modal-box .btn-submit:hover {
             background: #1557b0;
         }
 
-        /* ===== TOAST ===== */
+        /* Toast */
         .toast {
             position: fixed;
             bottom: 30px;
             right: 30px;
             background: #1a1a2e;
             color: white;
-            padding: 15px 30px;
+            padding: 14px 28px;
             border-radius: 12px;
             font-weight: 600;
             z-index: 9999;
             opacity: 0;
             transform: translateY(20px);
             transition: 0.4s;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
         }
 
         .toast.show {
@@ -941,44 +462,47 @@
             transform: translateY(0);
         }
 
-        /* ===== RESPONSIVE ===== */
+        /* Mobile */
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 20;
+            background: #1a1a2e;
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
-                width: 280px;
+                width: 260px;
             }
-
             .sidebar.open {
                 transform: translateX(0);
             }
-
-            .main-content {
+            .main {
                 margin-left: 0;
-                padding: 20px;
+                padding: 16px;
             }
-
             .stats-grid {
                 grid-template-columns: 1fr 1fr;
             }
-
             .tab-btn {
-                padding: 12px 16px;
+                padding: 10px 14px;
                 font-size: 13px;
             }
-
-            .tab-header {
-                overflow-x: auto;
-            }
-
-            .table-header {
+            .table-toolbar {
                 flex-direction: column;
                 align-items: stretch;
             }
-
-            .btn-add {
-                justify-content: center;
-            }
-
             .mobile-menu-btn {
                 display: block !important;
             }
@@ -988,34 +512,11 @@
             .stats-grid {
                 grid-template-columns: 1fr;
             }
-
-            .main-content {
-                padding: 15px;
-            }
-
             .modal-box {
-                padding: 25px 20px;
+                padding: 20px;
             }
         }
 
-        .mobile-menu-btn {
-            display: none;
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            z-index: 101;
-            background: #1a1a2e;
-            color: white;
-            border: none;
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        /* Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -1030,86 +531,418 @@
 </head>
 <body>
 
-<!-- ===== MOBILE MENU BUTTON ===== -->
-<button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+    <!-- Mobile toggle -->
+    <button class="mobile-menu-btn" id="menuToggle">☰</button>
 
-<!-- ===== SIDEBAR ===== -->
-<aside class="sidebar" id="sidebar">
-    <div class="sidebar-brand">
-        <div class="logo">
-            🎬 Doraemon<span>FanSub</span>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <h2>🎬 <span>Doraemon</span> VN</h2>
+            <small>Admin Dashboard</small>
         </div>
-        <div class="subtitle">Admin Dashboard</div>
-    </div>
-
-    <ul class="sidebar-menu">
-        <li class="active" onclick="switchTab('overview')">
-            <span class="icon">📊</span> Tổng quan
-        </li>
-        <li onclick="switchTab('posts')">
-            <span class="icon">📝</span> Quản lý bài viết
-        </li>
-        <li onclick="switchTab('movies')">
-            <span class="icon">🎬</span> Quản lý phim
-        </li>
-        <li onclick="switchTab('users')">
-            <span class="icon">👥</span> Người dùng
-        </li>
-        <li onclick="switchTab('settings')">
-            <span class="icon">⚙️</span> Cài đặt
-        </li>
-    </ul>
-
-    <div class="sidebar-footer">
-        <img id="adminAvatar" src="https://ui-avatars.com/api/?name=Admin" alt="Admin">
-        <div class="user-info">
-            <div class="name" id="adminName">Admin</div>
-            <div class="email">admin@doraemonfansub.com</div>
+        <ul class="sidebar-menu">
+            <li class="active" data-tab="overview"><span>📊</span> Tổng quan</li>
+            <li data-tab="movies"><span>🎬</span> Quản lý phim</li>
+            <li data-tab="posts"><span>📝</span> Quản lý bài viết</li>
+        </ul>
+        <div class="sidebar-footer">
+            <img id="adminAvatar" src="https://ui-avatars.com/api/?name=Admin" alt="avatar" />
+            <div class="info">
+                <div class="name" id="adminName">Admin</div>
+                <div class="email" id="adminEmail">admin@example.com</div>
+            </div>
+            <button class="logout-btn" id="logoutBtn">🚪</button>
         </div>
-        <button class="logout-btn" onclick="logoutAdmin()">🚪</button>
-    </div>
-</aside>
+    </aside>
 
-<!-- ===== MAIN CONTENT ===== -->
-<main class="main-content">
-    
-    <!-- ===== LOGIN REQUIRED ===== -->
-    <div id="loginRequired" class="login-required">
-        <div class="lock-icon">🔐</div>
-        <h2>Yêu cầu đăng nhập</h2>
-        <p>Vui lòng đăng nhập với tài khoản Admin để truy cập Dashboard</p>
-        <a href="index.html" class="btn-primary">🏠 Về trang chủ</a>
-    </div>
+    <!-- Main -->
+    <main class="main">
+        <div class="page-header">
+            <h1>📊 Dashboard</h1>
+            <span style="color:#666;font-size:14px;">Chào mừng admin!</span>
+        </div>
 
-    <!-- ===== DASHBOARD CONTENT ===== -->
-    <div id="dashboardContent" style="display:none;">
-        
-        <!-- Stats -->
         <div class="stats-grid">
-            <div class="stat-card stat-blue">
-                <div class="stat-icon">📝</div>
-                <div class="stat-number" id="totalPosts">0</div>
-                <div class="stat-label">Tổng bài viết</div>
+            <div class="stat-card">
+                <div class="number" id="totalMovies">0</div>
+                <div class="label">🎬 Tổng phim</div>
             </div>
-            <div class="stat-card stat-green">
-                <div class="stat-icon">👥</div>
-                <div class="stat-number" id="totalUsers">0</div>
-                <div class="stat-label">Người dùng</div>
+            <div class="stat-card">
+                <div class="number" id="totalPosts">0</div>
+                <div class="label">📝 Tổng bài viết</div>
             </div>
-            <div class="stat-card stat-orange">
-                <div class="stat-icon">🎬</div>
-                <div class="stat-number" id="totalMovies">0</div>
-                <div class="stat-label">Phim</div>
-            </div>
-            <div class="stat-card stat-red">
-                <div class="stat-icon">👁️</div>
-                <div class="stat-number" id="totalViews">0</div>
-                <div class="stat-label">Lượt xem</div>
+            <div class="stat-card">
+                <div class="number" id="totalUsers">1</div>
+                <div class="label">👤 Admin</div>
             </div>
         </div>
 
-        <!-- Tabs -->
         <div class="tab-container">
             <div class="tab-header">
-                <button class="tab-btn active" data-tab="overview" onclick="switchTab('overview')">📊 Tổng quan</button>
-                <button class="tab-btn" data-tab="posts" onclick="switchTab('posts')">📝 Bài viết</
+                <button class="tab-btn active" data-tab="overview">📊 Tổng quan</button>
+                <button class="tab-btn" data-tab="movies">🎬 Phim</button>
+                <button class="tab-btn" data-tab="posts">📝 Bài viết</button>
+            </div>
+
+            <!-- Overview -->
+            <div class="tab-content active" id="tab-overview">
+                <div style="padding:20px 0;">
+                    <h3 style="margin-bottom:12px;">👋 Chào mừng bạn đến với Dashboard</h3>
+                    <p style="color:#666;">Tại đây bạn có thể quản lý toàn bộ nội dung của Doraemon Fansub VN.</p>
+                    <ul style="margin-top:16px;list-style:none;display:flex;gap:16px;flex-wrap:wrap;">
+                        <li style="background:#e8f0fe;padding:10px 18px;border-radius:12px;">✅ Thêm phim mới</li>
+                        <li style="background:#e8f0fe;padding:10px 18px;border-radius:12px;">✅ Sửa / Xóa phim</li>
+                        <li style="background:#e8f0fe;padding:10px 18px;border-radius:12px;">✅ Xóa bài viết</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Movies -->
+            <div class="tab-content" id="tab-movies">
+                <div class="table-toolbar">
+                    <span style="font-weight:600;font-size:16px;">🎬 Danh sách phim</span>
+                    <button class="btn-primary" id="addMovieBtn">➕ Thêm phim</button>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead>
+                            <tr><th>#</th><th>Tên phim</th><th>Thể loại</th><th>Lượt xem</th><th>Hành động</th></tr>
+                        </thead>
+                        <tbody id="moviesTableBody">
+                            <tr><td colspan="5" class="empty-state">⏳ Đang tải...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Posts -->
+            <div class="tab-content" id="tab-posts">
+                <div class="table-toolbar">
+                    <span style="font-weight:600;font-size:16px;">📝 Danh sách bài viết</span>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead>
+                            <tr><th>#</th><th>Người đăng</th><th>Nội dung</th><th>Thời gian</th><th>Hành động</th></tr>
+                        </thead>
+                        <tbody id="postsTableBody">
+                            <tr><td colspan="5" class="empty-state">⏳ Đang tải...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="movieModal">
+        <div class="modal-box">
+            <button class="close" id="closeModal">✕</button>
+            <h2 id="modalTitle">Thêm phim mới</h2>
+            <form id="movieForm" onsubmit="return false;">
+                <div class="form-group">
+                    <label>Tên phim</label>
+                    <input type="text" id="movieTitle" placeholder="VD: Doraemon: Nobita và đảo giấu vàng" required />
+                </div>
+                <div class="form-group">
+                    <label>Thể loại</label>
+                    <input type="text" id="movieGenre" placeholder="Phiêu lưu, Hài hước" required />
+                </div>
+                <div class="form-group">
+                    <label>Mô tả</label>
+                    <textarea id="movieDesc" placeholder="Mô tả ngắn về phim..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>URL Poster</label>
+                    <input type="url" id="moviePoster" placeholder="https://example.com/poster.jpg" required />
+                </div>
+                <div class="form-group">
+                    <label>URL Video</label>
+                    <input type="url" id="movieVideo" placeholder="https://example.com/video.mp4" required />
+                </div>
+                <button type="button" class="btn-submit" id="submitMovieBtn">💾 Lưu phim</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ============================================================
+        // FIREBASE
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyBt3G9n5JYu3EsvqJR9IoW2vRAc_Es3-ws",
+            authDomain: "doraemon-fansub-vietnam.firebaseapp.com",
+            projectId: "doraemon-fansub-vietnam",
+            storageBucket: "doraemon-fansub-vietnam.firebasestorage.app",
+            messagingSenderId: "380840935390",
+            appId: "1:380840935390:web:60fab4722a9fba5053a74f",
+            measurementId: "G-0S2Z4XRK0B"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const ADMIN_EMAIL = 'tuankhaimoi12345@gmail.com';
+
+        // DOM refs
+        const sidebar = document.getElementById('sidebar');
+        const menuToggle = document.getElementById('menuToggle');
+        const adminName = document.getElementById('adminName');
+        const adminEmail = document.getElementById('adminEmail');
+        const adminAvatar = document.getElementById('adminAvatar');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const toast = document.getElementById('toast');
+        const modal = document.getElementById('movieModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const submitBtn = document.getElementById('submitMovieBtn');
+        const closeModalBtn = document.getElementById('closeModal');
+
+        // ============================================================
+        // AUTH CHECK
+        // ============================================================
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            if (user.email !== ADMIN_EMAIL) {
+                alert('⚠️ Bạn không có quyền truy cập Dashboard!');
+                window.location.href = 'index.html';
+                return;
+            }
+            adminName.textContent = user.displayName || 'Admin';
+            adminEmail.textContent = user.email;
+            adminAvatar.src = user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName ||
+                'Admin');
+
+            loadMovies();
+            loadPosts();
+        });
+
+        // Logout
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await auth.signOut();
+                window.location.href = 'index.html';
+            } catch (e) {
+                showToast('❌ Đăng xuất thất bại');
+            }
+        });
+
+        // Mobile menu
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+        });
+
+        // Tabs
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const tab = this.dataset.tab;
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                document.getElementById('tab-' + tab).classList.add('active');
+                document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
+                document.querySelector(`.sidebar-menu li[data-tab="${tab}"]`).classList.add('active');
+            });
+        });
+
+        document.querySelectorAll('.sidebar-menu li').forEach(li => {
+            li.addEventListener('click', function() {
+                const tab = this.dataset.tab;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                document.getElementById('tab-' + tab).classList.add('active');
+                document.querySelectorAll('.sidebar-menu li').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+                if (window.innerWidth <= 768) sidebar.classList.remove('open');
+            });
+        });
+
+        // Toast
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // ============================================================
+        // MOVIES CRUD
+        // ============================================================
+        async function loadMovies() {
+            const tbody = document.getElementById('moviesTableBody');
+            try {
+                const snapshot = await db.collection('movies').orderBy('timestamp', 'desc').get();
+                if (snapshot.empty) {
+                    tbody.innerHTML =
+                    `<tr><td colspan="5" class="empty-state">🎬 Chưa có phim nào</td></tr>`;
+                    document.getElementById('totalMovies').textContent = '0';
+                    return;
+                }
+                let html = '',
+                    count = 0;
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    count++;
+                    html += `
+                        <tr>
+                            <td>${count}</td>
+                            <td><strong>${data.title || 'Untitled'}</strong></td>
+                            <td>${data.genre || 'Chưa phân loại'}</td>
+                            <td>${data.views || 0} 👁️</td>
+                            <td>
+                                <button class="btn-edit" onclick="editMovie('${doc.id}')">✏️ Sửa</button>
+                                <button class="btn-danger" onclick="deleteMovie('${doc.id}')">🗑️ Xóa</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = html;
+                document.getElementById('totalMovies').textContent = count;
+            } catch (e) {
+                console.error(e);
+                tbody.innerHTML =
+                    `<tr><td colspan="5" class="empty-state">❌ Lỗi tải dữ liệu: ${e.message}</td></tr>`;
+            }
+        }
+
+        window.deleteMovie = async function(id) {
+            if (!confirm('Bạn có chắc muốn xóa phim này?')) return;
+            try {
+                await db.collection('movies').doc(id).delete();
+                showToast('✅ Đã xóa phim!');
+                loadMovies();
+            } catch (e) {
+                showToast('❌ Lỗi xóa: ' + e.message);
+            }
+        };
+
+        window.editMovie = async function(id) {
+            try {
+                const doc = await db.collection('movies').doc(id).get();
+                if (!doc.exists) return;
+                const data = doc.data();
+                document.getElementById('movieTitle').value = data.title || '';
+                document.getElementById('movieGenre').value = data.genre || '';
+                document.getElementById('movieDesc').value = data.desc || '';
+                document.getElementById('moviePoster').value = data.poster || '';
+                document.getElementById('movieVideo').value = data.video || '';
+                modalTitle.textContent = '✏️ Sửa phim';
+                submitBtn.textContent = '💾 Cập nhật';
+                submitBtn.dataset.mode = 'edit';
+                submitBtn.dataset.id = id;
+                modal.classList.add('active');
+            } catch (e) {
+                showToast('❌ Lỗi tải dữ liệu: ' + e.message);
+            }
+        };
+
+        document.getElementById('addMovieBtn').addEventListener('click', () => {
+            document.getElementById('movieTitle').value = '';
+            document.getElementById('movieGenre').value = '';
+            document.getElementById('movieDesc').value = '';
+            document.getElementById('moviePoster').value = '';
+            document.getElementById('movieVideo').value = '';
+            modalTitle.textContent = '➕ Thêm phim mới';
+            submitBtn.textContent = '💾 Lưu phim';
+            submitBtn.dataset.mode = 'add';
+            submitBtn.dataset.id = '';
+            modal.classList.add('active');
+        });
+
+        closeModalBtn.addEventListener('click', () => modal.classList.remove('active'));
+        modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
+
+        submitBtn.addEventListener('click', async function() {
+            const title = document.getElementById('movieTitle').value.trim();
+            const genre = document.getElementById('movieGenre').value.trim();
+            const desc = document.getElementById('movieDesc').value.trim();
+            const poster = document.getElementById('moviePoster').value.trim();
+            const video = document.getElementById('movieVideo').value.trim();
+
+            if (!title || !genre || !desc || !poster || !video) {
+                showToast('⚠️ Vui lòng nhập đầy đủ thông tin!');
+                return;
+            }
+
+            const data = { title, genre, desc, poster, video, views: 0 };
+            const mode = this.dataset.mode;
+            const id = this.dataset.id;
+
+            try {
+                if (mode === 'edit') {
+                    await db.collection('movies').doc(id).update(data);
+                    showToast('✅ Cập nhật phim thành công!');
+                } else {
+                    await db.collection('movies').add({
+                        ...data,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    showToast('✅ Thêm phim thành công!');
+                }
+                modal.classList.remove('active');
+                loadMovies();
+            } catch (e) {
+                showToast('❌ Lỗi: ' + e.message);
+            }
+        });
+
+        // ============================================================
+        // POSTS (chỉ xóa)
+        // ============================================================
+        async function loadPosts() {
+            const tbody = document.getElementById('postsTableBody');
+            try {
+                const snapshot = await db.collection('posts').orderBy('timestamp', 'desc').get();
+                if (snapshot.empty) {
+                    tbody.innerHTML =
+                    `<tr><td colspan="5" class="empty-state">📝 Chưa có bài viết nào</td></tr>`;
+                    document.getElementById('totalPosts').textContent = '0';
+                    return;
+                }
+                let html = '',
+                    count = 0;
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    count++;
+                    html += `
+                        <tr>
+                            <td>${count}</td>
+                            <td>${data.user || 'Anonymous'}</td>
+                            <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${data.content || ''}</td>
+                            <td>${data.time || 'Vừa xong'}</td>
+                            <td>
+                                <button class="btn-danger" onclick="deletePost('${doc.id}')">🗑️ Xóa</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = html;
+                document.getElementById('totalPosts').textContent = count;
+            } catch (e) {
+                console.error(e);
+                tbody.innerHTML =
+                    `<tr><td colspan="5" class="empty-state">❌ Lỗi tải dữ liệu: ${e.message}</td></tr>`;
+            }
+        }
+
+        window.deletePost = async function(id) {
+            if (!confirm('Bạn có chắc muốn xóa bài viết này?')) return;
+            try {
+                await db.collection('posts').doc(id).delete();
+                showToast('✅ Đã xóa bài viết!');
+                loadPosts();
+            } catch (e) {
+                showToast('❌ Lỗi xóa: ' + e.message);
+            }
+        };
+
+        console.log('🔥 Dashboard admin đã sẵn sàng!');
+        console.log('👑 Admin:', ADMIN_EMAIL);
+    </script>
+</body>
+</html>
