@@ -1155,19 +1155,31 @@
         }
 
         // ============================================================
-        // OPEN MOVIE MODAL
+        // OPEN MOVIE MODAL (Sửa lỗi)
         // ============================================================
         async function openMovieModal(movieId) {
             try {
+                // Lấy thông tin phim
                 const doc = await db.collection('movies').doc(movieId).get();
-                if (!doc.exists) return;
+
+                if (!doc.exists) {
+                    alert('❌ Phim không tồn tại!');
+                    return;
+                }
+
                 const m = doc.data();
 
-                // Tăng lượt xem
-                await db.collection('movies').doc(movieId).update({
-                    views: (m.views || 0) + 1
-                });
+                // Tăng lượt xem (có xử lý lỗi)
+                try {
+                    await db.collection('movies').doc(movieId).update({
+                        views: (m.views || 0) + 1
+                    });
+                } catch (updateError) {
+                    console.warn('Không thể cập nhật lượt xem:', updateError);
+                    // Vẫn tiếp tục mở phim
+                }
 
+                // Xây dựng nội dung video
                 let videoContent = '';
                 if (m.embed) {
                     videoContent = m.embed;
@@ -1182,15 +1194,17 @@
                     videoContent = `<p style="color:#999;text-align:center;">Không có video</p>`;
                 }
 
+                // Tạo modal
                 const modal = document.createElement('div');
                 modal.style.cssText = `
                     position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);
                     z-index:9999;display:flex;justify-content:center;align-items:center;
                     backdrop-filter:blur(5px);padding:20px;
                 `;
+
                 modal.innerHTML = `
                     <div style="background:#1a1a2e;border-radius:20px;padding:30px;max-width:800px;width:100%;max-height:90vh;overflow-y:auto;position:relative;">
-                        <button onclick="this.parentElement.parentElement.remove()" 
+                        <button onclick="this.closest('div[style*="fixed"]').remove()" 
                                 style="position:absolute;top:12px;right:18px;background:rgba(255,255,255,0.1);border:none;color:white;font-size:28px;cursor:pointer;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:0.3s;"
                                 onmouseover="this.style.background='rgba(255,0,0,0.3)'"
                                 onmouseout="this.style.background='rgba(255,255,255,0.1)'">✕</button>
@@ -1206,18 +1220,30 @@
                         </div>
                     </div>
                 `;
+
+                // Đóng modal khi click bên ngoài
                 modal.addEventListener('click', (e) => {
                     if (e.target === modal) modal.remove();
                 });
+
                 document.body.appendChild(modal);
 
+                // Tự động phát video
                 const video = modal.querySelector('video');
-                if (video) setTimeout(() => video.play(), 500);
+                if (video) {
+                    try {
+                        await video.play();
+                    } catch (playError) {
+                        console.log('Video không tự động phát được:', playError);
+                    }
+                }
 
+                // Cập nhật danh sách phim sau 2 giây
                 setTimeout(loadMovies, 2000);
+
             } catch (e) {
-                console.error(e);
-                alert('❌ Lỗi mở phim: ' + e.message);
+                console.error('Lỗi mở phim:', e);
+                alert('❌ Lỗi mở phim: ' + (e.message || 'Không thể tải phim. Vui lòng thử lại.'));
             }
         }
 
@@ -1245,8 +1271,7 @@
         console.log('👑 Admin:', ADMIN_EMAIL);
         console.log('📌 Nếu gặp lỗi "Missing or insufficient permissions":');
         console.log('   Vào Firebase Console → Firestore → Rules');
-        console.log('   Thay bằng: allow read: if true;');
-        console.log('   allow write: if request.auth != null && request.auth.token.email == "' + ADMIN_EMAIL + '";');
+        console.log('   Thêm rules cho từng collection như hướng dẫn.');
     </script>
 </body>
 </html>
