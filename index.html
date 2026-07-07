@@ -632,6 +632,126 @@
             }
         }
 
+        /* Movie Modal */
+        .movie-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            padding: 20px;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .movie-modal-content {
+            background: #1a1a2e;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: modalSlideUp 0.3s ease;
+        }
+
+        @keyframes modalSlideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .movie-modal-close {
+            position: absolute;
+            top: 12px;
+            right: 18px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+            z-index: 10;
+        }
+
+        .movie-modal-close:hover {
+            background: rgba(255, 0, 0, 0.4);
+            transform: rotate(90deg);
+        }
+
+        .movie-modal-content h2 {
+            color: white;
+            margin-bottom: 6px;
+            font-size: 22px;
+        }
+
+        .movie-modal-content .genre-tag {
+            color: #ffeb3b;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .movie-modal-content .desc {
+            color: #ccc;
+            margin: 10px 0 16px 0;
+            line-height: 1.6;
+        }
+
+        .movie-modal-content .video-wrapper {
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .movie-modal-content .video-wrapper video {
+            width: 100%;
+            display: block;
+            max-height: 60vh;
+        }
+
+        .movie-modal-content .video-wrapper iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+            display: block;
+        }
+
+        .movie-modal-content .movie-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+            color: #999;
+            font-size: 13px;
+        }
+
         /* Colors */
         .color-1 {
             background: #e94560;
@@ -690,6 +810,19 @@
             }
             .movie-grid {
                 grid-template-columns: 1fr;
+            }
+            .movie-modal-content {
+                padding: 20px;
+            }
+            .movie-modal-content .video-wrapper iframe {
+                height: 250px;
+            }
+            .movie-modal-close {
+                top: 8px;
+                right: 12px;
+                width: 34px;
+                height: 34px;
+                font-size: 22px;
             }
         }
 
@@ -1155,11 +1288,10 @@
         }
 
         // ============================================================
-        // OPEN MOVIE MODAL (Sửa lỗi)
+        // OPEN MOVIE MODAL (ĐÃ SỬA NÚT ĐÓNG)
         // ============================================================
         async function openMovieModal(movieId) {
             try {
-                // Lấy thông tin phim
                 const doc = await db.collection('movies').doc(movieId).get();
 
                 if (!doc.exists) {
@@ -1169,64 +1301,80 @@
 
                 const m = doc.data();
 
-                // Tăng lượt xem (có xử lý lỗi)
+                // Tăng lượt xem
                 try {
                     await db.collection('movies').doc(movieId).update({
                         views: (m.views || 0) + 1
                     });
                 } catch (updateError) {
                     console.warn('Không thể cập nhật lượt xem:', updateError);
-                    // Vẫn tiếp tục mở phim
                 }
 
                 // Xây dựng nội dung video
                 let videoContent = '';
                 if (m.embed) {
-                    videoContent = m.embed;
+                    videoContent = `<div class="video-wrapper">${m.embed}</div>`;
                 } else if (m.video) {
                     videoContent = `
-                        <video controls style="width:100%;border-radius:12px;background:#000;max-height:70vh;">
-                            <source src="${m.video}">
-                            Trình duyệt không hỗ trợ video
-                        </video>
+                        <div class="video-wrapper">
+                            <video controls>
+                                <source src="${m.video}">
+                                Trình duyệt không hỗ trợ video
+                            </video>
+                        </div>
                     `;
                 } else {
-                    videoContent = `<p style="color:#999;text-align:center;">Không có video</p>`;
+                    videoContent = `<p style="color:#999;text-align:center;padding:20px;">Không có video</p>`;
                 }
 
-                // Tạo modal
+                // Tạo modal với cấu trúc rõ ràng
                 const modal = document.createElement('div');
-                modal.style.cssText = `
-                    position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);
-                    z-index:9999;display:flex;justify-content:center;align-items:center;
-                    backdrop-filter:blur(5px);padding:20px;
-                `;
+                modal.className = 'movie-modal-overlay';
+                modal.setAttribute('id', 'movieModal');
 
                 modal.innerHTML = `
-                    <div style="background:#1a1a2e;border-radius:20px;padding:30px;max-width:800px;width:100%;max-height:90vh;overflow-y:auto;position:relative;">
-                        <button onclick="this.closest('div[style*="fixed"]').remove()" 
-                                style="position:absolute;top:12px;right:18px;background:rgba(255,255,255,0.1);border:none;color:white;font-size:28px;cursor:pointer;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:0.3s;"
-                                onmouseover="this.style.background='rgba(255,0,0,0.3)'"
-                                onmouseout="this.style.background='rgba(255,255,255,0.1)'">✕</button>
-                        <h2 style="color:white;margin-bottom:6px;">${m.title || 'Phim'}</h2>
-                        <span style="color:#ffeb3b;font-size:14px;font-weight:600;">${m.genre || ''}</span>
-                        <p style="color:#ccc;margin:10px 0 16px 0;line-height:1.6;">${m.desc || ''}</p>
-                        <div style="border-radius:12px;overflow:hidden;background:#000;">
-                            ${videoContent}
-                        </div>
-                        <div style="display:flex;justify-content:space-between;margin-top:12px;color:#999;font-size:13px;">
+                    <div class="movie-modal-content">
+                        <button class="movie-modal-close" id="modalCloseBtn">✕</button>
+                        <h2>${m.title || 'Phim'}</h2>
+                        <span class="genre-tag">${m.genre || ''}</span>
+                        <p class="desc">${m.desc || ''}</p>
+                        ${videoContent}
+                        <div class="movie-footer">
                             <span>👁️ ${(m.views || 0) + 1} lượt xem</span>
                             <span>🎬 Doraemon Fansub VN</span>
                         </div>
                     </div>
                 `;
 
-                // Đóng modal khi click bên ngoài
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) modal.remove();
+                // Thêm modal vào body
+                document.body.appendChild(modal);
+
+                // Lấy các phần tử trong modal
+                const closeBtn = document.getElementById('modalCloseBtn');
+
+                // Sự kiện đóng modal - CÁCH 1: Click vào nút X
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        closeMovieModal(modal);
+                    });
+                }
+
+                // Sự kiện đóng modal - CÁCH 2: Click ra ngoài
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        closeMovieModal(modal);
+                    }
                 });
 
-                document.body.appendChild(modal);
+                // Sự kiện đóng modal - CÁCH 3: Nhấn phím ESC
+                const escHandler = function(e) {
+                    if (e.key === 'Escape') {
+                        closeMovieModal(modal);
+                        document.removeEventListener('keydown', escHandler);
+                    }
+                };
+                document.addEventListener('keydown', escHandler);
 
                 // Tự động phát video
                 const video = modal.querySelector('video');
@@ -1244,6 +1392,22 @@
             } catch (e) {
                 console.error('Lỗi mở phim:', e);
                 alert('❌ Lỗi mở phim: ' + (e.message || 'Không thể tải phim. Vui lòng thử lại.'));
+            }
+        }
+
+        // ============================================================
+        // HÀM ĐÓNG MODAL
+        // ============================================================
+        function closeMovieModal(modalElement) {
+            if (modalElement && modalElement.parentNode) {
+                // Dừng video nếu có
+                const video = modalElement.querySelector('video');
+                if (video) {
+                    video.pause();
+                    video.currentTime = 0;
+                }
+                // Xóa modal
+                modalElement.remove();
             }
         }
 
@@ -1269,9 +1433,6 @@
         // ============================================================
         console.log('🎬 Doraemon Fansub VN đã sẵn sàng!');
         console.log('👑 Admin:', ADMIN_EMAIL);
-        console.log('📌 Nếu gặp lỗi "Missing or insufficient permissions":');
-        console.log('   Vào Firebase Console → Firestore → Rules');
-        console.log('   Thêm rules cho từng collection như hướng dẫn.');
     </script>
 </body>
 </html>
