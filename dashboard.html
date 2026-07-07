@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard - Doraemon Fansub VN</title>
 
-    <!-- Firebase compat -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js">
     </script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js">
@@ -13,6 +12,10 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js">
     </script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js">
+    </script>
+
+    <!-- Cloudinary Upload Widget -->
+    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript">
     </script>
 
     <style>
@@ -31,7 +34,7 @@
 
         /* Sidebar */
         .sidebar {
-            width: 240px;
+            width: 250px;
             background: linear-gradient(180deg, #1a1a2e, #16213e);
             color: white;
             padding: 20px 0;
@@ -43,19 +46,20 @@
             bottom: 0;
             z-index: 10;
             transition: 0.3s;
+            overflow-y: auto;
         }
 
         .sidebar-brand {
-            padding: 0 24px 20px 24px;
+            padding: 0 20px 20px 20px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .sidebar-brand h2 {
-            font-size: 22px;
+            font-size: 20px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .sidebar-brand h2 span {
@@ -63,28 +67,29 @@
         }
 
         .sidebar-brand small {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.5);
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
             display: block;
             margin-top: 4px;
         }
 
         .sidebar-menu {
             list-style: none;
+            padding: 0 10px;
             flex: 1;
-            padding: 0 12px;
         }
 
         .sidebar-menu li {
-            padding: 12px 16px;
-            border-radius: 12px;
-            margin-bottom: 4px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            margin-bottom: 2px;
             cursor: pointer;
             transition: 0.3s;
             display: flex;
             align-items: center;
             gap: 12px;
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
         }
 
         .sidebar-menu li:hover {
@@ -98,9 +103,15 @@
             border-left: 3px solid #ffeb3b;
         }
 
+        .sidebar-menu li .icon {
+            font-size: 18px;
+            width: 28px;
+            text-align: center;
+        }
+
         .sidebar-footer {
-            padding: 16px 24px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 14px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
             display: flex;
             align-items: center;
             gap: 12px;
@@ -111,6 +122,7 @@
             height: 36px;
             border-radius: 50%;
             border: 2px solid #ffeb3b;
+            object-fit: cover;
         }
 
         .sidebar-footer .info {
@@ -119,12 +131,13 @@
 
         .sidebar-footer .info .name {
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .sidebar-footer .info .email {
             font-size: 11px;
-            color: rgba(255, 255, 255, 0.5);
+            color: rgba(255, 255, 255, 0.4);
+            word-break: break-all;
         }
 
         .sidebar-footer .logout-btn {
@@ -144,36 +157,54 @@
 
         /* Main */
         .main {
-            margin-left: 240px;
-            padding: 30px;
+            margin-left: 250px;
+            padding: 24px 30px;
             flex: 1;
+            width: calc(100% - 250px);
         }
 
         .page-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
         .page-header h1 {
-            font-size: 28px;
+            font-size: 26px;
             color: #1a1a2e;
+        }
+
+        .page-header .admin-badge {
+            background: #ffeb3b;
+            color: #1a1a2e;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 13px;
         }
 
         /* Stats */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 16px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
         }
 
         .stat-card {
             background: white;
-            border-radius: 16px;
-            padding: 20px;
+            border-radius: 14px;
+            padding: 18px 20px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
         }
 
         .stat-card .number {
@@ -183,12 +214,17 @@
         }
 
         .stat-card .label {
-            font-size: 14px;
+            font-size: 13px;
             color: #666;
             margin-top: 4px;
         }
 
-        /* Tab container */
+        .stat-card .icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        /* Tabs */
         .tab-container {
             background: white;
             border-radius: 16px;
@@ -200,18 +236,21 @@
             display: flex;
             border-bottom: 1px solid #e4e6eb;
             background: #fafafa;
+            overflow-x: auto;
+            flex-wrap: nowrap;
         }
 
         .tab-btn {
-            padding: 14px 24px;
+            padding: 12px 20px;
             border: none;
             background: none;
             font-weight: 600;
-            font-size: 15px;
+            font-size: 14px;
             color: #666;
             cursor: pointer;
             border-bottom: 3px solid transparent;
             transition: 0.3s;
+            white-space: nowrap;
         }
 
         .tab-btn:hover {
@@ -224,7 +263,7 @@
         }
 
         .tab-content {
-            padding: 24px;
+            padding: 20px 24px;
             display: none;
         }
 
@@ -232,23 +271,30 @@
             display: block;
         }
 
-        /* Table */
+        /* Table toolbar */
         .table-toolbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 10px;
+        }
+
+        .table-toolbar .title {
+            font-weight: 600;
+            font-size: 16px;
+            color: #1a1a2e;
         }
 
         .btn-primary {
             background: #1a73e8;
             color: white;
             border: none;
-            padding: 8px 20px;
+            padding: 8px 18px;
             border-radius: 25px;
             font-weight: 600;
+            font-size: 14px;
             cursor: pointer;
             transition: 0.3s;
             display: inline-flex;
@@ -269,7 +315,7 @@
             border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 12px;
             transition: 0.3s;
         }
 
@@ -285,13 +331,18 @@
             border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 12px;
             transition: 0.3s;
             margin-right: 4px;
         }
 
         .btn-edit:hover {
             background: #d97706;
+        }
+
+        .btn-sm {
+            padding: 4px 12px;
+            font-size: 12px;
         }
 
         table {
@@ -303,7 +354,7 @@
             text-align: left;
             padding: 10px 12px;
             background: #f8f9fa;
-            font-size: 13px;
+            font-size: 12px;
             color: #666;
             font-weight: 700;
             text-transform: uppercase;
@@ -327,6 +378,11 @@
             color: #999;
         }
 
+        .empty-state .icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+
         /* Modal */
         .modal-overlay {
             display: none;
@@ -339,6 +395,7 @@
             z-index: 999;
             justify-content: center;
             align-items: center;
+            backdrop-filter: blur(4px);
         }
 
         .modal-overlay.active {
@@ -348,8 +405,8 @@
         .modal-box {
             background: white;
             border-radius: 20px;
-            padding: 30px;
-            max-width: 500px;
+            padding: 28px 30px;
+            max-width: 550px;
             width: 92%;
             max-height: 90vh;
             overflow-y: auto;
@@ -371,8 +428,8 @@
         .modal-box .close {
             position: absolute;
             top: 12px;
-            right: 18px;
-            font-size: 28px;
+            right: 16px;
+            font-size: 26px;
             cursor: pointer;
             color: #999;
             border: none;
@@ -386,8 +443,9 @@
         }
 
         .modal-box h2 {
-            font-size: 22px;
+            font-size: 20px;
             margin-bottom: 16px;
+            color: #1a1a2e;
         }
 
         .modal-box .form-group {
@@ -397,8 +455,9 @@
         .modal-box .form-group label {
             display: block;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px;
             margin-bottom: 4px;
+            color: #1a1a2e;
         }
 
         .modal-box .form-group input,
@@ -422,6 +481,77 @@
             min-height: 60px;
         }
 
+        .modal-box .form-group .file-upload-area {
+            border: 2px dashed #e4e6eb;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            background: #fafafa;
+        }
+
+        .modal-box .form-group .file-upload-area:hover {
+            border-color: #1a73e8;
+            background: #f0f2f5;
+        }
+
+        .modal-box .form-group .file-upload-area .icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .modal-box .form-group .file-upload-area p {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .modal-box .form-group .file-upload-area .hint {
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .modal-box .form-group .upload-preview {
+            display: none;
+            margin-top: 8px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e4e6eb;
+            position: relative;
+        }
+
+        .modal-box .form-group .upload-preview video {
+            width: 100%;
+            max-height: 150px;
+            border-radius: 6px;
+            background: #000;
+        }
+
+        .modal-box .form-group .upload-preview .remove-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .modal-box .form-group .upload-preview .remove-btn:hover {
+            background: #e94560;
+        }
+
+        .modal-box .form-group .video-url-input {
+            margin-top: 8px;
+        }
+
         .modal-box .btn-submit {
             width: 100%;
             padding: 12px;
@@ -440,6 +570,38 @@
             background: #1557b0;
         }
 
+        .modal-box .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Upload progress */
+        .upload-progress {
+            display: none;
+            margin: 8px 0;
+            padding: 10px 14px;
+            background: #e8f0fe;
+            border-radius: 10px;
+            font-size: 13px;
+            color: #1a73e8;
+        }
+
+        .upload-progress .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #d2e3fc;
+            border-radius: 2px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+
+        .upload-progress .progress-bar .fill {
+            height: 100%;
+            background: #1a73e8;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
         /* Toast */
         .toast {
             position: fixed;
@@ -447,7 +609,7 @@
             right: 30px;
             background: #1a1a2e;
             color: white;
-            padding: 14px 28px;
+            padding: 12px 24px;
             border-radius: 12px;
             font-weight: 600;
             z-index: 9999;
@@ -455,6 +617,8 @@
             transform: translateY(20px);
             transition: 0.4s;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            font-size: 14px;
+            max-width: 90%;
         }
 
         .toast.show {
@@ -466,16 +630,16 @@
         .mobile-menu-btn {
             display: none;
             position: fixed;
-            top: 16px;
-            left: 16px;
+            top: 14px;
+            left: 14px;
             z-index: 20;
             background: #1a1a2e;
             color: white;
             border: none;
-            width: 44px;
-            height: 44px;
+            width: 42px;
+            height: 42px;
             border-radius: 12px;
-            font-size: 24px;
+            font-size: 22px;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
@@ -483,7 +647,7 @@
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
-                width: 260px;
+                width: 280px;
             }
             .sidebar.open {
                 transform: translateX(0);
@@ -491,6 +655,7 @@
             .main {
                 margin-left: 0;
                 padding: 16px;
+                width: 100%;
             }
             .stats-grid {
                 grid-template-columns: 1fr 1fr;
@@ -499,12 +664,18 @@
                 padding: 10px 14px;
                 font-size: 13px;
             }
+            .tab-content {
+                padding: 16px;
+            }
             .table-toolbar {
                 flex-direction: column;
                 align-items: stretch;
             }
             .mobile-menu-btn {
                 display: block !important;
+            }
+            .page-header h1 {
+                font-size: 20px;
             }
         }
 
@@ -518,7 +689,7 @@
         }
 
         ::-webkit-scrollbar {
-            width: 6px;
+            width: 5px;
         }
         ::-webkit-scrollbar-track {
             background: #f0f2f5;
@@ -531,94 +702,87 @@
 </head>
 <body>
 
-    <!-- Mobile toggle -->
     <button class="mobile-menu-btn" id="menuToggle">☰</button>
 
-    <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <h2>🎬 <span>Doraemon</span> VN</h2>
             <small>Admin Dashboard</small>
         </div>
         <ul class="sidebar-menu">
-            <li class="active" data-tab="overview"><span>📊</span> Tổng quan</li>
-            <li data-tab="movies"><span>🎬</span> Quản lý phim</li>
-            <li data-tab="posts"><span>📝</span> Quản lý bài viết</li>
+            <li class="active" data-tab="overview"><span class="icon">📊</span> Tổng quan</li>
+            <li data-tab="posts"><span class="icon">📝</span> Quản lý bài viết</li>
+            <li data-tab="movies"><span class="icon">🎬</span> Quản lý phim</li>
+            <li data-tab="users"><span class="icon">👥</span> Người dùng</li>
+            <li data-tab="settings"><span class="icon">⚙️</span> Cài đặt</li>
         </ul>
         <div class="sidebar-footer">
             <img id="adminAvatar" src="https://ui-avatars.com/api/?name=Admin" alt="avatar" />
             <div class="info">
                 <div class="name" id="adminName">Admin</div>
-                <div class="email" id="adminEmail">admin@example.com</div>
+                <div class="email" id="adminEmail">admin@doraemonfansub.com</div>
             </div>
             <button class="logout-btn" id="logoutBtn">🚪</button>
         </div>
     </aside>
 
-    <!-- Main -->
     <main class="main">
         <div class="page-header">
-            <h1>📊 Dashboard</h1>
-            <span style="color:#666;font-size:14px;">Chào mừng admin!</span>
+            <h1 id="pageTitle">📊 Tổng quan</h1>
+            <span class="admin-badge">👑 Admin</span>
         </div>
 
-        <div class="stats-grid">
+        <div class="stats-grid" id="statsGrid">
             <div class="stat-card">
-                <div class="number" id="totalMovies">0</div>
-                <div class="label">🎬 Tổng phim</div>
-            </div>
-            <div class="stat-card">
+                <div class="icon">📝</div>
                 <div class="number" id="totalPosts">0</div>
-                <div class="label">📝 Tổng bài viết</div>
+                <div class="label">Bài viết</div>
             </div>
             <div class="stat-card">
-                <div class="number" id="totalUsers">1</div>
-                <div class="label">👤 Admin</div>
+                <div class="icon">🎬</div>
+                <div class="number" id="totalMovies">0</div>
+                <div class="label">Phim</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">👥</div>
+                <div class="number" id="totalUsers">0</div>
+                <div class="label">Người dùng</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">👁️</div>
+                <div class="number" id="totalViews">0</div>
+                <div class="label">Lượt xem phim</div>
             </div>
         </div>
 
         <div class="tab-container">
             <div class="tab-header">
                 <button class="tab-btn active" data-tab="overview">📊 Tổng quan</button>
-                <button class="tab-btn" data-tab="movies">🎬 Phim</button>
                 <button class="tab-btn" data-tab="posts">📝 Bài viết</button>
+                <button class="tab-btn" data-tab="movies">🎬 Phim</button>
+                <button class="tab-btn" data-tab="users">👥 Người dùng</button>
+                <button class="tab-btn" data-tab="settings">⚙️ Cài đặt</button>
             </div>
 
-            <!-- Overview -->
             <div class="tab-content active" id="tab-overview">
-                <div style="padding:20px 0;">
-                    <h3 style="margin-bottom:12px;">👋 Chào mừng bạn đến với Dashboard</h3>
-                    <p style="color:#666;">Tại đây bạn có thể quản lý toàn bộ nội dung của Doraemon Fansub VN.</p>
-                    <ul style="margin-top:16px;list-style:none;display:flex;gap:16px;flex-wrap:wrap;">
-                        <li style="background:#e8f0fe;padding:10px 18px;border-radius:12px;">✅ Thêm phim mới</li>
-                        <li style="background:#e8f0fe;padding:10px 18px;border-radius:12px;">✅ Sửa / Xóa phim</li>
-                        <li style="background:#e8f0fe;padding:10px 18px;border-radius:12px;">✅ Xóa bài viết</li>
-                    </ul>
+                <div style="padding:10px 0;">
+                    <h3 style="margin-bottom:8px;">👋 Chào mừng Admin!</h3>
+                    <p style="color:#666;font-size:15px;line-height:1.6;">
+                        Đây là khu vực quản trị của <strong>Doraemon Fansub VN</strong>.
+                        Bạn có thể quản lý bài viết, phim và người dùng tại đây.
+                    </p>
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:16px;">
+                        <span style="background:#e8f0fe;padding:8px 16px;border-radius:10px;font-size:14px;">✅ Thêm phim mới</span>
+                        <span style="background:#e8f0fe;padding:8px 16px;border-radius:10px;font-size:14px;">✅ Xóa bài viết</span>
+                        <span style="background:#e8f0fe;padding:8px 16px;border-radius:10px;font-size:14px;">✅ Quản lý người dùng</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Movies -->
-            <div class="tab-content" id="tab-movies">
-                <div class="table-toolbar">
-                    <span style="font-weight:600;font-size:16px;">🎬 Danh sách phim</span>
-                    <button class="btn-primary" id="addMovieBtn">➕ Thêm phim</button>
-                </div>
-                <div style="overflow-x:auto;">
-                    <table>
-                        <thead>
-                            <tr><th>#</th><th>Tên phim</th><th>Thể loại</th><th>Lượt xem</th><th>Hành động</th></tr>
-                        </thead>
-                        <tbody id="moviesTableBody">
-                            <tr><td colspan="5" class="empty-state">⏳ Đang tải...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Posts -->
             <div class="tab-content" id="tab-posts">
                 <div class="table-toolbar">
-                    <span style="font-weight:600;font-size:16px;">📝 Danh sách bài viết</span>
+                    <span class="title">📝 Danh sách bài viết</span>
+                    <span style="font-size:13px;color:#999;" id="postCount">0 bài viết</span>
                 </div>
                 <div style="overflow-x:auto;">
                     <table>
@@ -626,9 +790,62 @@
                             <tr><th>#</th><th>Người đăng</th><th>Nội dung</th><th>Thời gian</th><th>Hành động</th></tr>
                         </thead>
                         <tbody id="postsTableBody">
-                            <tr><td colspan="5" class="empty-state">⏳ Đang tải...</td></tr>
+                            <tr><td colspan="5" class="empty-state"><div class="icon">⏳</div>Đang tải...</td></tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            <div class="tab-content" id="tab-movies">
+                <div class="table-toolbar">
+                    <span class="title">🎬 Danh sách phim</span>
+                    <div>
+                        <span style="font-size:13px;color:#999;margin-right:12px;" id="movieCount">0 phim</span>
+                        <button class="btn-primary" id="addMovieBtn">➕ Thêm phim</button>
+                    </div>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead>
+                            <tr><th>#</th><th>Tên phim</th><th>Thể loại</th><th>Lượt xem</th><th>Hành động</th></tr>
+                        </thead>
+                        <tbody id="moviesTableBody">
+                            <tr><td colspan="5" class="empty-state"><div class="icon">⏳</div>Đang tải...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="tab-content" id="tab-users">
+                <div class="table-toolbar">
+                    <span class="title">👥 Danh sách người dùng</span>
+                    <span style="font-size:13px;color:#999;" id="userCount">0 người dùng</span>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead>
+                            <tr><th>#</th><th>Avatar</th><th>Tên</th><th>Email</th><th>Ngày tham gia</th></tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <tr><td colspan="5" class="empty-state"><div class="icon">⏳</div>Đang tải...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="tab-content" id="tab-settings">
+                <div style="max-width:500px;">
+                    <h3 style="margin-bottom:16px;">⚙️ Cài đặt Admin</h3>
+                    <div class="form-group">
+                        <label>Email Admin hiện tại</label>
+                        <input type="email" id="settingsEmail" disabled style="background:#f5f5f5;color:#666;" />
+                    </div>
+                    <div class="form-group">
+                        <label>Tên hiển thị</label>
+                        <input type="text" id="settingsName" placeholder="Tên của bạn" />
+                    </div>
+                    <button class="btn-primary" id="settingsSaveBtn" style="width:100%;justify-content:center;">💾 Lưu cài đặt</button>
+                    <p style="margin-top:12px;font-size:13px;color:#999;">* Thay đổi sẽ cập nhật trên Firebase.</p>
                 </div>
             </div>
         </div>
@@ -640,26 +857,52 @@
             <button class="close" id="closeModal">✕</button>
             <h2 id="modalTitle">Thêm phim mới</h2>
             <form id="movieForm" onsubmit="return false;">
+
                 <div class="form-group">
-                    <label>Tên phim</label>
+                    <label>Tên phim *</label>
                     <input type="text" id="movieTitle" placeholder="VD: Doraemon: Nobita và đảo giấu vàng" required />
                 </div>
+
                 <div class="form-group">
-                    <label>Thể loại</label>
+                    <label>Thể loại *</label>
                     <input type="text" id="movieGenre" placeholder="Phiêu lưu, Hài hước" required />
                 </div>
+
                 <div class="form-group">
-                    <label>Mô tả</label>
+                    <label>Mô tả *</label>
                     <textarea id="movieDesc" placeholder="Mô tả ngắn về phim..." required></textarea>
                 </div>
+
                 <div class="form-group">
-                    <label>URL Poster</label>
+                    <label>URL Poster *</label>
                     <input type="url" id="moviePoster" placeholder="https://example.com/poster.jpg" required />
                 </div>
+
                 <div class="form-group">
-                    <label>URL Video</label>
-                    <input type="url" id="movieVideo" placeholder="https://example.com/video.mp4" required />
+                    <label>Video *</label>
+                    <div class="file-upload-area" id="videoUploadArea">
+                        <div class="icon">🎬</div>
+                        <p>Nhấn để tải video lên Cloudinary</p>
+                        <span class="hint">Hỗ trợ MP4, WebM, AVI, MOV</span>
+                    </div>
+
+                    <div class="upload-progress" id="uploadProgress">
+                        <span id="uploadStatus">📤 Đang tải video lên Cloudinary...</span>
+                        <div class="progress-bar">
+                            <div class="fill" id="progressFill"></div>
+                        </div>
+                    </div>
+
+                    <div class="upload-preview" id="videoPreview">
+                        <video id="previewVideo" controls></video>
+                        <button class="remove-btn" id="removeVideoBtn">✕</button>
+                    </div>
+
+                    <div class="video-url-input">
+                        <input type="url" id="movieVideo" placeholder="Hoặc nhập link video trực tiếp (URL)" />
+                    </div>
                 </div>
+
                 <button type="button" class="btn-submit" id="submitMovieBtn">💾 Lưu phim</button>
             </form>
         </div>
@@ -687,7 +930,20 @@
 
         const ADMIN_EMAIL = 'tuankhaimoi12345@gmail.com';
 
-        // DOM refs
+        // ============================================================
+        // CLOUDINARY
+        // ============================================================
+        const CLOUDINARY_CONFIG = {
+            cloudName: 'gntkeeno',
+            uploadPreset: 'doraemon_fansub_vn',
+            folder: 'doraemon_fansub_videos'
+        };
+
+        let uploadedVideoUrl = '';
+
+        // ============================================================
+        // DOM REFS
+        // ============================================================
         const sidebar = document.getElementById('sidebar');
         const menuToggle = document.getElementById('menuToggle');
         const adminName = document.getElementById('adminName');
@@ -699,9 +955,19 @@
         const modalTitle = document.getElementById('modalTitle');
         const submitBtn = document.getElementById('submitMovieBtn');
         const closeModalBtn = document.getElementById('closeModal');
+        const pageTitle = document.getElementById('pageTitle');
+
+        const videoUploadArea = document.getElementById('videoUploadArea');
+        const uploadProgress = document.getElementById('uploadProgress');
+        const progressFill = document.getElementById('progressFill');
+        const uploadStatus = document.getElementById('uploadStatus');
+        const videoPreview = document.getElementById('videoPreview');
+        const previewVideo = document.getElementById('previewVideo');
+        const removeVideoBtn = document.getElementById('removeVideoBtn');
+        const movieVideoInput = document.getElementById('movieVideo');
 
         // ============================================================
-        // AUTH CHECK
+        // AUTH
         // ============================================================
         auth.onAuthStateChanged(async (user) => {
             if (!user) {
@@ -713,16 +979,25 @@
                 window.location.href = 'index.html';
                 return;
             }
+
             adminName.textContent = user.displayName || 'Admin';
             adminEmail.textContent = user.email;
             adminAvatar.src = user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName ||
                 'Admin');
+            document.getElementById('settingsEmail').value = user.email;
+            document.getElementById('settingsName').value = user.displayName || '';
 
-            loadMovies();
-            loadPosts();
+            await Promise.all([
+                loadPosts(),
+                loadMovies(),
+                loadUsers()
+            ]);
+            updateStats();
         });
 
-        // Logout
+        // ============================================================
+        // LOGOUT
+        // ============================================================
         logoutBtn.addEventListener('click', async () => {
             try {
                 await auth.signOut();
@@ -732,21 +1007,35 @@
             }
         });
 
-        // Mobile menu
+        // ============================================================
+        // MOBILE MENU
+        // ============================================================
         menuToggle.addEventListener('click', () => {
             sidebar.classList.toggle('open');
         });
 
-        // Tabs
+        // ============================================================
+        // TABS
+        // ============================================================
+        const tabMap = {
+            'overview': '📊 Tổng quan',
+            'posts': '📝 Quản lý bài viết',
+            'movies': '🎬 Quản lý phim',
+            'users': '👥 Người dùng',
+            'settings': '⚙️ Cài đặt'
+        };
+
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', function() {
+                const tab = this.dataset.tab;
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
-                const tab = this.dataset.tab;
                 document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
                 document.getElementById('tab-' + tab).classList.add('active');
                 document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
                 document.querySelector(`.sidebar-menu li[data-tab="${tab}"]`).classList.add('active');
+                pageTitle.textContent = tabMap[tab] || '📊 Tổng quan';
+                if (window.innerWidth <= 768) sidebar.classList.remove('open');
             });
         });
 
@@ -759,19 +1048,182 @@
                 document.getElementById('tab-' + tab).classList.add('active');
                 document.querySelectorAll('.sidebar-menu li').forEach(l => l.classList.remove('active'));
                 this.classList.add('active');
+                pageTitle.textContent = tabMap[tab] || '📊 Tổng quan';
                 if (window.innerWidth <= 768) sidebar.classList.remove('open');
             });
         });
 
-        // Toast
-        function showToast(msg) {
+        // ============================================================
+        // TOAST
+        // ============================================================
+        function showToast(msg, isError = false) {
             toast.textContent = msg;
+            toast.style.background = isError ? '#c62828' : '#1a1a2e';
             toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => toast.classList.remove('show'), 3500);
         }
 
         // ============================================================
-        // MOVIES CRUD
+        // UPDATE STATS
+        // ============================================================
+        function updateStats() {
+            document.getElementById('totalPosts').textContent = document.querySelectorAll('#postsTableBody tr:not(.empty-state)')
+                .length || 0;
+            document.getElementById('totalMovies').textContent = document.querySelectorAll('#moviesTableBody tr:not(.empty-state)')
+                .length || 0;
+            document.getElementById('totalUsers').textContent = document.querySelectorAll('#usersTableBody tr:not(.empty-state)')
+                .length || 0;
+            let views = 0;
+            document.querySelectorAll('#moviesTableBody tr').forEach(row => {
+                const cell = row.querySelector('td:nth-child(4)');
+                if (cell) {
+                    const num = parseInt(cell.textContent.replace(/[^0-9]/g, ''));
+                    if (!isNaN(num)) views += num;
+                }
+            });
+            document.getElementById('totalViews').textContent = views;
+        }
+
+        // ============================================================
+        // VIDEO UPLOAD
+        // ============================================================
+        function openVideoUpload() {
+            const widget = cloudinary.createUploadWidget({
+                    cloudName: CLOUDINARY_CONFIG.cloudName,
+                    uploadPreset: CLOUDINARY_CONFIG.uploadPreset,
+                    folder: CLOUDINARY_CONFIG.folder,
+                    sources: ['local', 'url', 'google_drive'],
+                    multiple: false,
+                    maxFileSize: 50000000,
+                    resourceType: 'video',
+                    clientAllowedFormats: ['mp4', 'webm', 'avi', 'mov', 'mkv'],
+                    styles: {
+                        palette: {
+                            window: '#FFFFFF',
+                            sourceBg: '#f0f2f5',
+                            windowBorder: '#e4e6eb',
+                            tabIcon: '#1a73e8',
+                            inactiveTabIcon: '#65676b',
+                            menuIcons: '#1a73e8',
+                            link: '#1a73e8',
+                            action: '#1a73e8',
+                            inProgress: '#1a73e8',
+                            complete: '#34a853',
+                            error: '#e94560',
+                            textDark: '#1a1a2e',
+                            textLight: '#65676b'
+                        }
+                    }
+                },
+                (error, result) => {
+                    if (error) {
+                        showToast('❌ Upload video thất bại!', true);
+                        uploadProgress.style.display = 'none';
+                        return;
+                    }
+
+                    if (result.event === 'success') {
+                        uploadedVideoUrl = result.info.secure_url;
+                        movieVideoInput.value = uploadedVideoUrl;
+                        previewVideo.src = uploadedVideoUrl;
+                        videoPreview.style.display = 'block';
+                        uploadStatus.textContent = '✅ Đã tải video lên Cloudinary thành công!';
+                        progressFill.style.width = '100%';
+                        setTimeout(() => {
+                            uploadProgress.style.display = 'none';
+                            progressFill.style.width = '0%';
+                        }, 2000);
+                        showToast('✅ Video đã được tải lên!');
+                    }
+
+                    if (result.event === 'progress') {
+                        uploadProgress.style.display = 'block';
+                        const progress = Math.round((result.info.bytesUploaded / result.info.totalBytes) * 100);
+                        progressFill.style.width = progress + '%';
+                        uploadStatus.textContent = `📤 Đang tải video lên Cloudinary... ${progress}%`;
+                    }
+
+                    if (result.event === 'close') {
+                        uploadProgress.style.display = 'none';
+                    }
+                }
+            );
+            widget.open();
+        }
+
+        videoUploadArea.addEventListener('click', openVideoUpload);
+
+        removeVideoBtn.addEventListener('click', () => {
+            uploadedVideoUrl = '';
+            movieVideoInput.value = '';
+            videoPreview.style.display = 'none';
+            previewVideo.src = '';
+        });
+
+        movieVideoInput.addEventListener('input', function() {
+            if (this.value.trim()) {
+                uploadedVideoUrl = this.value.trim();
+                previewVideo.src = this.value.trim();
+                videoPreview.style.display = 'block';
+            } else {
+                videoPreview.style.display = 'none';
+            }
+        });
+
+        // ============================================================
+        // POSTS
+        // ============================================================
+        async function loadPosts() {
+            const tbody = document.getElementById('postsTableBody');
+            try {
+                const snapshot = await db.collection('posts').orderBy('timestamp', 'desc').get();
+                if (snapshot.empty) {
+                    tbody.innerHTML =
+                        `<tr><td colspan="5" class="empty-state"><div class="icon">📝</div>Chưa có bài viết nào</td></tr>`;
+                    document.getElementById('postCount').textContent = '0 bài viết';
+                    return;
+                }
+                let html = '';
+                let count = 0;
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    count++;
+                    html += `
+                        <tr>
+                            <td>${count}</td>
+                            <td>${data.user || 'Anonymous'}</td>
+                            <td style="max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${data.content || ''}</td>
+                            <td>${data.time || 'Vừa xong'}</td>
+                            <td>
+                                <button class="btn-danger btn-sm" onclick="deletePost('${doc.id}')">🗑️ Xóa</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = html;
+                document.getElementById('postCount').textContent = count + ' bài viết';
+                updateStats();
+            } catch (e) {
+                console.error(e);
+                tbody.innerHTML =
+                    `<tr><td colspan="5" class="empty-state"><div class="icon">❌</div>Lỗi tải: ${e.message}</td></tr>`;
+            }
+        }
+
+        window.deletePost = async function(id) {
+            if (!confirm('Bạn có chắc muốn xóa bài viết này?')) return;
+            try {
+                await db.collection('posts').doc(id).delete();
+                showToast('✅ Đã xóa bài viết!');
+                loadPosts();
+            } catch (e) {
+                showToast('❌ Lỗi xóa: ' + e.message, true);
+            }
+        };
+
+        // ============================================================
+        // MOVIES
         // ============================================================
         async function loadMovies() {
             const tbody = document.getElementById('moviesTableBody');
@@ -779,12 +1231,12 @@
                 const snapshot = await db.collection('movies').orderBy('timestamp', 'desc').get();
                 if (snapshot.empty) {
                     tbody.innerHTML =
-                    `<tr><td colspan="5" class="empty-state">🎬 Chưa có phim nào</td></tr>`;
-                    document.getElementById('totalMovies').textContent = '0';
+                        `<tr><td colspan="5" class="empty-state"><div class="icon">🎬</div>Chưa có phim nào</td></tr>`;
+                    document.getElementById('movieCount').textContent = '0 phim';
                     return;
                 }
-                let html = '',
-                    count = 0;
+                let html = '';
+                let count = 0;
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     count++;
@@ -795,18 +1247,19 @@
                             <td>${data.genre || 'Chưa phân loại'}</td>
                             <td>${data.views || 0} 👁️</td>
                             <td>
-                                <button class="btn-edit" onclick="editMovie('${doc.id}')">✏️ Sửa</button>
-                                <button class="btn-danger" onclick="deleteMovie('${doc.id}')">🗑️ Xóa</button>
+                                <button class="btn-edit btn-sm" onclick="editMovie('${doc.id}')">✏️ Sửa</button>
+                                <button class="btn-danger btn-sm" onclick="deleteMovie('${doc.id}')">🗑️ Xóa</button>
                             </td>
                         </tr>
                     `;
                 });
                 tbody.innerHTML = html;
-                document.getElementById('totalMovies').textContent = count;
+                document.getElementById('movieCount').textContent = count + ' phim';
+                updateStats();
             } catch (e) {
                 console.error(e);
                 tbody.innerHTML =
-                    `<tr><td colspan="5" class="empty-state">❌ Lỗi tải dữ liệu: ${e.message}</td></tr>`;
+                    `<tr><td colspan="5" class="empty-state"><div class="icon">❌</div>Lỗi tải: ${e.message}</td></tr>`;
             }
         }
 
@@ -817,7 +1270,7 @@
                 showToast('✅ Đã xóa phim!');
                 loadMovies();
             } catch (e) {
-                showToast('❌ Lỗi xóa: ' + e.message);
+                showToast('❌ Lỗi xóa: ' + e.message, true);
             }
         };
 
@@ -830,14 +1283,23 @@
                 document.getElementById('movieGenre').value = data.genre || '';
                 document.getElementById('movieDesc').value = data.desc || '';
                 document.getElementById('moviePoster').value = data.poster || '';
-                document.getElementById('movieVideo').value = data.video || '';
+                if (data.video) {
+                    movieVideoInput.value = data.video;
+                    uploadedVideoUrl = data.video;
+                    previewVideo.src = data.video;
+                    videoPreview.style.display = 'block';
+                } else {
+                    movieVideoInput.value = '';
+                    uploadedVideoUrl = '';
+                    videoPreview.style.display = 'none';
+                }
                 modalTitle.textContent = '✏️ Sửa phim';
                 submitBtn.textContent = '💾 Cập nhật';
                 submitBtn.dataset.mode = 'edit';
                 submitBtn.dataset.id = id;
                 modal.classList.add('active');
             } catch (e) {
-                showToast('❌ Lỗi tải dữ liệu: ' + e.message);
+                showToast('❌ Lỗi tải: ' + e.message, true);
             }
         };
 
@@ -846,7 +1308,10 @@
             document.getElementById('movieGenre').value = '';
             document.getElementById('movieDesc').value = '';
             document.getElementById('moviePoster').value = '';
-            document.getElementById('movieVideo').value = '';
+            movieVideoInput.value = '';
+            uploadedVideoUrl = '';
+            videoPreview.style.display = 'none';
+            previewVideo.src = '';
             modalTitle.textContent = '➕ Thêm phim mới';
             submitBtn.textContent = '💾 Lưu phim';
             submitBtn.dataset.mode = 'add';
@@ -855,17 +1320,19 @@
         });
 
         closeModalBtn.addEventListener('click', () => modal.classList.remove('active'));
-        modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.classList.remove('active');
+        });
 
         submitBtn.addEventListener('click', async function() {
             const title = document.getElementById('movieTitle').value.trim();
             const genre = document.getElementById('movieGenre').value.trim();
             const desc = document.getElementById('movieDesc').value.trim();
             const poster = document.getElementById('moviePoster').value.trim();
-            const video = document.getElementById('movieVideo').value.trim();
+            const video = movieVideoInput.value.trim() || uploadedVideoUrl;
 
             if (!title || !genre || !desc || !poster || !video) {
-                showToast('⚠️ Vui lòng nhập đầy đủ thông tin!');
+                showToast('⚠️ Vui lòng nhập đầy đủ thông tin!', true);
                 return;
             }
 
@@ -887,59 +1354,86 @@
                 modal.classList.remove('active');
                 loadMovies();
             } catch (e) {
-                showToast('❌ Lỗi: ' + e.message);
+                showToast('❌ Lỗi: ' + e.message, true);
             }
         });
 
         // ============================================================
-        // POSTS (chỉ xóa)
+        // USERS
         // ============================================================
-        async function loadPosts() {
-            const tbody = document.getElementById('postsTableBody');
+        async function loadUsers() {
+            const tbody = document.getElementById('usersTableBody');
             try {
-                const snapshot = await db.collection('posts').orderBy('timestamp', 'desc').get();
+                const snapshot = await db.collection('users').orderBy('createdAt', 'desc').get();
                 if (snapshot.empty) {
-                    tbody.innerHTML =
-                    `<tr><td colspan="5" class="empty-state">📝 Chưa có bài viết nào</td></tr>`;
-                    document.getElementById('totalPosts').textContent = '0';
+                    tbody.innerHTML = `
+                        <tr>
+                            <td>1</td>
+                            <td><img src="https://ui-avatars.com/api/?name=Admin" style="width:32px;height:32px;border-radius:50%;object-fit:cover;"></td>
+                            <td>Admin</td>
+                            <td>${ADMIN_EMAIL}</td>
+                            <td>${new Date().toLocaleDateString('vi-VN')}</td>
+                        </tr>
+                    `;
+                    document.getElementById('userCount').textContent = '1 người dùng';
+                    updateStats();
                     return;
                 }
-                let html = '',
-                    count = 0;
+                let html = '';
+                let count = 0;
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     count++;
+                    const avatar = data.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.displayName || 'User')}`;
                     html += `
                         <tr>
                             <td>${count}</td>
-                            <td>${data.user || 'Anonymous'}</td>
-                            <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${data.content || ''}</td>
-                            <td>${data.time || 'Vừa xong'}</td>
-                            <td>
-                                <button class="btn-danger" onclick="deletePost('${doc.id}')">🗑️ Xóa</button>
-                            </td>
+                            <td><img src="${avatar}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;"></td>
+                            <td>${data.displayName || 'Người dùng'}</td>
+                            <td>${data.email || ''}</td>
+                            <td>${data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString('vi-VN') : 'Chưa có'}</td>
                         </tr>
                     `;
                 });
                 tbody.innerHTML = html;
-                document.getElementById('totalPosts').textContent = count;
+                document.getElementById('userCount').textContent = count + ' người dùng';
+                updateStats();
             } catch (e) {
                 console.error(e);
-                tbody.innerHTML =
-                    `<tr><td colspan="5" class="empty-state">❌ Lỗi tải dữ liệu: ${e.message}</td></tr>`;
+                tbody.innerHTML = `
+                    <tr>
+                        <td>1</td>
+                        <td><img src="https://ui-avatars.com/api/?name=Admin" style="width:32px;height:32px;border-radius:50%;object-fit:cover;"></td>
+                        <td>Admin</td>
+                        <td>${ADMIN_EMAIL}</td>
+                        <td>${new Date().toLocaleDateString('vi-VN')}</td>
+                    </tr>
+                `;
+                document.getElementById('userCount').textContent = '1 người dùng';
+                updateStats();
             }
         }
 
-        window.deletePost = async function(id) {
-            if (!confirm('Bạn có chắc muốn xóa bài viết này?')) return;
-            try {
-                await db.collection('posts').doc(id).delete();
-                showToast('✅ Đã xóa bài viết!');
-                loadPosts();
-            } catch (e) {
-                showToast('❌ Lỗi xóa: ' + e.message);
+        // ============================================================
+        // SETTINGS
+        // ============================================================
+        document.getElementById('settingsSaveBtn').addEventListener('click', async () => {
+            const displayName = document.getElementById('settingsName').value.trim();
+            if (!displayName) {
+                showToast('⚠️ Vui lòng nhập tên hiển thị!', true);
+                return;
             }
-        };
+            try {
+                const user = auth.currentUser;
+                if (user) {
+                    await user.updateProfile({ displayName });
+                    adminName.textContent = displayName;
+                    showToast('✅ Cập nhật tên thành công!');
+                }
+            } catch (e) {
+                showToast('❌ Lỗi cập nhật: ' + e.message, true);
+            }
+        });
 
         console.log('🔥 Dashboard admin đã sẵn sàng!');
         console.log('👑 Admin:', ADMIN_EMAIL);
