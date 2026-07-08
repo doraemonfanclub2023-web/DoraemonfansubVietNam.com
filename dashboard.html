@@ -59,6 +59,8 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            text-decoration: none;
+            color: white;
         }
 
         .sidebar-brand .brand-logo img {
@@ -866,10 +868,10 @@
 
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <div class="brand-logo">
+            <a href="index.html" class="brand-logo">
                 <img src="https://i.ibb.co/9kJhtfp1/Doraemon-fansub.png" alt="Logo">
                 <h2>🎬 <span>Doraemon</span> VN</h2>
-            </div>
+            </a>
             <small>Admin Dashboard</small>
         </div>
 
@@ -997,7 +999,7 @@
         </div>
     </main>
 
-    <!-- ===== MODAL (Đã sửa phân loại: Movie, Short Movie, Seri) ===== -->
+    <!-- ===== MODAL ===== -->
     <div class="modal-overlay" id="movieModal">
         <div class="modal-box">
             <button class="close" id="closeModal">✕</button>
@@ -1223,7 +1225,7 @@
         };
 
         // ============================================================
-        // MOVIES (Đã sửa phân loại: Movie, Short Movie, Seri)
+        // MOVIES
         // ============================================================
         async function loadMovies() {
             const tbody = document.getElementById('moviesTableBody');
@@ -1240,7 +1242,6 @@
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     count++;
-                    // Hiển thị tên phân loại
                     const categoryLabels = {
                         'movie': '🎬 Movie',
                         'short': '🎥 Short Movie',
@@ -1558,7 +1559,7 @@
         console.log('👑 Admin:', ADMIN_EMAIL);
         console.log('🖼️ Logo URL:', LOGO_URL);
         console.log('📱 Đã tối ưu hóa cho điện thoại!');
-        console.log('📂 Phân loại: Movie, Short Movie, Seri');
+        console.log('🏠 Click logo để về trang chủ!');
     </script>
 </body>
 </html>
