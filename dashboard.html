@@ -491,22 +491,6 @@
             transform: scale(0.95);
         }
 
-        .btn-warning {
-            background: #f59e0b;
-            color: white;
-            border: none;
-            padding: 4px 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 11px;
-            transition: 0.3s;
-        }
-
-        .btn-warning:active {
-            transform: scale(0.95);
-        }
-
         table {
             width: 100%;
             border-collapse: collapse;
@@ -910,7 +894,6 @@
             <li data-tab="posts"><span class="icon">📝</span> Quản lý bài viết</li>
             <li data-tab="movies"><span class="icon">🎬</span> Quản lý phim</li>
             <li data-tab="users"><span class="icon">👥</span> Người dùng</li>
-            <li data-tab="admins"><span class="icon">👑</span> Quản trị viên</li>
             <li data-tab="settings"><span class="icon">⚙️</span> Cài đặt</li>
         </ul>
 
@@ -951,7 +934,6 @@
                 <button class="tab-btn" data-tab="posts">📝 Bài viết</button>
                 <button class="tab-btn" data-tab="movies">🎬 Phim</button>
                 <button class="tab-btn" data-tab="users">👥 Người dùng</button>
-                <button class="tab-btn" data-tab="admins">👑 Quản trị viên</button>
                 <button class="tab-btn" data-tab="settings">⚙️ Cài đặt</button>
             </div>
 
@@ -963,7 +945,7 @@
                         <span style="background:#e8f0fe;padding:4px 12px;border-radius:6px;font-size:12px;">✅ Quản lý bài viết</span>
                         <span style="background:#e8f0fe;padding:4px 12px;border-radius:6px;font-size:12px;">✅ Quản lý phim</span>
                         <span style="background:#e8f0fe;padding:4px 12px;border-radius:6px;font-size:12px;">✅ Quản lý người dùng</span>
-                        <span style="background:#e8f0fe;padding:4px 12px;border-radius:6px;font-size:12px;">👑 Quản lý Admin</span>
+                        <span style="background:#fce8e6;padding:4px 12px;border-radius:6px;font-size:12px;color:#e94560;">🗑️ Xóa tài khoản ảo</span>
                     </div>
                 </div>
             </div>
@@ -999,6 +981,7 @@
                 </div>
             </div>
 
+            <!-- ===== TAB USERS - ĐÃ THÊM NÚT XÓA ===== -->
             <div class="tab-content" id="tab-users">
                 <div class="table-toolbar">
                     <span class="title">👥 Danh sách người dùng</span>
@@ -1027,34 +1010,6 @@
                 </div>
             </div>
 
-            <!-- ===== TAB ADMINS ===== -->
-            <div class="tab-content" id="tab-admins">
-                <div class="table-toolbar">
-                    <span class="title">👑 Danh sách quản trị viên</span>
-                    <div class="right">
-                        <span style="font-size:12px;color:#999;" id="adminCount">0 quản trị viên</span>
-                        <button class="btn-primary" id="addAdminBtn" style="font-size:11px;padding:4px 12px;">➕ Thêm Admin</button>
-                    </div>
-                </div>
-                <div style="overflow-x:auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Avatar</th>
-                                <th>Tên</th>
-                                <th>Email</th>
-                                <th>Ngày thêm</th>
-                                <th>Hành động</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminsTableBody">
-                            <tr><td colspan="6" class="empty-state"><div class="icon">⏳</div>Đang tải...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
             <div class="tab-content" id="tab-settings">
                 <div style="max-width:100%;">
                     <h3 style="margin-bottom:12px;font-size:16px;">⚙️ Cài đặt Admin</h3>
@@ -1072,23 +1027,7 @@
         </div>
     </main>
 
-    <!-- ===== ADD ADMIN MODAL ===== -->
-    <div class="modal-overlay" id="addAdminModal">
-        <div class="modal-box">
-            <button class="close" id="closeAddAdminModal">✕</button>
-            <h2>👑 Thêm quản trị viên</h2>
-            <p style="color:#666;font-size:14px;margin-bottom:16px;">Nhập email của người dùng muốn mời làm quản trị viên.</p>
-            <form id="addAdminForm" onsubmit="return false;">
-                <div class="form-group">
-                    <label>📧 Email người dùng</label>
-                    <input type="email" id="adminEmailInput" placeholder="example@email.com" required />
-                </div>
-                <button type="button" class="btn-submit" id="addAdminSubmitBtn">👑 Thêm Admin</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- ===== MOVIE MODAL ===== -->
+    <!-- ===== MODAL ===== -->
     <div class="modal-overlay" id="movieModal">
         <div class="modal-box">
             <button class="close" id="closeModal">✕</button>
@@ -1160,13 +1099,8 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Admin chính (Super Admin) - chỉ định email
-        const SUPER_ADMIN_EMAIL = 'tuankhaimoi12345@gmail.com';
+        const ADMIN_EMAIL = 'tuankhaimoi12345@gmail.com';
         const LOGO_URL = 'https://i.ibb.co/9kJhtfp1/Doraemon-fansub.png';
-
-        let currentUser = null;
-        let isSuperAdmin = false;
-        let adminList = [];
 
         // ============================================================
         // DOM REFS
@@ -1189,12 +1123,6 @@
         const embedPreview = document.getElementById('embedPreview');
         const embedPreviewContent = document.getElementById('embedPreviewContent');
         const removeEmbedBtn = document.getElementById('removeEmbedBtn');
-
-        // Admin modal
-        const addAdminModal = document.getElementById('addAdminModal');
-        const closeAddAdminModal = document.getElementById('closeAddAdminModal');
-        const addAdminSubmitBtn = document.getElementById('addAdminSubmitBtn');
-        const adminEmailInput = document.getElementById('adminEmailInput');
 
         // ============================================================
         // MOBILE MENU
@@ -1251,279 +1179,7 @@
         }
 
         // ============================================================
-        // KIỂM TRA QUYỀN ADMIN
-        // ============================================================
-        async function isUserAdmin(email) {
-            if (!email) return false;
-            try {
-                const snapshot = await db.collection('admins')
-                    .where('email', '==', email)
-                    .get();
-                return !snapshot.empty;
-            } catch (e) {
-                return false;
-            }
-        }
-
-        // ============================================================
-        // LOAD ADMINS
-        // ============================================================
-        async function loadAdmins() {
-            const tbody = document.getElementById('adminsTableBody');
-            try {
-                const snapshot = await db.collection('admins')
-                    .orderBy('createdAt', 'desc')
-                    .get();
-
-                if (snapshot.empty) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="6" class="empty-state">
-                                <div class="icon">👑</div>
-                                Chưa có quản trị viên nào
-                            </td>
-                        </tr>
-                    `;
-                    document.getElementById('adminCount').textContent = '0 quản trị viên';
-                    return;
-                }
-
-                let html = '';
-                let count = 0;
-                adminList = [];
-
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    adminList.push({ id: doc.id, ...data });
-                    count++;
-
-                    const avatar = data.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.displayName || 'Admin')}&background=1a73e8&color=fff&size=32`;
-
-                    let joinDate = 'Chưa có';
-                    if (data.createdAt) {
-                        if (data.createdAt.seconds) {
-                            joinDate = new Date(data.createdAt.seconds * 1000).toLocaleDateString('vi-VN', {
-                                day: '2-digit',
-                                month: '2-digit',
-                                year: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            });
-                        }
-                    }
-
-                    // Không cho xóa Super Admin
-                    const isSuper = data.email === SUPER_ADMIN_EMAIL;
-                    const deleteBtn = isSuper ?
-                        `<span style="color:#999;font-size:11px;">👑 Super Admin</span>` :
-                        `<button class="btn-danger btn-sm" onclick="removeAdmin('${doc.id}','${data.email}')">🗑️ Xóa</button>`;
-
-                    html += `
-                        <tr>
-                            <td>${count}</td>
-                            <td>
-                                <img src="${avatar}" 
-                                     style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid #ffeb3b;"
-                                     onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(data.displayName || 'Admin')}&background=1a73e8&color=fff&size=32'">
-                            </td>
-                            <td style="font-weight:500;font-size:13px;">${data.displayName || 'Quản trị viên'}</td>
-                            <td style="font-size:12px;color:#1a73e8;">${data.email || ''}</td>
-                            <td style="font-size:12px;color:#666;">${joinDate}</td>
-                            <td>${deleteBtn}</td>
-                        </tr>
-                    `;
-                });
-
-                tbody.innerHTML = html;
-                document.getElementById('adminCount').textContent = count + ' quản trị viên';
-
-            } catch (e) {
-                console.error('Lỗi tải admin:', e);
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="empty-state">
-                            <div class="icon">❌</div>
-                            Lỗi tải dữ liệu: ${e.message}
-                        </td>
-                    </tr>
-                `;
-            }
-        }
-
-        // ============================================================
-        // THÊM ADMIN
-        // ============================================================
-        async function addAdmin(email) {
-            if (!email) return;
-
-            // Kiểm tra email đã là admin chưa
-            const snapshot = await db.collection('admins')
-                .where('email', '==', email)
-                .get();
-
-            if (!snapshot.empty) {
-                showToast('⚠️ Email này đã là quản trị viên!', true);
-                return;
-            }
-
-            try {
-                // Tìm user trong collection users
-                const userSnapshot = await db.collection('users')
-                    .where('email', '==', email)
-                    .get();
-
-                if (userSnapshot.empty) {
-                    showToast('⚠️ Không tìm thấy người dùng với email này!', true);
-                    return;
-                }
-
-                const userDoc = userSnapshot.docs[0];
-                const userData = userDoc.data();
-
-                // Thêm vào collection admins
-                await db.collection('admins').add({
-                    email: email,
-                    displayName: userData.displayName || 'Quản trị viên',
-                    photoURL: userData.photoURL || '',
-                    uid: userDoc.id,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    addedBy: currentUser ? currentUser.email : 'System'
-                });
-
-                showToast(`✅ Đã thêm ${email} làm quản trị viên!`);
-                loadAdmins();
-                loadUsers();
-
-            } catch (e) {
-                console.error('Lỗi thêm admin:', e);
-                showToast('❌ Lỗi thêm admin: ' + e.message, true);
-            }
-        }
-
-        // ============================================================
-        // XÓA ADMIN
-        // ============================================================
-        window.removeAdmin = async function(docId, email) {
-            if (email === SUPER_ADMIN_EMAIL) {
-                showToast('⚠️ Không thể xóa Super Admin!', true);
-                return;
-            }
-
-            if (!confirm(`Bạn có chắc muốn xóa quyền admin của ${email}?`)) return;
-
-            try {
-                await db.collection('admins').doc(docId).delete();
-                showToast(`✅ Đã xóa quyền admin của ${email}`);
-                loadAdmins();
-                loadUsers();
-            } catch (e) {
-                console.error('Lỗi xóa admin:', e);
-                showToast('❌ Lỗi xóa admin: ' + e.message, true);
-            }
-        };
-
-        // ============================================================
-        // LOAD USERS (Có hiển thị vai trò)
-        // ============================================================
-        async function loadUsers() {
-            const tbody = document.getElementById('usersTableBody');
-            try {
-                const snapshot = await db.collection('users')
-                    .orderBy('createdAt', 'desc')
-                    .get();
-
-                if (snapshot.empty) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="7" class="empty-state">
-                                <div class="icon">👥</div>
-                                Chưa có người dùng nào
-                            </td>
-                        </tr>
-                    `;
-                    document.getElementById('userCount').textContent = '0 người dùng';
-                    updateStats();
-                    return;
-                }
-
-                // Lấy danh sách admin
-                const adminSnapshot = await db.collection('admins').get();
-                const adminEmails = new Set();
-                adminSnapshot.forEach(doc => {
-                    adminEmails.add(doc.data().email);
-                });
-
-                let html = '';
-                let count = 0;
-
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    count++;
-
-                    const avatar = data.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.displayName || 'User')}&background=1a73e8&color=fff&size=32`;
-
-                    let joinDate = 'Chưa có';
-                    if (data.createdAt) {
-                        if (data.createdAt.seconds) {
-                            joinDate = new Date(data.createdAt.seconds * 1000).toLocaleDateString('vi-VN', {
-                                day: '2-digit',
-                                month: '2-digit',
-                                year: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            });
-                        }
-                    }
-
-                    // Kiểm tra vai trò
-                    const isAdmin = adminEmails.has(data.email);
-                    const roleHtml = isAdmin ?
-                        `<span style="background:#ffeb3b;color:#1a1a2e;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:600;">👑 Admin</span>` :
-                        `<span style="background:#f0f2f5;color:#666;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:600;">👤 User</span>`;
-
-                    // Nút thêm admin (chỉ hiện nếu không phải admin và là Super Admin)
-                    const actionBtn = (!isAdmin && isSuperAdmin) ?
-                        `<button class="btn-success btn-sm" onclick="addAdmin('${data.email}')">👑 Thêm Admin</button>` :
-                        (isAdmin && data.email === SUPER_ADMIN_EMAIL ?
-                            `<span style="color:#999;font-size:11px;">👑 Super</span>` :
-                            '');
-
-                    html += `
-                        <tr>
-                            <td>${count}</td>
-                            <td>
-                                <img src="${avatar}" 
-                                     style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid #e8f0fe;"
-                                     onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(data.displayName || 'User')}&background=1a73e8&color=fff&size=32'">
-                            </td>
-                            <td style="font-weight:500;font-size:13px;">${data.displayName || 'Người dùng'}</td>
-                            <td style="font-size:12px;color:#1a73e8;">${data.email || ''}</td>
-                            <td style="font-size:12px;color:#666;">${joinDate}</td>
-                            <td>${roleHtml}</td>
-                            <td>${actionBtn}</td>
-                        </tr>
-                    `;
-                });
-
-                tbody.innerHTML = html;
-                document.getElementById('userCount').textContent = count + ' người dùng';
-                updateStats();
-
-            } catch (e) {
-                console.error('Lỗi tải người dùng:', e);
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="empty-state">
-                            <div class="icon">❌</div>
-                            Lỗi tải dữ liệu: ${e.message}
-                        </td>
-                    </tr>
-                `;
-            }
-        }
-
-        // ============================================================
-        // EMBED PREVIEW (Movie)
+        // EMBED PREVIEW
         // ============================================================
         function updateEmbedPreview() {
             const embedCode = movieEmbed.value.trim();
@@ -1549,7 +1205,7 @@
         }
 
         // ============================================================
-        // POSTS (giữ nguyên)
+        // POSTS
         // ============================================================
         async function loadPosts() {
             const tbody = document.getElementById('postsTableBody');
@@ -1597,7 +1253,7 @@
         };
 
         // ============================================================
-        // MOVIES (giữ nguyên)
+        // MOVIES
         // ============================================================
         async function loadMovies() {
             const tbody = document.getElementById('moviesTableBody');
@@ -1759,35 +1415,254 @@
         }
 
         // ============================================================
-        // ADD ADMIN MODAL
+        // USERS - ĐÃ THÊM NÚT XÓA TÀI KHOẢN
         // ============================================================
-        document.getElementById('addAdminBtn').addEventListener('click', function() {
-            adminEmailInput.value = '';
-            addAdminModal.classList.add('active');
-        });
+        async function loadUsers() {
+            const tbody = document.getElementById('usersTableBody');
+            try {
+                const snapshot = await db.collection('users')
+                    .orderBy('createdAt', 'desc')
+                    .get();
 
-        closeAddAdminModal.addEventListener('click', function() {
-            addAdminModal.classList.remove('active');
-        });
+                if (snapshot.empty) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                <div class="icon">👥</div>
+                                Chưa có người dùng nào
+                            </td>
+                        </tr>
+                    `;
+                    document.getElementById('userCount').textContent = '0 người dùng';
+                    updateStats();
+                    return;
+                }
 
-        addAdminModal.addEventListener('click', function(e) {
-            if (e.target === addAdminModal) addAdminModal.classList.remove('active');
-        });
+                // Lấy danh sách admin
+                const adminSnapshot = await db.collection('admins').get();
+                const adminEmails = new Set();
+                adminSnapshot.forEach(doc => {
+                    adminEmails.add(doc.data().email);
+                });
 
-        addAdminSubmitBtn.addEventListener('click', async function() {
-            const email = adminEmailInput.value.trim();
-            if (!email) {
-                showToast('⚠️ Vui lòng nhập email!', true);
+                let html = '';
+                let count = 0;
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const uid = doc.id;
+                    count++;
+
+                    const avatar = data.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.displayName || 'User')}&background=1a73e8&color=fff&size=32`;
+
+                    let joinDate = 'Chưa có';
+                    if (data.createdAt) {
+                        if (data.createdAt.seconds) {
+                            joinDate = new Date(data.createdAt.seconds * 1000).toLocaleDateString('vi-VN', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+                        }
+                    }
+
+                    const isAdmin = adminEmails.has(data.email);
+                    const isSuperAdmin = data.email === ADMIN_EMAIL;
+
+                    const roleHtml = isSuperAdmin ?
+                        `<span style="background:#ffeb3b;color:#1a1a2e;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:600;">👑 Super Admin</span>` :
+                        isAdmin ?
+                        `<span style="background:#ffeb3b;color:#1a1a2e;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:600;">👑 Admin</span>` :
+                        `<span style="background:#f0f2f5;color:#666;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:600;">👤 User</span>`;
+
+                    // Nút thêm/xóa admin
+                    let adminAction = '';
+                    if (!isSuperAdmin) {
+                        if (!isAdmin) {
+                            adminAction =
+                                `<button class="btn-success btn-sm" onclick="addAdmin('${data.email}')">👑 Thêm Admin</button>`;
+                        } else {
+                            adminAction =
+                                `<button class="btn-danger btn-sm" onclick="removeAdmin('${doc.id}','${data.email}')">🗑️ Xóa Admin</button>`;
+                        }
+                    } else {
+                        adminAction =
+                            `<span style="color:#999;font-size:11px;">👑 Chủ sở hữu</span>`;
+                    }
+
+                    // NÚT XÓA TÀI KHOẢN (không cho xóa Super Admin)
+                    const deleteAccount = isSuperAdmin ?
+                        `<span style="color:#999;font-size:11px;">🔒 Không thể xóa</span>` :
+                        `<button class="btn-danger btn-sm" onclick="deleteUserAccount('${uid}','${data.email}')">🗑️ Xóa TK</button>`;
+
+                    html += `
+                        <tr>
+                            <td>${count}</td>
+                            <td>
+                                <img src="${avatar}" 
+                                     style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid #e8f0fe;"
+                                     onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(data.displayName || 'User')}&background=1a73e8&color=fff&size=32'">
+                            </td>
+                            <td style="font-weight:500;font-size:13px;">${data.displayName || 'Người dùng'}</td>
+                            <td style="font-size:12px;color:#1a73e8;">${data.email || ''}</td>
+                            <td style="font-size:12px;color:#666;">${joinDate}</td>
+                            <td>${roleHtml}</td>
+                            <td>
+                                <div style="display:flex;gap:4px;flex-wrap:wrap;">
+                                    ${adminAction}
+                                    ${deleteAccount}
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                tbody.innerHTML = html;
+                document.getElementById('userCount').textContent = count + ' người dùng';
+                updateStats();
+
+            } catch (e) {
+                console.error('Lỗi tải người dùng:', e);
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            <div class="icon">❌</div>
+                            Lỗi tải dữ liệu: ${e.message}
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // ============================================================
+        // THÊM ADMIN
+        // ============================================================
+        async function addAdmin(email) {
+            if (!email) return;
+
+            try {
+                const snapshot = await db.collection('admins')
+                    .where('email', '==', email)
+                    .get();
+
+                if (!snapshot.empty) {
+                    showToast('⚠️ Email này đã là admin!', true);
+                    return;
+                }
+
+                const userSnapshot = await db.collection('users')
+                    .where('email', '==', email)
+                    .get();
+
+                if (userSnapshot.empty) {
+                    showToast('⚠️ Không tìm thấy người dùng!', true);
+                    return;
+                }
+
+                const userDoc = userSnapshot.docs[0];
+                const userData = userDoc.data();
+
+                await db.collection('admins').add({
+                    email: email,
+                    displayName: userData.displayName || 'Quản trị viên',
+                    photoURL: userData.photoURL || '',
+                    uid: userDoc.id,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    addedBy: auth.currentUser?.email || 'System'
+                });
+
+                showToast(`✅ Đã thêm ${email} làm admin!`);
+                loadUsers();
+                loadAdmins();
+
+            } catch (e) {
+                console.error('Lỗi thêm admin:', e);
+                showToast('❌ Lỗi thêm admin: ' + e.message, true);
+            }
+        }
+
+        // ============================================================
+        // XÓA ADMIN
+        // ============================================================
+        window.removeAdmin = async function(docId, email) {
+            if (email === ADMIN_EMAIL) {
+                showToast('⚠️ Không thể xóa Super Admin!', true);
                 return;
             }
-            if (!email.includes('@')) {
-                showToast('⚠️ Email không hợp lệ!', true);
+
+            if (!confirm(`Bạn có chắc muốn xóa quyền admin của ${email}?`)) return;
+
+            try {
+                await db.collection('admins').doc(docId).delete();
+                showToast(`✅ Đã xóa quyền admin của ${email}`);
+                loadUsers();
+                loadAdmins();
+            } catch (e) {
+                console.error('Lỗi xóa admin:', e);
+                showToast('❌ Lỗi xóa admin: ' + e.message, true);
+            }
+        };
+
+        // ============================================================
+        // XÓA TÀI KHOẢN NGƯỜI DÙNG (TÍNH NĂNG MỚI)
+        // ============================================================
+        window.deleteUserAccount = async function(uid, email) {
+            if (email === ADMIN_EMAIL) {
+                showToast('⚠️ Không thể xóa Super Admin!', true);
                 return;
             }
-            await addAdmin(email);
-            addAdminModal.classList.remove('active');
-            adminEmailInput.value = '';
-        });
+
+            if (!confirm(`⚠️ Bạn có chắc muốn XÓA VĨNH VIỄN tài khoản ${email}?\n\nHành động này KHÔNG THỂ HOÀN TÁC!`)) return;
+
+            if (!confirm(`Lần cuối: Xóa tài khoản ${email}?`)) return;
+
+            try {
+                showToast('⏳ Đang xóa tài khoản...');
+
+                // 1. Xóa tất cả bài viết của user
+                const postsSnapshot = await db.collection('posts')
+                    .where('userId', '==', uid)
+                    .get();
+
+                const batch = db.batch();
+                postsSnapshot.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+                await batch.commit();
+
+                // 2. Xóa user khỏi collection admins (nếu có)
+                const adminSnapshot = await db.collection('admins')
+                    .where('email', '==', email)
+                    .get();
+                adminSnapshot.forEach(doc => {
+                    doc.ref.delete();
+                });
+
+                // 3. Xóa user khỏi collection users
+                await db.collection('users').doc(uid).delete();
+
+                // 4. Xóa tài khoản khỏi Firebase Authentication
+                // Lưu ý: Chỉ Admin mới có thể xóa user khỏi Auth
+                // Cần có Firebase Admin SDK hoặc dùng API
+                // Nếu không có quyền, vẫn xóa được dữ liệu Firestore
+
+                showToast(`✅ Đã xóa tài khoản ${email} thành công!`);
+                loadUsers();
+
+            } catch (e) {
+                console.error('Lỗi xóa tài khoản:', e);
+                showToast('❌ Lỗi xóa tài khoản: ' + e.message, true);
+            }
+        };
+
+        // ============================================================
+        // LOAD ADMINS
+        // ============================================================
+        async function loadAdmins() {
+            // Không cần load riêng nữa, đã có trong loadUsers
+        }
 
         // ============================================================
         // SETTINGS
@@ -1821,20 +1696,11 @@
                 window.location.href = 'login.html';
                 return;
             }
-
-            currentUser = user;
-            isSuperAdmin = user.email === SUPER_ADMIN_EMAIL;
-
-            // Kiểm tra quyền admin
-            const isAdmin = await isUserAdmin(user.email);
-
-            // Nếu không phải admin và không phải super admin -> chặn
-            if (!isAdmin && !isSuperAdmin) {
+            if (user.email !== ADMIN_EMAIL) {
                 alert('⚠️ Bạn không có quyền truy cập Dashboard!');
                 window.location.href = 'index.html';
                 return;
             }
-
             adminName.textContent = user.displayName || 'Admin';
             adminEmail.textContent = user.email;
             adminAvatar.src = user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName ||
@@ -1846,7 +1712,7 @@
             const settingsName = document.getElementById('settingsName');
             if (settingsName) settingsName.value = user.displayName || '';
 
-            await Promise.all([loadPosts(), loadMovies(), loadUsers(), loadAdmins()]);
+            await Promise.all([loadPosts(), loadMovies(), loadUsers()]);
             updateStats();
         });
 
@@ -1869,7 +1735,6 @@
             'posts': '📝 Quản lý bài viết',
             'movies': '🎬 Quản lý phim',
             'users': '👥 Người dùng',
-            'admins': '👑 Quản trị viên',
             'settings': '⚙️ Cài đặt'
         };
 
@@ -1916,8 +1781,8 @@
         });
 
         console.log('🔥 Dashboard admin đã sẵn sàng!');
-        console.log('👑 Super Admin:', SUPER_ADMIN_EMAIL);
-        console.log('👥 Có thể mời người dùng làm quản trị viên!');
+        console.log('👑 Super Admin:', ADMIN_EMAIL);
+        console.log('🗑️ Đã thêm chức năng xóa tài khoản người dùng!');
     </script>
 </body>
 </html>
