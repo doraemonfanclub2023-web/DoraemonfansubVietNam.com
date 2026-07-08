@@ -1095,7 +1095,7 @@
             transform: scale(1.05);
         }
 
-        /* ===== ACCOUNT DELETED MODAL ===== */
+        /* ===== ACCOUNT DELETED MODAL (SỬA) ===== */
         .account-deleted-modal {
             display: none;
             position: fixed;
@@ -1108,6 +1108,7 @@
             justify-content: center;
             align-items: center;
             backdrop-filter: blur(5px);
+            animation: modalFadeIn 0.3s ease;
         }
 
         .account-deleted-modal.active {
@@ -1143,23 +1144,48 @@
             margin-bottom: 20px;
         }
 
-        .account-deleted-content .btn-register {
-            padding: 12px 40px;
-            background: #1a73e8;
+        .account-deleted-content .btn-facebook {
+            display: inline-block;
+            background: #1877f2;
             color: white;
-            border: none;
+            padding: 12px 40px;
             border-radius: 30px;
             font-size: 16px;
             font-weight: 700;
-            cursor: pointer;
-            transition: 0.3s;
             text-decoration: none;
-            display: inline-block;
+            transition: 0.3s;
+            width: 100%;
+            text-align: center;
         }
 
-        .account-deleted-content .btn-register:hover {
-            background: #1557b0;
-            transform: scale(1.05);
+        .account-deleted-content .btn-facebook:hover {
+            background: #1664d9;
+            transform: scale(1.02);
+        }
+
+        .account-deleted-content .btn-close-modal {
+            background: transparent;
+            color: #666;
+            border: 1px solid #ddd;
+            padding: 10px 30px;
+            border-radius: 30px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 100%;
+        }
+
+        .account-deleted-content .btn-close-modal:hover {
+            background: #f0f2f5;
+            border-color: #999;
+        }
+
+        .account-deleted-content .action-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+            width: 100%;
         }
 
         @keyframes slideUp {
@@ -1312,16 +1338,23 @@
 </head>
 <body>
 
-    <!-- ===== ACCOUNT DELETED MODAL ===== -->
+    <!-- ===== ACCOUNT DELETED MODAL (SỬA) ===== -->
     <div class="account-deleted-modal" id="accountDeletedModal">
         <div class="account-deleted-content">
             <div class="icon">🚫</div>
             <h2>⚠️ Tài khoản đã bị xóa</h2>
             <p>
                 Tài khoản của bạn đã bị xóa trong đợt lọc tài khoản ảo vừa qua.<br><br>
-                <strong>Vui lòng đăng ký lại để sử dụng dịch vụ.</strong>
+                <strong>Vui lòng liên hệ page để được hỗ trợ khôi phục.</strong>
             </p>
-            <a href="login.html" class="btn-register">📝 Đăng ký lại</a>
+            <div class="action-group">
+                <a href="https://www.facebook.com/DoraemonFansubVietNam" target="_blank" class="btn-facebook">
+                    💬 Liên hệ Facebook
+                </a>
+                <button onclick="closeAccountDeletedModal()" class="btn-close-modal">
+                    ✖ Đóng
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1552,8 +1585,37 @@
         // ============================================================
         function showAccountDeletedModal() {
             accountDeletedModal.classList.add('active');
+            // Đăng xuất người dùng
             auth.signOut().catch(() => {});
         }
+
+        // ============================================================
+        // ĐÓNG MODAL TÀI KHOẢN BỊ XÓA
+        // ============================================================
+        function closeAccountDeletedModal() {
+            const modal = document.getElementById('accountDeletedModal');
+            if (modal) {
+                modal.classList.remove('active');
+                modal.style.display = 'none';
+            }
+        }
+
+        // Click outside để đóng
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('accountDeletedModal');
+            if (modal && modal.classList.contains('active')) {
+                if (e.target === modal) {
+                    closeAccountDeletedModal();
+                }
+            }
+        });
+
+        // ESC để đóng
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeAccountDeletedModal();
+            }
+        });
 
         // ============================================================
         // AUTH STATE
@@ -1811,7 +1873,7 @@
         }
 
         // ============================================================
-        // LOAD POSTS (FIXED)
+        // LOAD POSTS
         // ============================================================
         async function loadPosts() {
             if (!postList) return;
@@ -1864,7 +1926,7 @@
         }
 
         // ============================================================
-        // RENDER POST CARDS (FIXED)
+        // RENDER POST CARDS
         // ============================================================
         async function renderPostCards(posts) {
             if (!posts || posts.length === 0) return '';
@@ -2185,7 +2247,7 @@
         });
 
         // ============================================================
-        // OPEN MOVIE MODAL (FIXED)
+        // OPEN MOVIE MODAL
         // ============================================================
         async function openMovieModal(movieId) {
             if (!isLoggedIn) {
@@ -2227,7 +2289,6 @@
                     videoContent = `<p style="color:#999;text-align:center;padding:20px;">Không có video</p>`;
                 }
 
-                // Check if modal already exists
                 const existingModal = document.getElementById('movieModal');
                 if (existingModal) {
                     existingModal.remove();
@@ -2253,7 +2314,6 @@
 
                 document.body.appendChild(modal);
 
-                // Close button
                 const closeBtn = document.getElementById('modalCloseBtn');
                 if (closeBtn) {
                     closeBtn.addEventListener('click', function(e) {
@@ -2262,14 +2322,12 @@
                     });
                 }
 
-                // Click outside to close
                 modal.addEventListener('click', function(e) {
                     if (e.target === modal) {
                         closeMovieModal(modal);
                     }
                 });
 
-                // ESC key to close
                 const escHandler = function(e) {
                     if (e.key === 'Escape') {
                         closeMovieModal(modal);
@@ -2320,7 +2378,7 @@
         console.log('🎬 Doraemon Fansub đã sẵn sàng!');
         console.log('👑 Super Admin:', SUPER_ADMIN_EMAIL);
         console.log('✅ Đã thêm kiểm tra tài khoản bị cấm (banned_users)!');
-        console.log('🚫 Tài khoản bị xóa sẽ hiển thị popup yêu cầu đăng ký lại!');
+        console.log('🚫 Tài khoản bị xóa sẽ hiển thị popup yêu cầu liên hệ page!');
         console.log('📎 Đã thêm tính năng đính kèm ảnh/video!');
         console.log('👥 Click vào tên user để xem trang cá nhân!');
     </script>
