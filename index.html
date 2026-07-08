@@ -75,6 +75,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            flex-wrap: wrap;
         }
 
         #authStatus {
@@ -1257,8 +1258,8 @@
                             <img id="userAvatar" src="" alt="Avatar">
                             <span class="user-name" id="userName">User</span>
                         </a>
+                        <a href="dashboard.html" class="dashboard-link" id="dashboardLink">📊 Dashboard</a>
                     </div>
-                    <a href="dashboard.html" class="dashboard-link" id="dashboardLink">📊 Dashboard</a>
                     <a href="login.html" class="login-btn" id="loginBtn">🔑 Đăng nhập</a>
                     <button class="logout-btn" id="logoutBtn" onclick="logoutUser()">🚪 Đăng xuất</button>
                 </div>
@@ -1380,7 +1381,7 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        const ADMIN_EMAIL = 'tuankhaimoi12345@gmail.com';
+        const SUPER_ADMIN_EMAIL = 'tuankhaimoi12345@gmail.com';
         const LOGO_URL = 'https://i.ibb.co/9kJhtfp1/Doraemon-fansub.png';
 
         // ============================================================
@@ -1394,6 +1395,8 @@
 
         let uploadedFileUrl = '';
         let uploadedFileType = '';
+        let isLoggedIn = false;
+        let isAdmin = false;
 
         // ============================================================
         // DOM REFS
@@ -1417,7 +1420,21 @@
         const progressFill = document.getElementById('progressFill');
         const uploadStatus = document.getElementById('uploadStatus');
 
-        let isLoggedIn = false;
+        // ============================================================
+        // KIỂM TRA QUYỀN ADMIN
+        // ============================================================
+        async function isUserAdmin(email) {
+            if (!email) return false;
+            try {
+                const snapshot = await db.collection('admins')
+                    .where('email', '==', email)
+                    .get();
+                return !snapshot.empty;
+            } catch (e) {
+                console.error('Lỗi kiểm tra admin:', e);
+                return false;
+            }
+        }
 
         // ============================================================
         // AUTH STATE
@@ -1435,9 +1452,15 @@
                 createPostBox.style.pointerEvents = 'auto';
                 postInput.placeholder = `${user.displayName || 'Bạn'} đang nghĩ gì thế?`;
 
-                if (user.email === ADMIN_EMAIL) {
+                // Kiểm tra quyền admin
+                const adminCheck = await isUserAdmin(user.email);
+                const isSuperAdmin = user.email === SUPER_ADMIN_EMAIL;
+
+                if (adminCheck || isSuperAdmin) {
+                    isAdmin = true;
                     dashboardLink.style.display = 'inline-block';
                 } else {
+                    isAdmin = false;
                     dashboardLink.style.display = 'none';
                 }
 
@@ -1445,6 +1468,7 @@
                 await loadMovies();
             } else {
                 isLoggedIn = false;
+                isAdmin = false;
                 authStatus.style.display = 'none';
                 loginBtn.style.display = 'block';
                 logoutBtn.style.display = 'none';
@@ -1546,7 +1570,6 @@
                     uploadedFileUrl = result.info.secure_url;
                     uploadedFileType = isImage ? 'image' : 'video';
 
-                    // Hiển thị preview
                     uploadPreview.classList.add('show');
                     if (isImage) {
                         previewContent.innerHTML =
@@ -1593,7 +1616,7 @@
         }
 
         // ============================================================
-        // CREATE POST (Có đính kèm ảnh/video)
+        // CREATE POST
         // ============================================================
         async function createPost() {
             if (!isLoggedIn) {
@@ -1628,7 +1651,6 @@
                     userId: user.uid
                 };
 
-                // Thêm file nếu có
                 if (uploadedFileUrl) {
                     postData.fileUrl = uploadedFileUrl;
                     postData.fileType = uploadedFileType;
@@ -1712,7 +1734,7 @@
         }
 
         // ============================================================
-        // RENDER POST CARDS (Có hiển thị ảnh/video)
+        // RENDER POST CARDS
         // ============================================================
         function renderPostCards(posts) {
             if (!posts || posts.length === 0) return '';
@@ -1735,7 +1757,6 @@
                     </div>
                 `).join('');
 
-                // Hiển thị file đính kèm
                 let fileHtml = '';
                 if (p.fileUrl) {
                     if (p.fileType === 'image') {
@@ -1744,7 +1765,6 @@
                         fileHtml =
                             `<video controls class="post-video"><source src="${p.fileUrl}">Trình duyệt không hỗ trợ video</video>`;
                     } else {
-                        // Fallback: hiển thị link
                         fileHtml =
                             `<a href="${p.fileUrl}" target="_blank" style="display:block;padding:10px;background:#f0f2f5;border-radius:8px;margin:10px 0;color:#1a73e8;">📎 Xem file đính kèm</a>`;
                     }
@@ -1793,7 +1813,7 @@
         }
 
         // ============================================================
-        // LIKE, COMMENT, SHARE (giữ nguyên)
+        // LIKE
         // ============================================================
         async function toggleLike(postId) {
             try {
@@ -1812,6 +1832,9 @@
             }
         }
 
+        // ============================================================
+        // COMMENTS
+        // ============================================================
         function toggleComments(postId) {
             const el = document.getElementById(`comments-${postId}`);
             if (el) {
@@ -1850,6 +1873,9 @@
             }
         }
 
+        // ============================================================
+        // SHARE
+        // ============================================================
         function sharePost(postId) {
             const post = document.getElementById(`post-${postId}`);
             if (!post) return;
@@ -1863,12 +1889,25 @@
             }
         }
 
+        // ============================================================
+        // POST OPTIONS (Chỉ Admin mới xóa được)
+        // ============================================================
         async function showPostOptions(postId) {
             const user = auth.currentUser;
-            if (!user || user.email !== ADMIN_EMAIL) {
+            if (!user) {
+                alert('⚠️ Vui lòng đăng nhập!');
+                return;
+            }
+
+            // Kiểm tra quyền admin
+            const adminCheck = await isUserAdmin(user.email);
+            const isSuperAdmin = user.email === SUPER_ADMIN_EMAIL;
+
+            if (!adminCheck && !isSuperAdmin) {
                 alert('⚠️ Bạn không có quyền!');
                 return;
             }
+
             const choice = prompt('Chọn hành động:\n1. Xóa bài viết');
             if (choice === '1') {
                 if (confirm('Xóa bài viết này?')) {
@@ -1880,7 +1919,7 @@
         }
 
         // ============================================================
-        // MOVIES (giữ nguyên)
+        // MOVIES
         // ============================================================
         let allMovies = [];
         let currentCategory = 'all';
@@ -2009,7 +2048,7 @@
         });
 
         // ============================================================
-        // OPEN MOVIE MODAL (giữ nguyên)
+        // OPEN MOVIE MODAL
         // ============================================================
         async function openMovieModal(movieId) {
             if (!isLoggedIn) {
@@ -2114,7 +2153,7 @@
         }
 
         // ============================================================
-        // ENTER KEY
+        // ENTER KEY - Đã sửa để xuống hàng được
         // ============================================================
         document.getElementById('postInput').addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
@@ -2134,9 +2173,9 @@
         // INIT
         // ============================================================
         console.log('🎬 Doraemon đã sẵn sàng!');
-        console.log('👑 Admin:', ADMIN_EMAIL);
+        console.log('👑 Super Admin:', SUPER_ADMIN_EMAIL);
         console.log('📎 Đã thêm tính năng đính kèm ảnh/video!');
-        console.log('📷 Click "Ảnh" hoặc "Video" để đính kèm file.');
+        console.log('👥 Kiểm tra quyền admin để hiển thị nút Dashboard');
     </script>
 </body>
 </html>
