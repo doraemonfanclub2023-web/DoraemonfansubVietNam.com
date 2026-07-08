@@ -601,7 +601,8 @@
         }
 
         .modal-box .form-group input,
-        .modal-box .form-group textarea {
+        .modal-box .form-group textarea,
+        .modal-box .form-group select {
             width: 100%;
             padding: 8px 12px;
             border: 2px solid #e4e6eb;
@@ -609,10 +610,12 @@
             font-size: 13px;
             outline: none;
             transition: 0.3s;
+            background: white;
         }
 
         .modal-box .form-group input:focus,
-        .modal-box .form-group textarea:focus {
+        .modal-box .form-group textarea:focus,
+        .modal-box .form-group select:focus {
             border-color: #1a73e8;
         }
 
@@ -958,8 +961,8 @@
                 </div>
                 <div style="overflow-x:auto;">
                     <table>
-                        <thead><tr><th>#</th><th>Tên phim</th><th>Thể loại</th><th>Lượt xem</th><th>Hành động</th></tr></thead>
-                        <tbody id="moviesTableBody"><tr><td colspan="5" class="empty-state"><div class="icon">⏳</div>Đang tải...</td></tr></tbody>
+                        <thead><tr><th>#</th><th>Tên phim</th><th>Thể loại</th><th>Phân loại</th><th>Lượt xem</th><th>Hành động</th></tr></thead>
+                        <tbody id="moviesTableBody"><tr><td colspan="6" class="empty-state"><div class="icon">⏳</div>Đang tải...</td></tr></tbody>
                     </table>
                 </div>
             </div>
@@ -994,6 +997,7 @@
         </div>
     </main>
 
+    <!-- ===== MODAL (Đã thêm phân loại phim) ===== -->
     <div class="modal-overlay" id="movieModal">
         <div class="modal-box">
             <button class="close" id="closeModal">✕</button>
@@ -1002,6 +1006,19 @@
                 <div class="form-group">
                     <label>Tên phim *</label>
                     <input type="text" id="movieTitle" placeholder="VD: Doraemon: Nobita và đảo giấu vàng" />
+                </div>
+                <div class="form-group">
+                    <label>Phân loại *</label>
+                    <select id="movieCategory">
+                        <option value="movie">🎬 Phim lẻ</option>
+                        <option value="seri">📺 Phim bộ</option>
+                        <option value="tv-show">📺 TV Show</option>
+                        <option value="hoat-hinh">🎨 Hoạt hình</option>
+                        <option value="hanh-dong">⚔️ Hành động</option>
+                        <option value="hai-huoc">😂 Hài hước</option>
+                        <option value="tinh-cam">💕 Tình cảm</option>
+                        <option value="phim-bo">📺 Phim bộ</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>Thể loại *</label>
@@ -1127,7 +1144,7 @@
                 .length || 0;
             let views = 0;
             document.querySelectorAll('#moviesTableBody tr').forEach(row => {
-                const cell = row.querySelector('td:nth-child(4)');
+                const cell = row.querySelector('td:nth-child(5)');
                 if (cell) {
                     const num = parseInt(cell.textContent.replace(/[^0-9]/g, ''));
                     if (!isNaN(num)) views += num;
@@ -1211,7 +1228,7 @@
         };
 
         // ============================================================
-        // MOVIES
+        // MOVIES (Đã thêm phân loại)
         // ============================================================
         async function loadMovies() {
             const tbody = document.getElementById('moviesTableBody');
@@ -1219,7 +1236,7 @@
                 const snapshot = await db.collection('movies').orderBy('timestamp', 'desc').get();
                 if (snapshot.empty) {
                     tbody.innerHTML =
-                        `<tr><td colspan="5" class="empty-state"><div class="icon">🎬</div>Chưa có phim nào</td></tr>`;
+                        `<tr><td colspan="6" class="empty-state"><div class="icon">🎬</div>Chưa có phim nào</td></tr>`;
                     document.getElementById('movieCount').textContent = '0 phim';
                     return;
                 }
@@ -1228,11 +1245,25 @@
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     count++;
+                    // Hiển thị tên phân loại
+                    const categoryLabels = {
+                        'movie': '🎬 Phim lẻ',
+                        'seri': '📺 Phim bộ',
+                        'tv-show': '📺 TV Show',
+                        'hoat-hinh': '🎨 Hoạt hình',
+                        'hanh-dong': '⚔️ Hành động',
+                        'hai-huoc': '😂 Hài hước',
+                        'tinh-cam': '💕 Tình cảm',
+                        'phim-bo': '📺 Phim bộ'
+                    };
+                    const categoryLabel = categoryLabels[data.category] || '📺 Chưa phân loại';
+
                     html += `
                         <tr>
                             <td>${count}</td>
                             <td style="max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;"><strong>${data.title || 'Untitled'}</strong></td>
                             <td style="font-size:12px;">${data.genre || 'Chưa phân loại'}</td>
+                            <td style="font-size:12px;">${categoryLabel}</td>
                             <td style="font-size:12px;">${data.views || 0}</td>
                             <td>
                                 <button class="btn-edit btn-sm" onclick="editMovie('${doc.id}')">✏️</button>
@@ -1247,7 +1278,7 @@
             } catch (e) {
                 console.error(e);
                 tbody.innerHTML =
-                    `<tr><td colspan="5" class="empty-state"><div class="icon">❌</div>Lỗi tải: ${e.message}</td></tr>`;
+                    `<tr><td colspan="6" class="empty-state"><div class="icon">❌</div>Lỗi tải: ${e.message}</td></tr>`;
             }
         }
 
@@ -1268,6 +1299,7 @@
                 if (!doc.exists) return;
                 const data = doc.data();
                 document.getElementById('movieTitle').value = data.title || '';
+                document.getElementById('movieCategory').value = data.category || 'movie';
                 document.getElementById('movieGenre').value = data.genre || '';
                 document.getElementById('movieDesc').value = data.desc || '';
                 document.getElementById('moviePoster').value = data.poster || '';
@@ -1287,6 +1319,7 @@
         if (addMovieBtn) {
             addMovieBtn.addEventListener('click', function() {
                 document.getElementById('movieTitle').value = '';
+                document.getElementById('movieCategory').value = 'movie';
                 document.getElementById('movieGenre').value = '';
                 document.getElementById('movieDesc').value = '';
                 document.getElementById('moviePoster').value = '';
@@ -1316,6 +1349,7 @@
         if (submitBtn) {
             submitBtn.addEventListener('click', async function() {
                 const title = document.getElementById('movieTitle').value.trim();
+                const category = document.getElementById('movieCategory').value;
                 const genre = document.getElementById('movieGenre').value.trim();
                 const desc = document.getElementById('movieDesc').value.trim();
                 const poster = document.getElementById('moviePoster').value.trim();
@@ -1330,7 +1364,15 @@
                     return;
                 }
 
-                const data = { title, genre, desc, poster, embed, views: 0 };
+                const data = {
+                    title,
+                    category,
+                    genre,
+                    desc,
+                    poster,
+                    embed,
+                    views: 0
+                };
                 const mode = this.dataset.mode;
                 const id = this.dataset.id;
 
@@ -1527,6 +1569,7 @@
         console.log('🖼️ Logo URL:', LOGO_URL);
         console.log('📱 Đã tối ưu hóa cho điện thoại!');
         console.log('🏠 Nhấn "Về trang chủ" để quay lại giao diện chính.');
+        console.log('📂 Đã thêm phân loại phim: Phim lẻ, Phim bộ, TV Show, Hoạt hình...');
     </script>
 </body>
 </html>
