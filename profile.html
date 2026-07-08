@@ -32,7 +32,6 @@
             min-height: 100vh;
         }
 
-        /* ===== HEADER ===== */
         header {
             background: linear-gradient(135deg, #1a73e8, #0d47a1);
             padding: 12px 0;
@@ -158,7 +157,6 @@
             background: rgba(255, 255, 255, 0.25);
         }
 
-        /* ===== PROFILE ===== */
         .profile-container {
             max-width: 680px;
             margin: 20px auto;
@@ -235,7 +233,6 @@
             border-radius: 12px;
         }
 
-        /* ===== STATS ===== */
         .stats-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -262,7 +259,6 @@
             margin-top: 2px;
         }
 
-        /* ===== FORM ===== */
         .form-group {
             margin-bottom: 16px;
         }
@@ -341,7 +337,6 @@
             background: #d0d2d6;
         }
 
-        /* ===== UPLOAD PROGRESS ===== */
         .upload-progress {
             display: none;
             margin: 8px 0;
@@ -368,7 +363,6 @@
             transition: width 0.3s;
         }
 
-        /* ===== TOAST ===== */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -393,7 +387,6 @@
             transform: translateX(-50%) translateY(0);
         }
 
-        /* ===== LOGIN REQUIRED ===== */
         .login-required {
             text-align: center;
             padding: 60px 20px;
@@ -433,7 +426,6 @@
             transform: scale(1.05);
         }
 
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 480px) {
             .profile-card {
                 padding: 20px;
@@ -457,7 +449,6 @@
 </head>
 <body>
 
-    <!-- ===== HEADER ===== -->
     <header>
         <div class="container">
             <div class="header-content">
@@ -478,15 +469,12 @@
         </div>
     </header>
 
-    <!-- ===== PROFILE ===== -->
     <div class="profile-container" id="profileContainer">
-        <!-- Loading -->
         <div id="loadingState" style="text-align:center;padding:60px 20px;color:#999;">
             <div style="width:50px;height:50px;border:4px solid #f0f2f5;border-top:4px solid #1a73e8;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;"></div>
             <p>Đang tải thông tin...</p>
         </div>
 
-        <!-- Login Required -->
         <div id="loginRequired" class="login-required" style="display:none;">
             <div class="icon">🔒</div>
             <h2>Vui lòng đăng nhập</h2>
@@ -494,16 +482,13 @@
             <a href="login.html" class="btn-login">Đăng nhập ngay</a>
         </div>
 
-        <!-- Profile Content -->
         <div id="profileContent" style="display:none;">
             <div class="profile-card">
-                <!-- Avatar -->
                 <div class="profile-avatar" id="avatarContainer">
                     <img id="profileAvatar" src="" alt="Avatar">
                     <div class="avatar-overlay" onclick="openAvatarUpload()">📷 Đổi ảnh</div>
                 </div>
 
-                <!-- Upload Progress -->
                 <div class="upload-progress" id="uploadProgress">
                     <span id="uploadStatus">📤 Đang tải ảnh lên Cloudinary...</span>
                     <div class="progress-bar">
@@ -511,11 +496,9 @@
                     </div>
                 </div>
 
-                <!-- Name -->
                 <div class="profile-name" id="profileName">Tên người dùng</div>
                 <div class="profile-email" id="profileEmail">email@example.com</div>
 
-                <!-- Stats -->
                 <div class="stats-row">
                     <div class="stat-item">
                         <div class="number" id="statPosts">0</div>
@@ -533,7 +516,6 @@
 
                 <div class="profile-bio" id="profileBio">⭐ Thành viên của Doraemon Fansub VN</div>
 
-                <!-- Edit Form -->
                 <form id="profileForm" onsubmit="return false;">
                     <div class="form-group">
                         <label>Tên hiển thị</label>
@@ -551,7 +533,6 @@
         </div>
     </div>
 
-    <!-- ===== TOAST ===== -->
     <div class="toast" id="toast"></div>
 
     <script>
@@ -667,7 +648,6 @@
                 if (doc.exists) {
                     userData = doc.data();
                 } else {
-                    // Tạo mới nếu chưa có
                     userData = {
                         displayName: user.displayName || user.email.split('@')[0],
                         email: user.email,
@@ -678,7 +658,6 @@
                     await db.collection('users').doc(user.uid).set(userData);
                 }
 
-                // Hiển thị thông tin
                 profileAvatar.src = userData.photoURL || user.photoURL || 'https://ui-avatars.com/api/?name=' +
                     encodeURIComponent(userData.displayName || user.email);
                 profileName.textContent = userData.displayName || user.email;
@@ -688,7 +667,6 @@
                 editName.value = userData.displayName || '';
                 editBio.value = userData.bio || '';
 
-                // Load thống kê
                 await loadStats(user.uid);
 
             } catch (e) {
@@ -702,7 +680,6 @@
         // ============================================================
         async function loadStats(uid) {
             try {
-                // Đếm số bài viết của user
                 const postsSnapshot = await db.collection('posts')
                     .where('userId', '==', uid)
                     .get();
@@ -747,17 +724,14 @@
             saveBtn.textContent = '⏳ Đang lưu...';
 
             try {
-                // Update Firebase Auth
                 await currentUser.updateProfile({ displayName });
 
-                // Update Firestore
                 await db.collection('users').doc(currentUser.uid).update({
                     displayName: displayName,
                     bio: bio || '⭐ Thành viên của Doraemon Fansub VN',
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                // Cập nhật UI
                 profileName.textContent = displayName;
                 profileBio.textContent = bio || '⭐ Thành viên của Doraemon Fansub VN';
                 userName.textContent = displayName;
@@ -776,7 +750,7 @@
         });
 
         // ============================================================
-        // UPLOAD AVATAR (Cloudinary - ĐÃ SỬA LỖI)
+        // UPLOAD AVATAR (ĐÃ SỬA - BỎ THAM SỐ GÂY LỖI)
         // ============================================================
         function openAvatarUpload() {
             if (!currentUser) {
@@ -784,29 +758,25 @@
                 return;
             }
 
-            // Kiểm tra Cloudinary đã load chưa
             if (typeof cloudinary === 'undefined') {
                 showToast('⚠️ Cloudinary đang tải, vui lòng thử lại sau!', true);
                 return;
             }
 
+            // Cấu hình đơn giản - chỉ giữ các tham số cần thiết
             const widget = cloudinary.createUploadWidget({
                 cloudName: CLOUDINARY_CONFIG.cloudName,
                 uploadPreset: CLOUDINARY_CONFIG.uploadPreset,
                 folder: CLOUDINARY_CONFIG.folder,
-                sources: ['local', 'url', 'camera', 'google_drive', 'facebook', 'instagram'],
+                sources: ['local', 'url', 'camera', 'google_drive'],
                 multiple: false,
-                maxFileSize: 10000000, // 10MB
+                maxFileSize: 10000000,
                 resourceType: 'image',
-                // Cho phép tất cả định dạng ảnh
-                clientAllowedFormats: [
-                    'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'webp', 'svg', 'ico', 'heic', 'heif'
-                ],
+                clientAllowedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'],
                 cropping: true,
                 croppingAspectRatio: 1,
+                // KHÔNG DÙNG: use_filename, unique_filename
                 showAdvancedOptions: false,
-                use_filename: true,
-                unique_filename: true,
                 styles: {
                     palette: {
                         window: '#FFFFFF',
@@ -823,14 +793,6 @@
                         textDark: '#1a1a2e',
                         textLight: '#65676b'
                     }
-                },
-                text: {
-                    en: {
-                        queue: {
-                            title: 'Chọn ảnh đại diện',
-                            title_upload: 'Tải lên Cloudinary'
-                        }
-                    }
                 }
             }, async (error, result) => {
                 if (error) {
@@ -843,11 +805,9 @@
                 if (result.event === 'success') {
                     const avatarUrl = result.info.secure_url;
 
-                    // Update UI
                     profileAvatar.src = avatarUrl;
                     userAvatar.src = avatarUrl;
 
-                    // Update Firestore
                     try {
                         await db.collection('users').doc(currentUser.uid).update({
                             photoURL: avatarUrl,
@@ -857,7 +817,6 @@
                         console.warn('Không thể update Firestore:', e);
                     }
 
-                    // Update Auth
                     try {
                         await currentUser.updateProfile({ photoURL: avatarUrl });
                     } catch (e) {
@@ -872,25 +831,18 @@
                     }, 2000);
 
                     showToast('✅ Đổi avatar thành công!');
+                    userAvatar.src = avatarUrl;
 
-                    // Cập nhật lại tên trong header (trong trường hợp avatar đã đổi)
-                    if (currentUser) {
-                        userAvatar.src = avatarUrl;
-                    }
-                }
-
-                if (result.event === 'progress') {
+                } else if (result.event === 'progress') {
                     uploadProgress.style.display = 'block';
                     const progress = Math.round((result.info.bytesUploaded / result.info.totalBytes) * 100);
                     progressFill.style.width = progress + '%';
                     uploadStatus.textContent = `📤 Đang tải ảnh lên Cloudinary... ${progress}%`;
-                }
 
-                if (result.event === 'close') {
+                } else if (result.event === 'close') {
                     uploadProgress.style.display = 'none';
-                }
 
-                if (result.event === 'error') {
+                } else if (result.event === 'error') {
                     showToast('❌ Upload thất bại: ' + (result.info.message || 'Lỗi không xác định'), true);
                     uploadProgress.style.display = 'none';
                 }
@@ -910,12 +862,8 @@
             }
         };
 
-        // ============================================================
-        // INIT
-        // ============================================================
         console.log('👤 Trang cá nhân đã sẵn sàng!');
-        console.log('🖼️ Có thể đổi avatar và tên hiển thị.');
-        console.log('📷 Hỗ trợ định dạng: JPG, PNG, GIF, WEBP, BMP, TIFF, SVG, HEIC');
+        console.log('📷 Đã sửa lỗi Cloudinary - bỏ tham số use_filename');
     </script>
 </body>
 </html>
