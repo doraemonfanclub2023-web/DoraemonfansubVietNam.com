@@ -28,7 +28,6 @@
             min-height: 100vh;
         }
 
-        /* ===== SIDEBAR ===== */
         .sidebar {
             width: 250px;
             background: linear-gradient(180deg, #1a1a2e, #16213e);
@@ -56,14 +55,24 @@
             margin-bottom: 12px;
         }
 
-        .sidebar-brand h2 {
-            font-size: 18px;
+        .sidebar-brand .brand-logo {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
-        .sidebar-brand h2 span {
+        .sidebar-brand .brand-logo img {
+            height: 32px;
+            width: auto;
+            border-radius: 50%;
+        }
+
+        .sidebar-brand .brand-logo h2 {
+            font-size: 18px;
+            color: white;
+        }
+
+        .sidebar-brand .brand-logo h2 span {
             color: #ffeb3b;
         }
 
@@ -72,6 +81,7 @@
             color: rgba(255, 255, 255, 0.4);
             display: block;
             margin-top: 2px;
+            margin-left: 42px;
         }
 
         .sidebar-home-btn {
@@ -188,7 +198,6 @@
             background: rgba(255, 0, 0, 0.3);
         }
 
-        /* ===== OVERLAY (mobile) ===== */
         .sidebar-overlay {
             display: none;
             position: fixed;
@@ -205,7 +214,6 @@
             display: block;
         }
 
-        /* ===== MAIN ===== */
         .main {
             margin-left: 0;
             padding: 16px;
@@ -214,7 +222,6 @@
             min-height: 100vh;
         }
 
-        /* ===== MOBILE MENU BUTTON ===== */
         .mobile-menu-btn {
             display: flex !important;
             position: fixed;
@@ -239,7 +246,6 @@
             transform: scale(0.9);
         }
 
-        /* ===== PAGE HEADER ===== */
         .page-header {
             display: flex;
             justify-content: space-between;
@@ -254,6 +260,15 @@
             font-size: 20px;
             color: #1a1a2e;
             margin-left: 44px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .page-header h1 img {
+            height: 28px;
+            width: auto;
+            border-radius: 50%;
         }
 
         .page-header .admin-badge {
@@ -292,7 +307,6 @@
             gap: 6px;
         }
 
-        /* ===== STATS ===== */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -329,7 +343,6 @@
             margin-bottom: 2px;
         }
 
-        /* ===== TABS ===== */
         .tab-container {
             background: white;
             border-radius: 14px;
@@ -383,7 +396,6 @@
             display: block;
         }
 
-        /* ===== TABLE ===== */
         .table-toolbar {
             display: flex;
             flex-direction: column;
@@ -503,7 +515,6 @@
             margin-bottom: 6px;
         }
 
-        /* ===== MODAL ===== */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -691,7 +702,6 @@
             transform: scale(0.97);
         }
 
-        /* ===== TOAST ===== */
         .toast {
             position: fixed;
             bottom: 20px;
@@ -716,45 +726,36 @@
             transform: translateX(-50%) translateY(0);
         }
 
-        /* ===== RESPONSIVE ===== */
         @media (min-width: 769px) {
             .sidebar {
                 transform: translateX(0) !important;
                 position: fixed;
             }
-
             .sidebar-overlay {
                 display: none !important;
             }
-
             .mobile-menu-btn {
                 display: none !important;
             }
-
             .main {
                 margin-left: 250px;
                 padding: 24px 30px;
             }
-
             .page-header h1 {
                 margin-left: 0;
             }
-
             .stats-grid {
                 grid-template-columns: repeat(4, 1fr);
                 gap: 14px;
             }
-
             .table-toolbar {
                 flex-direction: row;
                 justify-content: space-between;
                 align-items: center;
             }
-
             .table-toolbar .right {
                 gap: 12px;
             }
-
             .modal-box {
                 max-width: 580px;
                 padding: 28px 30px;
@@ -766,56 +767,44 @@
                 grid-template-columns: 1fr 1fr;
                 gap: 8px;
             }
-
             .stat-card {
                 padding: 10px 12px;
             }
-
             .stat-card .number {
                 font-size: 18px;
             }
-
             .stat-card .label {
                 font-size: 11px;
             }
-
             .tab-btn {
                 font-size: 11px;
                 padding: 8px 10px;
             }
-
             .tab-content {
                 padding: 10px 12px;
             }
-
             table th,
             table td {
                 padding: 6px 6px;
                 font-size: 11px;
             }
-
             .page-header h1 {
                 font-size: 17px;
                 margin-left: 38px;
             }
-
             .modal-box {
                 padding: 16px;
             }
-
             .modal-box h2 {
                 font-size: 16px;
             }
-
             .sidebar {
                 width: 280px;
             }
-
             .btn-primary {
                 font-size: 11px;
                 padding: 5px 12px;
             }
-
             .toast {
                 font-size: 12px;
                 padding: 8px 16px;
@@ -828,30 +817,24 @@
                 grid-template-columns: 1fr 1fr;
                 gap: 6px;
             }
-
             .stat-card {
                 padding: 8px 10px;
             }
-
             .stat-card .number {
                 font-size: 16px;
             }
-
             .page-header h1 {
                 font-size: 15px;
                 margin-left: 34px;
             }
-
             .page-header .home-link {
                 font-size: 10px;
                 padding: 3px 8px;
             }
-
             .page-header .admin-badge {
                 font-size: 10px;
                 padding: 2px 8px;
             }
-
             .mobile-menu-btn {
                 width: 34px;
                 height: 34px;
@@ -861,7 +844,6 @@
             }
         }
 
-        /* Scrollbar */
         ::-webkit-scrollbar {
             width: 4px;
         }
@@ -876,16 +858,15 @@
 </head>
 <body>
 
-    <!-- ===== SIDEBAR OVERLAY ===== -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-    <!-- ===== MOBILE MENU BUTTON ===== -->
     <button class="mobile-menu-btn" id="menuToggle" aria-label="Toggle menu">☰</button>
 
-    <!-- ===== SIDEBAR ===== -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <h2>🎬 <span>Doraemon</span> VN</h2>
+            <div class="brand-logo">
+                <img src="https://i.ibb.co/9kJhtfp1/Doraemon-fansub.png" alt="Logo">
+                <h2>🎬 <span>Doraemon</span> VN</h2>
+            </div>
             <small>Admin Dashboard</small>
         </div>
 
@@ -912,17 +893,18 @@
         </div>
     </aside>
 
-    <!-- ===== MAIN ===== -->
     <main class="main">
         <div class="page-header">
-            <h1 id="pageTitle">📊 Tổng quan</h1>
+            <h1>
+                <img src="https://i.ibb.co/9kJhtfp1/Doraemon-fansub.png" alt="Logo">
+                <span id="pageTitle">📊 Tổng quan</span>
+            </h1>
             <div class="header-right">
                 <a href="index.html" class="home-link">🏠 Về trang</a>
                 <span class="admin-badge">👑 Admin</span>
             </div>
         </div>
 
-        <!-- Stats -->
         <div class="stats-grid" id="statsGrid">
             <div class="stat-card"><div class="icon">📝</div><div class="number" id="totalPosts">0</div><div class="label">Bài viết</div></div>
             <div class="stat-card"><div class="icon">🎬</div><div class="number" id="totalMovies">0</div><div class="label">Phim</div></div>
@@ -930,7 +912,6 @@
             <div class="stat-card"><div class="icon">👁️</div><div class="number" id="totalViews">0</div><div class="label">Lượt xem</div></div>
         </div>
 
-        <!-- Tabs -->
         <div class="tab-container">
             <div class="tab-header">
                 <button class="tab-btn active" data-tab="overview">📊 Tổng quan</button>
@@ -940,7 +921,6 @@
                 <button class="tab-btn" data-tab="settings">⚙️ Cài đặt</button>
             </div>
 
-            <!-- Overview -->
             <div class="tab-content active" id="tab-overview">
                 <div style="padding:4px 0;">
                     <h3 style="margin-bottom:6px;font-size:16px;">👋 Chào mừng Admin!</h3>
@@ -953,7 +933,6 @@
                 </div>
             </div>
 
-            <!-- Posts -->
             <div class="tab-content" id="tab-posts">
                 <div class="table-toolbar">
                     <span class="title">📝 Danh sách bài viết</span>
@@ -969,7 +948,6 @@
                 </div>
             </div>
 
-            <!-- Movies -->
             <div class="tab-content" id="tab-movies">
                 <div class="table-toolbar">
                     <span class="title">🎬 Danh sách phim</span>
@@ -986,7 +964,6 @@
                 </div>
             </div>
 
-            <!-- Users -->
             <div class="tab-content" id="tab-users">
                 <div class="table-toolbar">
                     <span class="title">👥 Danh sách người dùng</span>
@@ -1000,7 +977,6 @@
                 </div>
             </div>
 
-            <!-- Settings -->
             <div class="tab-content" id="tab-settings">
                 <div style="max-width:100%;">
                     <h3 style="margin-bottom:12px;font-size:16px;">⚙️ Cài đặt Admin</h3>
@@ -1018,7 +994,6 @@
         </div>
     </main>
 
-    <!-- ===== MODAL ===== -->
     <div class="modal-overlay" id="movieModal">
         <div class="modal-box">
             <button class="close" id="closeModal">✕</button>
@@ -1062,7 +1037,6 @@
         </div>
     </div>
 
-    <!-- ===== TOAST ===== -->
     <div class="toast" id="toast"></div>
 
     <script>
@@ -1084,6 +1058,7 @@
         const db = firebase.firestore();
 
         const ADMIN_EMAIL = 'tuankhaimoi12345@gmail.com';
+        const LOGO_URL = 'https://i.ibb.co/9kJhtfp1/Doraemon-fansub.png';
 
         // ============================================================
         // DOM REFS
@@ -1119,7 +1094,6 @@
         menuToggle.addEventListener('click', toggleSidebar);
         sidebarOverlay.addEventListener('click', toggleSidebar);
 
-        // Đóng sidebar khi click vào menu item trên mobile
         document.querySelectorAll('.sidebar-menu li').forEach(item => {
             item.addEventListener('click', function() {
                 if (window.innerWidth <= 768) {
@@ -1550,6 +1524,7 @@
 
         console.log('🔥 Dashboard admin đã sẵn sàng!');
         console.log('👑 Admin:', ADMIN_EMAIL);
+        console.log('🖼️ Logo URL:', LOGO_URL);
         console.log('📱 Đã tối ưu hóa cho điện thoại!');
         console.log('🏠 Nhấn "Về trang chủ" để quay lại giao diện chính.');
     </script>
