@@ -89,6 +89,14 @@
             border-radius: 30px;
         }
 
+        #authStatus a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: white;
+        }
+
         #authStatus img {
             width: 34px;
             height: 34px;
@@ -140,6 +148,24 @@
         .logout-btn:hover {
             background: rgba(255, 0, 0, 0.3);
             border-color: #ff4444;
+        }
+
+        /* ===== TÍCH XANH ===== */
+        .verified-badge {
+            display: inline-block;
+            background: #ffeb3b;
+            color: #0d47a1;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 12px;
+            margin-left: 6px;
+            vertical-align: middle;
+            line-height: 1.5;
+        }
+
+        .verified-badge .check {
+            margin-right: 3px;
         }
 
         .profile-container {
@@ -199,6 +225,11 @@
             font-weight: 700;
             color: #1a1a2e;
             margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
         }
 
         .profile-email {
@@ -429,6 +460,10 @@
             .stat-item .number {
                 font-size: 18px;
             }
+            .verified-badge {
+                font-size: 9px;
+                padding: 1px 6px;
+            }
         }
     </style>
 </head>
@@ -443,8 +478,10 @@
                 </a>
                 <div class="header-actions">
                     <div id="authStatus">
-                        <img id="userAvatar" src="" alt="Avatar">
-                        <span class="user-name" id="userName">User</span>
+                        <a href="profile.html">
+                            <img id="userAvatar" src="" alt="Avatar">
+                            <span class="user-name" id="userName">User</span>
+                        </a>
                     </div>
                     <a href="login.html" class="login-btn" id="loginBtn">🔑 Đăng nhập</a>
                     <button class="logout-btn" id="logoutBtn" onclick="logoutUser()">🚪 Đăng xuất</button>
@@ -480,7 +517,12 @@
                     </div>
                 </div>
 
-                <div class="profile-name" id="profileName">Tên người dùng</div>
+                <div class="profile-name" id="profileName">
+                    <span id="profileNameText">Tên người dùng</span>
+                    <span class="verified-badge" id="profileBadge" style="display:none;">
+                        <span class="check">✓</span> Admin
+                    </span>
+                </div>
                 <div class="profile-email" id="profileEmail">email@example.com</div>
 
                 <div class="stats-row">
@@ -537,6 +579,7 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        const SUPER_ADMIN_EMAIL = 'tuankhaimoi12345@gmail.com';
         const LOGO_URL = 'https://i.ibb.co/9kJhtfp1/Doraemon-fansub.png';
 
         // ============================================================
@@ -562,9 +605,11 @@
         const profileContent = document.getElementById('profileContent');
 
         const profileAvatar = document.getElementById('profileAvatar');
+        const profileNameText = document.getElementById('profileNameText');
         const profileName = document.getElementById('profileName');
         const profileEmail = document.getElementById('profileEmail');
         const profileBio = document.getElementById('profileBio');
+        const profileBadge = document.getElementById('profileBadge');
 
         const editName = document.getElementById('editName');
         const editBio = document.getElementById('editBio');
@@ -581,6 +626,22 @@
 
         let currentUser = null;
         let userData = {};
+        let isAdmin = false;
+
+        // ============================================================
+        // KIỂM TRA QUYỀN ADMIN
+        // ============================================================
+        async function isUserAdmin(email) {
+            if (!email) return false;
+            try {
+                const snapshot = await db.collection('admins')
+                    .where('email', '==', email)
+                    .get();
+                return !snapshot.empty;
+            } catch (e) {
+                return false;
+            }
+        }
 
         // ============================================================
         // TOAST
@@ -607,6 +668,11 @@
                 userAvatar.src = user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user
                     .displayName || user.email);
                 userName.textContent = user.displayName || user.email;
+
+                // Kiểm tra quyền admin
+                const adminCheck = await isUserAdmin(user.email);
+                const isSuperAdmin = user.email === SUPER_ADMIN_EMAIL;
+                isAdmin = adminCheck || isSuperAdmin;
 
                 loginRequired.style.display = 'none';
                 profileContent.style.display = 'block';
@@ -642,11 +708,19 @@
                     await db.collection('users').doc(user.uid).set(userData);
                 }
 
+                // Hiển thị thông tin
                 profileAvatar.src = userData.photoURL || user.photoURL || 'https://ui-avatars.com/api/?name=' +
                     encodeURIComponent(userData.displayName || user.email);
-                profileName.textContent = userData.displayName || user.email;
+                profileNameText.textContent = userData.displayName || user.email;
                 profileEmail.textContent = userData.email || user.email;
                 profileBio.textContent = userData.bio || '⭐ Thành viên của Doraemon Fansub VN';
+
+                // Hiển thị tích xanh nếu là admin
+                if (isAdmin) {
+                    profileBadge.style.display = 'inline-block';
+                } else {
+                    profileBadge.style.display = 'none';
+                }
 
                 editName.value = userData.displayName || '';
                 editBio.value = userData.bio || '';
@@ -716,7 +790,7 @@
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                profileName.textContent = displayName;
+                profileNameText.textContent = displayName;
                 profileBio.textContent = bio || '⭐ Thành viên của Doraemon Fansub VN';
                 userName.textContent = displayName;
                 userAvatar.src = currentUser.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(
@@ -845,8 +919,7 @@
         };
 
         console.log('👤 Trang cá nhân đã sẵn sàng!');
-        console.log('📷 Đã sửa lỗi Cloudinary - bỏ tham số use_filename');
-        console.log('🗑️ Đã xóa nút "Trang chủ" (đã có logo)');
+        console.log('✅ Đã thêm tích xanh cho Admin!');
     </script>
 </body>
 </html>
