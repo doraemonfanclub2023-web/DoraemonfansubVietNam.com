@@ -82,12 +82,27 @@
             border-radius: 30px;
         }
 
+        #authStatus a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: white;
+        }
+
         #authStatus img {
             width: 34px;
             height: 34px;
             border-radius: 50%;
             border: 2px solid #ffeb3b;
             object-fit: cover;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        #authStatus img:hover {
+            transform: scale(1.05);
+            border-color: #ffeb3b;
         }
 
         #authStatus .user-name {
@@ -98,6 +113,12 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        #authStatus .user-name:hover {
+            color: #ffeb3b;
         }
 
         .login-btn {
@@ -229,10 +250,10 @@
             border-radius: 50%;
             overflow: hidden;
             flex-shrink: 0;
-            background: linear-gradient(135deg, #1a73e8, #0d47a1);
             display: flex;
             align-items: center;
             justify-content: center;
+            text-decoration: none;
         }
 
         .create-post-top .avatar img {
@@ -1125,8 +1146,10 @@
                 </a>
                 <div class="header-actions">
                     <div id="authStatus">
-                        <img id="userAvatar" src="" alt="Avatar">
-                        <span class="user-name" id="userName">User</span>
+                        <a href="profile.html">
+                            <img id="userAvatar" src="" alt="Avatar">
+                            <span class="user-name" id="userName">User</span>
+                        </a>
                     </div>
                     <a href="dashboard.html" class="dashboard-link" id="dashboardLink">📊 Dashboard</a>
                     <a href="login.html" class="login-btn" id="loginBtn">🔑 Đăng nhập</a>
@@ -1154,9 +1177,9 @@
                         <!-- Create Post -->
                         <div class="create-post" id="createPostBox">
                             <div class="create-post-top">
-                                <div class="avatar">
-                                    <img src="https://i.ibb.co/9kJhtfp1/Doraemon-fansub.png" alt="Logo">
-                                </div>
+                                <a href="profile.html" class="avatar" style="text-decoration:none; display:flex; align-items:center; justify-content:center; width:44px; height:44px; border-radius:50%; overflow:hidden; flex-shrink:0; background:linear-gradient(135deg, #1a73e8, #0d47a1);">
+                                    <img src="https://i.ibb.co/9kJhtfp1/Doraemon-fansub.png" alt="Logo" style="width:100%; height:100%; object-fit:cover;">
+                                </a>
                                 <input type="text" id="postInput" placeholder="Bạn đang nghĩ gì thế?">
                             </div>
                             <div class="create-post-bottom">
@@ -1856,6 +1879,7 @@
         console.log('🔒 Chức năng xem phim yêu cầu đăng nhập!');
         console.log('🏠 Click logo để về trang chủ!');
         console.log('📱 Đã tối ưu giao diện 2 cột cho máy tính!');
+        console.log('👤 Click avatar để vào trang cá nhân!');
     </script>
 </body>
 </html>
