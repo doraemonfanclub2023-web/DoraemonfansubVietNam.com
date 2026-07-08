@@ -627,20 +627,30 @@
         let currentUser = null;
         let userData = {};
         let isAdmin = false;
+        let adminEmails = new Set();
 
         // ============================================================
-        // KIỂM TRA QUYỀN ADMIN
+        // LẤY DANH SÁCH ADMIN
         // ============================================================
-        async function isUserAdmin(email) {
-            if (!email) return false;
+        async function loadAdminList() {
             try {
-                const snapshot = await db.collection('admins')
-                    .where('email', '==', email)
-                    .get();
-                return !snapshot.empty;
+                const snapshot = await db.collection('admins').get();
+                adminEmails = new Set();
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.email) {
+                        adminEmails.add(data.email);
+                    }
+                });
+                adminEmails.add(SUPER_ADMIN_EMAIL);
             } catch (e) {
-                return false;
+                console.error('Lỗi load admin list:', e);
             }
+        }
+
+        function isUserAdmin(email) {
+            if (!email) return false;
+            return adminEmails.has(email);
         }
 
         // ============================================================
@@ -658,6 +668,7 @@
         // AUTH STATE
         // ============================================================
         auth.onAuthStateChanged(async (user) => {
+            await loadAdminList();
             loadingState.style.display = 'none';
 
             if (user) {
@@ -669,10 +680,7 @@
                     .displayName || user.email);
                 userName.textContent = user.displayName || user.email;
 
-                // Kiểm tra quyền admin
-                const adminCheck = await isUserAdmin(user.email);
-                const isSuperAdmin = user.email === SUPER_ADMIN_EMAIL;
-                isAdmin = adminCheck || isSuperAdmin;
+                isAdmin = isUserAdmin(user.email);
 
                 loginRequired.style.display = 'none';
                 profileContent.style.display = 'block';
@@ -708,14 +716,12 @@
                     await db.collection('users').doc(user.uid).set(userData);
                 }
 
-                // Hiển thị thông tin
                 profileAvatar.src = userData.photoURL || user.photoURL || 'https://ui-avatars.com/api/?name=' +
                     encodeURIComponent(userData.displayName || user.email);
                 profileNameText.textContent = userData.displayName || user.email;
                 profileEmail.textContent = userData.email || user.email;
                 profileBio.textContent = userData.bio || '⭐ Thành viên của Doraemon Fansub VN';
 
-                // Hiển thị tích xanh nếu là admin
                 if (isAdmin) {
                     profileBadge.style.display = 'inline-block';
                 } else {
