@@ -997,7 +997,7 @@
         </div>
     </main>
 
-    <!-- ===== MODAL (Đã thêm phân loại phim) ===== -->
+    <!-- ===== MODAL (Đã sửa phân loại: Movie, Short Movie, Seri) ===== -->
     <div class="modal-overlay" id="movieModal">
         <div class="modal-box">
             <button class="close" id="closeModal">✕</button>
@@ -1010,14 +1010,9 @@
                 <div class="form-group">
                     <label>Phân loại *</label>
                     <select id="movieCategory">
-                        <option value="movie">🎬 Phim lẻ</option>
-                        <option value="seri">📺 Phim bộ</option>
-                        <option value="tv-show">📺 TV Show</option>
-                        <option value="hoat-hinh">🎨 Hoạt hình</option>
-                        <option value="hanh-dong">⚔️ Hành động</option>
-                        <option value="hai-huoc">😂 Hài hước</option>
-                        <option value="tinh-cam">💕 Tình cảm</option>
-                        <option value="phim-bo">📺 Phim bộ</option>
+                        <option value="movie">🎬 Movie</option>
+                        <option value="short">🎥 Short Movie</option>
+                        <option value="seri">📺 Seri</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -1228,7 +1223,7 @@
         };
 
         // ============================================================
-        // MOVIES (Đã thêm phân loại)
+        // MOVIES (Đã sửa phân loại: Movie, Short Movie, Seri)
         // ============================================================
         async function loadMovies() {
             const tbody = document.getElementById('moviesTableBody');
@@ -1247,14 +1242,9 @@
                     count++;
                     // Hiển thị tên phân loại
                     const categoryLabels = {
-                        'movie': '🎬 Phim lẻ',
-                        'seri': '📺 Phim bộ',
-                        'tv-show': '📺 TV Show',
-                        'hoat-hinh': '🎨 Hoạt hình',
-                        'hanh-dong': '⚔️ Hành động',
-                        'hai-huoc': '😂 Hài hước',
-                        'tinh-cam': '💕 Tình cảm',
-                        'phim-bo': '📺 Phim bộ'
+                        'movie': '🎬 Movie',
+                        'short': '🎥 Short Movie',
+                        'seri': '📺 Seri'
                     };
                     const categoryLabel = categoryLabels[data.category] || '📺 Chưa phân loại';
 
@@ -1568,8 +1558,7 @@
         console.log('👑 Admin:', ADMIN_EMAIL);
         console.log('🖼️ Logo URL:', LOGO_URL);
         console.log('📱 Đã tối ưu hóa cho điện thoại!');
-        console.log('🏠 Nhấn "Về trang chủ" để quay lại giao diện chính.');
-        console.log('📂 Đã thêm phân loại phim: Phim lẻ, Phim bộ, TV Show, Hoạt hình...');
+        console.log('📂 Phân loại: Movie, Short Movie, Seri');
     </script>
 </body>
 </html>
