@@ -672,7 +672,6 @@
             position: relative;
         }
 
-        /* Lock overlay khi chưa đăng nhập */
         .movie-card.locked {
             cursor: pointer;
         }
@@ -911,7 +910,6 @@
             font-size: 13px;
         }
 
-        /* Login required toast */
         .login-required-toast {
             position: fixed;
             bottom: 30px;
@@ -1068,7 +1066,7 @@
     <header>
         <div class="container">
             <div class="header-content">
-                <a href="#" class="logo">
+                <a href="index.html" class="logo">
                     <img src="https://i.ibb.co/9kJhtfp1/Doraemon-fansub.png" alt="Doraemon Fansub">
                     Doraemon
                 </a>
@@ -1512,7 +1510,7 @@
         }
 
         // ============================================================
-        // LOAD MOVIES (Có khóa xem khi chưa đăng nhập)
+        // LOAD MOVIES
         // ============================================================
         let allMovies = [];
         let currentCategory = 'all';
@@ -1565,7 +1563,7 @@
         }
 
         // ============================================================
-        // CẬP NHẬT SỐ LƯỢNG CHO TỪNG THỂ LOẠI
+        // CẬP NHẬT SỐ LƯỢNG
         // ============================================================
         function updateCategoryCounts(movies) {
             const counts = {
@@ -1582,7 +1580,7 @@
         }
 
         // ============================================================
-        // HIỂN THỊ PHIM THEO THỂ LOẠI (Có khóa xem khi chưa đăng nhập)
+        // RENDER MOVIES
         // ============================================================
         function renderMoviesByCategory(category) {
             currentCategory = category;
@@ -1629,7 +1627,7 @@
         }
 
         // ============================================================
-        // HIỂN THỊ THÔNG BÁO YÊU CẦU ĐĂNG NHẬP
+        // SHOW LOGIN REQUIRED
         // ============================================================
         function showLoginRequired() {
             loginRequiredToast.classList.add('show');
@@ -1639,7 +1637,7 @@
         }
 
         // ============================================================
-        // SỰ KIỆN CLICK VÀO THỂ LOẠI
+        // CATEGORY CLICK
         // ============================================================
         document.getElementById('categoryList').addEventListener('click', function(e) {
             const li = e.target.closest('li');
@@ -1653,10 +1651,9 @@
         });
 
         // ============================================================
-        // OPEN MOVIE MODAL (Chỉ gọi khi đã đăng nhập)
+        // OPEN MOVIE MODAL
         // ============================================================
         async function openMovieModal(movieId) {
-            // Kiểm tra lại đăng nhập
             if (!isLoggedIn) {
                 showLoginRequired();
                 return;
@@ -1739,7 +1736,6 @@
                 };
                 document.addEventListener('keydown', escHandler);
 
-                // Cập nhật lại danh sách phim sau 2s để cập nhật lượt xem
                 setTimeout(loadMovies, 2000);
 
             } catch (e) {
@@ -1783,6 +1779,7 @@
         console.log('👑 Admin:', ADMIN_EMAIL);
         console.log('🖼️ Logo URL:', LOGO_URL);
         console.log('🔒 Chức năng xem phim yêu cầu đăng nhập!');
+        console.log('🏠 Click logo để về trang chủ!');
     </script>
 </body>
 </html>
