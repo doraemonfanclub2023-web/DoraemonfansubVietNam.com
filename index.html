@@ -302,6 +302,7 @@
             font-size: 15px;
             outline: none;
             transition: 0.3s;
+            resize: vertical;
         }
 
         .create-post-top input:focus {
@@ -1788,7 +1789,7 @@
         }
 
         // ============================================================
-        // RENDER POST CARDS (Có tích xanh)
+        // RENDER POST CARDS
         // ============================================================
         async function renderPostCards(posts) {
             if (!posts || posts.length === 0) return '';
@@ -2238,6 +2239,7 @@
         console.log('👑 Super Admin:', SUPER_ADMIN_EMAIL);
         console.log('✅ Đã thêm tích xanh cho Admin!');
         console.log('📎 Đã thêm tính năng đính kèm ảnh/video!');
+        console.log('👥 Click vào tên user để xem trang cá nhân!');
     </script>
 </body>
 </html>
