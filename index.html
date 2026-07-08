@@ -589,14 +589,13 @@
             font-size: 15px;
         }
 
-        /* ===== MOVIE SECTION (Có phân loại bên trái) ===== */
+        /* ===== MOVIE SECTION ===== */
         .movie-layout {
             display: grid;
             grid-template-columns: 180px 1fr;
             gap: 16px;
         }
 
-        /* Phân loại bên trái */
         .movie-categories {
             background: white;
             border-radius: 16px;
@@ -657,7 +656,6 @@
             color: white;
         }
 
-        /* Movie grid bên phải */
         .movie-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -1029,14 +1027,9 @@
                         <div class="category-title">📂 Phân loại</div>
                         <ul class="category-list" id="categoryList">
                             <li class="active" data-category="all">📺 Tất cả <span class="count" id="countAll">0</span></li>
-                            <li data-category="movie">🎬 Phim lẻ <span class="count" id="countMovie">0</span></li>
-                            <li data-category="seri">📺 Phim bộ <span class="count" id="countSeri">0</span></li>
-                            <li data-category="phim-bo">📺 Phim bộ <span class="count" id="countPhimBo">0</span></li>
-                            <li data-category="tv-show">📺 TV Show <span class="count" id="countTvShow">0</span></li>
-                            <li data-category="hoat-hinh">🎨 Hoạt hình <span class="count" id="countHoatHinh">0</span></li>
-                            <li data-category="hanh-dong">⚔️ Hành động <span class="count" id="countHanhDong">0</span></li>
-                            <li data-category="hai-huoc">😂 Hài hước <span class="count" id="countHaiHuoc">0</span></li>
-                            <li data-category="tinh-cam">💕 Tình cảm <span class="count" id="countTinhCam">0</span></li>
+                            <li data-category="movie">🎬 Movie <span class="count" id="countMovie">0</span></li>
+                            <li data-category="short">🎥 Short Movie <span class="count" id="countShort">0</span></li>
+                            <li data-category="seri">📺 Seri <span class="count" id="countSeri">0</span></li>
                         </ul>
                     </div>
 
@@ -1404,7 +1397,7 @@
         }
 
         // ============================================================
-        // LOAD MOVIES (Có phân loại)
+        // LOAD MOVIES (Có phân loại: Movie, Short Movie, Seri)
         // ============================================================
         let allMovies = [];
         let currentCategory = 'all';
@@ -1433,21 +1426,9 @@
                 snapshot.forEach(doc => {
                     const m = doc.data();
                     m.id = doc.id;
-                    // Chuẩn hóa category (nếu chưa có thì mặc định là 'movie')
+                    // Mặc định nếu chưa có category thì set là movie
                     if (!m.category) {
-                        // Dùng genre làm category nếu có
-                        const genreMap = {
-                            'Phim lẻ': 'movie',
-                            'Phim bộ': 'seri',
-                            'TV Show': 'tv-show',
-                            'Hoạt hình': 'hoat-hinh',
-                            'Hành động': 'hanh-dong',
-                            'Hài hước': 'hai-huoc',
-                            'Tình cảm': 'tinh-cam',
-                            'Phiêu lưu': 'movie',
-                            'Khoa học viễn tưởng': 'movie'
-                        };
-                        m.category = genreMap[m.genre] || 'movie';
+                        m.category = 'movie';
                     }
                     allMovies.push(m);
                 });
@@ -1475,25 +1456,15 @@
         function updateCategoryCounts(movies) {
             const counts = {
                 all: movies.length,
-                movie: movies.filter(m => m.category === 'movie' || m.category === 'phim-le').length,
-                seri: movies.filter(m => m.category === 'seri').length,
-                'phim-bo': movies.filter(m => m.category === 'phim-bo' || m.category === 'seri').length,
-                'tv-show': movies.filter(m => m.category === 'tv-show').length,
-                'hoat-hinh': movies.filter(m => m.category === 'hoat-hinh').length,
-                'hanh-dong': movies.filter(m => m.category === 'hanh-dong').length,
-                'hai-huoc': movies.filter(m => m.category === 'hai-huoc').length,
-                'tinh-cam': movies.filter(m => m.category === 'tinh-cam').length
+                movie: movies.filter(m => m.category === 'movie').length,
+                short: movies.filter(m => m.category === 'short' || m.category === 'short-movie').length,
+                seri: movies.filter(m => m.category === 'seri' || m.category === 'series').length
             };
 
             document.getElementById('countAll').textContent = counts.all;
             document.getElementById('countMovie').textContent = counts.movie;
+            document.getElementById('countShort').textContent = counts.short;
             document.getElementById('countSeri').textContent = counts.seri;
-            document.getElementById('countPhimBo').textContent = counts['phim-bo'];
-            document.getElementById('countTvShow').textContent = counts['tv-show'];
-            document.getElementById('countHoatHinh').textContent = counts['hoat-hinh'];
-            document.getElementById('countHanhDong').textContent = counts['hanh-dong'];
-            document.getElementById('countHaiHuoc').textContent = counts['hai-huoc'];
-            document.getElementById('countTinhCam').textContent = counts['tinh-cam'];
         }
 
         // ============================================================
@@ -1543,7 +1514,6 @@
             const li = e.target.closest('li');
             if (!li) return;
 
-            // Bỏ active tất cả
             this.querySelectorAll('li').forEach(item => item.classList.remove('active'));
             li.classList.add('active');
 
@@ -1581,7 +1551,7 @@
                         <div class="video-wrapper">
                             <video controls>
                                 <source src="${m.video}">
-                                Trình duyệt không hỗ trỗ video
+                                Trình duyệt không hỗ trợ video
                             </video>
                         </div>
                     `;
