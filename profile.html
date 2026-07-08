@@ -150,6 +150,21 @@
             border-color: #ff4444;
         }
 
+        .back-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 6px 14px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            font-size: 13px;
+            transition: 0.3s;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
         /* ===== TÍCH XANH ===== */
         .verified-badge {
             display: inline-block;
@@ -442,6 +457,16 @@
             transform: scale(1.05);
         }
 
+        .owner-badge {
+            display: inline-block;
+            background: #e8f0fe;
+            color: #1a73e8;
+            font-size: 12px;
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
         @media (max-width: 480px) {
             .profile-card {
                 padding: 20px;
@@ -483,6 +508,7 @@
                             <span class="user-name" id="userName">User</span>
                         </a>
                     </div>
+                    <a href="index.html" class="back-link">🏠 Trang chủ</a>
                     <a href="login.html" class="login-btn" id="loginBtn">🔑 Đăng nhập</a>
                     <button class="logout-btn" id="logoutBtn" onclick="logoutUser()">🚪 Đăng xuất</button>
                 </div>
@@ -505,11 +531,13 @@
 
         <div id="profileContent" style="display:none;">
             <div class="profile-card">
+                <!-- Avatar -->
                 <div class="profile-avatar" id="avatarContainer">
                     <img id="profileAvatar" src="" alt="Avatar">
-                    <div class="avatar-overlay" onclick="openAvatarUpload()">📷 Đổi ảnh</div>
+                    <div class="avatar-overlay" id="avatarOverlay" onclick="openAvatarUpload()">📷 Đổi ảnh</div>
                 </div>
 
+                <!-- Upload Progress -->
                 <div class="upload-progress" id="uploadProgress">
                     <span id="uploadStatus">📤 Đang tải ảnh lên Cloudinary...</span>
                     <div class="progress-bar">
@@ -517,14 +545,17 @@
                     </div>
                 </div>
 
+                <!-- Name & Badge -->
                 <div class="profile-name" id="profileName">
                     <span id="profileNameText">Tên người dùng</span>
                     <span class="verified-badge" id="profileBadge" style="display:none;">
                         <span class="check">✓</span> Admin
                     </span>
+                    <span class="owner-badge" id="ownerBadge" style="display:none;">👤 Bạn</span>
                 </div>
                 <div class="profile-email" id="profileEmail">email@example.com</div>
 
+                <!-- Stats -->
                 <div class="stats-row">
                     <div class="stat-item">
                         <div class="number" id="statPosts">0</div>
@@ -542,19 +573,21 @@
 
                 <div class="profile-bio" id="profileBio">⭐ Thành viên của Doraemon Fansub VN</div>
 
-                <form id="profileForm" onsubmit="return false;">
-                    <div class="form-group">
-                        <label>Tên hiển thị</label>
-                        <input type="text" id="editName" placeholder="Nhập tên của bạn" />
-                    </div>
-                    <div class="form-group">
-                        <label>Giới thiệu</label>
-                        <textarea id="editBio" placeholder="Viết một vài dòng giới thiệu về bạn..."></textarea>
-                    </div>
-                    <button type="submit" class="btn-primary" id="saveBtn">💾 Lưu thay đổi</button>
-                </form>
-
-                <button class="btn-secondary" onclick="logoutUser()">🚪 Đăng xuất</button>
+                <!-- Edit Form - Chỉ hiện khi xem trang của chính mình -->
+                <div id="editSection">
+                    <form id="profileForm" onsubmit="return false;">
+                        <div class="form-group">
+                            <label>Tên hiển thị</label>
+                            <input type="text" id="editName" placeholder="Nhập tên của bạn" />
+                        </div>
+                        <div class="form-group">
+                            <label>Giới thiệu</label>
+                            <textarea id="editBio" placeholder="Viết một vài dòng giới thiệu về bạn..."></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary" id="saveBtn">💾 Lưu thay đổi</button>
+                    </form>
+                    <button class="btn-secondary" onclick="logoutUser()">🚪 Đăng xuất</button>
+                </div>
             </div>
         </div>
     </div>
@@ -606,14 +639,16 @@
 
         const profileAvatar = document.getElementById('profileAvatar');
         const profileNameText = document.getElementById('profileNameText');
-        const profileName = document.getElementById('profileName');
         const profileEmail = document.getElementById('profileEmail');
         const profileBio = document.getElementById('profileBio');
         const profileBadge = document.getElementById('profileBadge');
+        const ownerBadge = document.getElementById('ownerBadge');
+        const avatarOverlay = document.getElementById('avatarOverlay');
 
         const editName = document.getElementById('editName');
         const editBio = document.getElementById('editBio');
         const saveBtn = document.getElementById('saveBtn');
+        const editSection = document.getElementById('editSection');
 
         const statPosts = document.getElementById('statPosts');
         const statLikes = document.getElementById('statLikes');
@@ -625,7 +660,8 @@
         const uploadStatus = document.getElementById('uploadStatus');
 
         let currentUser = null;
-        let userData = {};
+        let viewingUserId = null; // ID của user đang xem
+        let isViewingSelf = false;
         let isAdmin = false;
         let adminEmails = new Set();
 
@@ -651,6 +687,14 @@
         function isUserAdmin(email) {
             if (!email) return false;
             return adminEmails.has(email);
+        }
+
+        // ============================================================
+        // LẤY USER ID TỪ URL
+        // ============================================================
+        function getUserIdFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('uid');
         }
 
         // ============================================================
@@ -685,7 +729,12 @@
                 loginRequired.style.display = 'none';
                 profileContent.style.display = 'block';
 
-                await loadUserData(user);
+                // Xác định user cần xem
+                const targetUid = getUserIdFromURL() || user.uid;
+                viewingUserId = targetUid;
+                isViewingSelf = targetUid === user.uid;
+
+                await loadUserData(targetUid);
             } else {
                 authStatus.style.display = 'none';
                 loginBtn.style.display = 'block';
@@ -699,39 +748,51 @@
         // ============================================================
         // LOAD USER DATA
         // ============================================================
-        async function loadUserData(user) {
+        async function loadUserData(uid) {
             try {
-                const doc = await db.collection('users').doc(user.uid).get();
+                const doc = await db.collection('users').doc(uid).get();
 
-                if (doc.exists) {
-                    userData = doc.data();
-                } else {
-                    userData = {
-                        displayName: user.displayName || user.email.split('@')[0],
-                        email: user.email,
-                        photoURL: user.photoURL || '',
-                        bio: '⭐ Thành viên của Doraemon Fansub VN',
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    };
-                    await db.collection('users').doc(user.uid).set(userData);
+                if (!doc.exists) {
+                    showToast('❌ Không tìm thấy người dùng!', true);
+                    return;
                 }
 
-                profileAvatar.src = userData.photoURL || user.photoURL || 'https://ui-avatars.com/api/?name=' +
-                    encodeURIComponent(userData.displayName || user.email);
-                profileNameText.textContent = userData.displayName || user.email;
-                profileEmail.textContent = userData.email || user.email;
-                profileBio.textContent = userData.bio || '⭐ Thành viên của Doraemon Fansub VN';
+                const data = doc.data();
 
-                if (isAdmin) {
+                // Hiển thị thông tin
+                profileAvatar.src = data.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(data
+                    .displayName || 'User') + '&background=1a73e8&color=fff&size=120';
+                profileNameText.textContent = data.displayName || 'Người dùng';
+                profileEmail.textContent = data.email || '';
+                profileBio.textContent = data.bio || '⭐ Thành viên của Doraemon Fansub VN';
+
+                // Tích xanh Admin
+                if (isUserAdmin(data.email)) {
                     profileBadge.style.display = 'inline-block';
                 } else {
                     profileBadge.style.display = 'none';
                 }
 
-                editName.value = userData.displayName || '';
-                editBio.value = userData.bio || '';
+                // Badge "Bạn" nếu xem chính mình
+                if (isViewingSelf) {
+                    ownerBadge.style.display = 'inline-block';
+                } else {
+                    ownerBadge.style.display = 'none';
+                }
 
-                await loadStats(user.uid);
+                // Chỉ hiển thị form chỉnh sửa nếu xem chính mình
+                if (isViewingSelf) {
+                    editSection.style.display = 'block';
+                    avatarOverlay.style.display = 'block';
+                    editName.value = data.displayName || '';
+                    editBio.value = data.bio || '';
+                } else {
+                    editSection.style.display = 'none';
+                    avatarOverlay.style.display = 'none';
+                }
+
+                // Load thống kê
+                await loadStats(uid);
 
             } catch (e) {
                 console.error('Lỗi tải dữ liệu:', e);
@@ -770,11 +831,14 @@
         }
 
         // ============================================================
-        // SAVE PROFILE
+        // SAVE PROFILE (Chỉ khi xem chính mình)
         // ============================================================
         document.getElementById('profileForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            if (!currentUser) return;
+            if (!currentUser || !isViewingSelf) {
+                showToast('⚠️ Bạn không có quyền chỉnh sửa!', true);
+                return;
+            }
 
             const displayName = editName.value.trim();
             const bio = editBio.value.trim();
@@ -814,11 +878,11 @@
         });
 
         // ============================================================
-        // UPLOAD AVATAR
+        // UPLOAD AVATAR (Chỉ khi xem chính mình)
         // ============================================================
         function openAvatarUpload() {
-            if (!currentUser) {
-                showToast('⚠️ Vui lòng đăng nhập!', true);
+            if (!currentUser || !isViewingSelf) {
+                showToast('⚠️ Bạn không có quyền chỉnh sửa!', true);
                 return;
             }
 
@@ -925,7 +989,8 @@
         };
 
         console.log('👤 Trang cá nhân đã sẵn sàng!');
-        console.log('✅ Đã thêm tích xanh cho Admin!');
+        console.log('✅ Hỗ trợ xem trang cá nhân của user khác!');
+        console.log('📝 Sử dụng ?uid=USER_ID để xem trang của người khác');
     </script>
 </body>
 </html>
