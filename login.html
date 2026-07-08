@@ -442,7 +442,7 @@
         const successMsg = document.getElementById('successMessage');
 
         // ============================================================
-        // HÀM LƯU USER VÀO FIRESTORE
+        // HÀM LƯU USER VÀO FIRESTORE (SỬA LỖI)
         // ============================================================
         function saveUserToFirestore(user, isNew = false) {
             const userData = {
@@ -457,8 +457,16 @@
                 userData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
             }
 
-            // Lưu vào Firestore
-            return db.collection('users').doc(user.uid).set(userData, { merge: true });
+            // Lưu vào Firestore với merge: true để không ghi đè
+            return db.collection('users').doc(user.uid).set(userData, { merge: true })
+                .then(() => {
+                    console.log('✅ Đã lưu user vào Firestore:', user.email);
+                    return true;
+                })
+                .catch((error) => {
+                    console.error('❌ Lỗi lưu user:', error);
+                    return false;
+                });
         }
 
         // ============================================================
@@ -569,12 +577,14 @@
         });
 
         // ============================================================
-        // REGISTER
+        // REGISTER (SỬA LỖI - LƯU USER VÀO FIRESTORE)
         // ============================================================
         document.getElementById('registerBtn').addEventListener('click', function() {
             const email = document.getElementById('registerEmail').value.trim();
             const password = document.getElementById('registerPassword').value.trim();
             const confirm = document.getElementById('registerConfirmPassword').value.trim();
+
+            // Kiểm tra thông tin
             if (!email || !password || !confirm) {
                 showError('📝 Vui lòng nhập đầy đủ thông tin!');
                 return;
@@ -587,16 +597,23 @@
                 showError('❌ Mật khẩu xác nhận không khớp!');
                 return;
             }
+
             showLoading();
             this.disabled = true;
+
             auth.createUserWithEmailAndPassword(email, password)
                 .then((userCredential) => {
                     // Lưu user mới vào Firestore
                     return saveUserToFirestore(userCredential.user, true);
                 })
-                .then(() => {
-                    showSuccess('✅ Đăng ký thành công! Đang chuyển hướng...');
-                    setTimeout(() => window.location.href = 'index.html', 1500);
+                .then((saved) => {
+                    if (saved) {
+                        showSuccess('✅ Đăng ký thành công! Đang chuyển hướng...');
+                        setTimeout(() => window.location.href = 'index.html', 1500);
+                    } else {
+                        showError('❌ Đăng ký thành công nhưng không lưu được dữ liệu!');
+                        setTimeout(() => window.location.href = 'index.html', 1500);
+                    }
                 })
                 .catch((err) => {
                     let msg = '❌ Đăng ký thất bại! ';
@@ -615,8 +632,10 @@
                     }
                     showError(msg);
                 })
-                .finally(() => { this.disabled = false;
-                    hideLoading(); });
+                .finally(() => {
+                    this.disabled = false;
+                    hideLoading();
+                });
         });
 
         // ============================================================
@@ -747,6 +766,7 @@
         console.log('🔥 Firebase Auth sẵn sàng!');
         console.log('🌐 Domain:', window.location.hostname);
         console.log('👤 User sẽ được lưu vào Firestore khi đăng nhập/đăng ký!');
+        console.log('✅ Đã sửa lỗi lưu user khi đăng ký!');
     </script>
 </body>
 </html>
