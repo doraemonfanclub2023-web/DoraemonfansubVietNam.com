@@ -93,9 +93,15 @@
             font-size: 15px;
         }
 
+        .logo-wrapper {
+            text-decoration: none;
+            display: block;
+        }
+
         .logo {
             text-align: center;
             margin-bottom: 28px;
+            cursor: pointer;
         }
 
         .logo img {
@@ -332,11 +338,13 @@
         </div>
 
         <!-- Logo -->
-        <div class="logo">
-            <img src="https://i.ibb.co/9kJhtfp1/Doraemon-fansub.png" alt="Doraemon Fansub" />
-            <h1>Doraemon <span>FanSub</span></h1>
-            <p>Đăng nhập để tham gia cộng đồng</p>
-        </div>
+        <a href="index.html" class="logo-wrapper">
+            <div class="logo">
+                <img src="https://i.ibb.co/9kJhtfp1/Doraemon-fansub.png" alt="Doraemon Fansub" />
+                <h1>Doraemon <span>FanSub</span></h1>
+                <p>Đăng nhập để tham gia cộng đồng</p>
+            </div>
+        </a>
 
         <div class="domain-info">
             🌐 Domain hiện tại: <strong id="domainInfo">loading...</strong>
@@ -433,19 +441,6 @@
         const errorMsg = document.getElementById('errorMessage');
         const successMsg = document.getElementById('successMessage');
 
-        // ============================================================
-        // KIỂM TRA EMAIL/PASSWORD ĐÃ BẬT CHƯA
-        // ============================================================
-        function checkEmailEnabled() {
-            // Firebase không có API kiểm tra trực tiếp, nhưng nếu chưa bật sẽ báo lỗi
-            console.log('📧 Kiểm tra Email/Password đã bật trong Firebase Console');
-            console.log('📍 Vào: Authentication → Sign-in methods → Email/Password → Enable');
-        }
-        checkEmailEnabled();
-
-        // ============================================================
-        // TOAST
-        // ============================================================
         function showLoading() { loading.style.display = 'flex'; }
 
         function hideLoading() { loading.style.display = 'none'; }
@@ -469,9 +464,7 @@
             successMsg.style.display = 'none';
         }
 
-        // ============================================================
-        // LOGIN
-        // ============================================================
+        // ===== LOGIN =====
         document.getElementById('loginBtn').addEventListener('click', function() {
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
@@ -516,9 +509,7 @@
                     hideLoading(); });
         });
 
-        // ============================================================
-        // GOOGLE
-        // ============================================================
+        // ===== GOOGLE =====
         document.getElementById('googleBtn').addEventListener('click', function() {
             showLoading();
             this.disabled = true;
@@ -554,9 +545,7 @@
                     hideLoading(); });
         });
 
-        // ============================================================
-        // REGISTER
-        // ============================================================
+        // ===== REGISTER =====
         document.getElementById('registerBtn').addEventListener('click', function() {
             const email = document.getElementById('registerEmail').value.trim();
             const password = document.getElementById('registerPassword').value.trim();
@@ -607,27 +596,19 @@
                     hideLoading(); });
         });
 
-        // ============================================================
-        // FORGOT PASSWORD (ĐÃ SỬA LỖI)
-        // ============================================================
+        // ===== FORGOT =====
         document.getElementById('forgotBtn').addEventListener('click', function() {
             const email = document.getElementById('forgotEmail').value.trim();
-
             if (!email) {
                 showError('📝 Vui lòng nhập email của bạn!');
                 return;
             }
-
-            // Kiểm tra email hợp lệ
             if (!email.includes('@') || !email.includes('.')) {
                 showError('📧 Email không hợp lệ! Vui lòng kiểm tra lại.');
                 return;
             }
-
             showLoading();
             this.disabled = true;
-
-            // Gửi email đặt lại mật khẩu
             auth.sendPasswordResetEmail(email, {
                 url: window.location.href,
                 handleCodeInApp: false
@@ -635,8 +616,6 @@
             .then(() => {
                 showSuccess(`✅ Email đặt lại mật khẩu đã được gửi đến ${email}!\n\nVui lòng kiểm tra hộp thư (cả Spam).`);
                 document.getElementById('forgotEmail').value = '';
-
-                // Tự động quay về login sau 5 giây
                 setTimeout(() => {
                     document.getElementById('forgotForm').style.display = 'none';
                     document.getElementById('loginForm').style.display = 'block';
@@ -646,7 +625,6 @@
             .catch((err) => {
                 console.error('Lỗi gửi email:', err);
                 let msg = '❌ Gửi email thất bại! ';
-
                 switch (err.code) {
                     case 'auth/user-not-found':
                         msg += 'Email này chưa được đăng ký. Vui lòng đăng ký tài khoản.';
@@ -671,9 +649,7 @@
             });
         });
 
-        // ============================================================
-        // TOGGLE FORMS
-        // ============================================================
+        // ===== TOGGLE FORMS =====
         document.getElementById('showRegister').addEventListener('click', function(e) {
             e.preventDefault();
             document.getElementById('loginForm').style.display = 'none';
@@ -703,9 +679,7 @@
             clearMessages();
         });
 
-        // ============================================================
-        // ENTER KEY
-        // ============================================================
+        // ===== ENTER KEY =====
         document.getElementById('email').addEventListener('keydown', function(e) {
             if (e.key === 'Enter') { e.preventDefault();
                 document.getElementById('password').focus(); }
@@ -731,9 +705,7 @@
                 document.getElementById('forgotBtn').click(); }
         });
 
-        // ============================================================
-        // AUTH STATE
-        // ============================================================
+        // ===== AUTH STATE =====
         auth.onAuthStateChanged(function(user) {
             if (user && window.location.pathname.includes('login.html')) {
                 window.location.href = 'index.html';
@@ -742,10 +714,7 @@
 
         console.log('🔥 Firebase Auth sẵn sàng!');
         console.log('🌐 Domain:', window.location.hostname);
-        console.log('📌 Nếu quên mật khẩu không hoạt động:');
-        console.log('   1. Vào Firebase Console → Authentication → Sign-in methods');
-        console.log('   2. Bật Email/Password');
-        console.log('   3. Vào Templates → Password reset → Cấu hình email');
+        console.log('🏠 Click logo để về trang chủ!');
     </script>
 </body>
 </html>
