@@ -669,6 +669,50 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
             cursor: pointer;
             transition: 0.3s;
+            position: relative;
+        }
+
+        /* Lock overlay khi chưa đăng nhập */
+        .movie-card.locked {
+            cursor: pointer;
+        }
+
+        .movie-card .lock-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 16px;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+            backdrop-filter: blur(3px);
+            z-index: 5;
+        }
+
+        .movie-card .lock-overlay.show {
+            display: flex;
+        }
+
+        .movie-card .lock-overlay .lock-icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+
+        .movie-card .lock-overlay .lock-text {
+            font-size: 14px;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .movie-card .lock-overlay .lock-sub {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 4px;
         }
 
         .movie-card:hover {
@@ -867,6 +911,61 @@
             font-size: 13px;
         }
 
+        /* Login required toast */
+        .login-required-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a1a2e;
+            color: white;
+            padding: 16px 28px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            z-index: 9998;
+            display: none;
+            align-items: center;
+            gap: 16px;
+            font-weight: 600;
+            font-size: 15px;
+            animation: slideUp 0.4s ease;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        .login-required-toast.show {
+            display: flex;
+        }
+
+        .login-required-toast .btn-login-now {
+            background: #ffeb3b;
+            color: #0d47a1;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .login-required-toast .btn-login-now:hover {
+            transform: scale(1.05);
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateX(-50%) translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
         /* Colors */
         .color-1 {
             background: #e94560;
@@ -931,6 +1030,11 @@
             }
             .movie-card img {
                 height: 130px;
+            }
+            .login-required-toast {
+                flex-direction: column;
+                gap: 12px;
+                padding: 16px 20px;
             }
         }
 
@@ -1046,6 +1150,12 @@
         </div>
     </main>
 
+    <!-- ===== LOGIN REQUIRED TOAST ===== -->
+    <div class="login-required-toast" id="loginRequiredToast">
+        <span>🔒 Vui lòng đăng nhập để xem phim</span>
+        <a href="login.html" class="btn-login-now">Đăng nhập ngay</a>
+    </div>
+
     <script>
         // ============================================================
         // FIREBASE CONFIG
@@ -1080,12 +1190,16 @@
         const postInput = document.getElementById('postInput');
         const postList = document.getElementById('postList');
         const movieList = document.getElementById('movieList');
+        const loginRequiredToast = document.getElementById('loginRequiredToast');
+
+        let isLoggedIn = false;
 
         // ============================================================
         // AUTH STATE
         // ============================================================
         auth.onAuthStateChanged(async (user) => {
             if (user) {
+                isLoggedIn = true;
                 authStatus.style.display = 'flex';
                 loginBtn.style.display = 'none';
                 logoutBtn.style.display = 'block';
@@ -1105,6 +1219,7 @@
                 await loadPosts();
                 await loadMovies();
             } else {
+                isLoggedIn = false;
                 authStatus.style.display = 'none';
                 loginBtn.style.display = 'block';
                 logoutBtn.style.display = 'none';
@@ -1397,7 +1512,7 @@
         }
 
         // ============================================================
-        // LOAD MOVIES (Có phân loại: Movie, Short Movie, Seri)
+        // LOAD MOVIES (Có khóa xem khi chưa đăng nhập)
         // ============================================================
         let allMovies = [];
         let currentCategory = 'all';
@@ -1426,7 +1541,6 @@
                 snapshot.forEach(doc => {
                     const m = doc.data();
                     m.id = doc.id;
-                    // Mặc định nếu chưa có category thì set là movie
                     if (!m.category) {
                         m.category = 'movie';
                     }
@@ -1468,7 +1582,7 @@
         }
 
         // ============================================================
-        // HIỂN THỊ PHIM THEO THỂ LOẠI
+        // HIỂN THỊ PHIM THEO THỂ LOẠI (Có khóa xem khi chưa đăng nhập)
         // ============================================================
         function renderMoviesByCategory(category) {
             currentCategory = category;
@@ -1490,7 +1604,14 @@
             let html = `<div class="movie-grid">`;
             filtered.forEach(m => {
                 html += `
-                    <div class="movie-card" onclick="openMovieModal('${m.id}')">
+                    <div class="movie-card ${!isLoggedIn ? 'locked' : ''}" onclick="${isLoggedIn ? `openMovieModal('${m.id}')` : `showLoginRequired()`}">
+                        ${!isLoggedIn ? `
+                        <div class="lock-overlay show">
+                            <div class="lock-icon">🔒</div>
+                            <div class="lock-text">Đăng nhập để xem</div>
+                            <div class="lock-sub">Vui lòng đăng nhập</div>
+                        </div>
+                        ` : ''}
                         <img src="${m.poster || 'https://via.placeholder.com/400x250/1a73e8/FFFFFF?text=Doraemon'}" 
                              alt="${m.title || 'Phim'}"
                              onerror="this.src='https://via.placeholder.com/400x250/1a73e8/FFFFFF?text=Doraemon'">
@@ -1508,6 +1629,16 @@
         }
 
         // ============================================================
+        // HIỂN THỊ THÔNG BÁO YÊU CẦU ĐĂNG NHẬP
+        // ============================================================
+        function showLoginRequired() {
+            loginRequiredToast.classList.add('show');
+            setTimeout(() => {
+                loginRequiredToast.classList.remove('show');
+            }, 5000);
+        }
+
+        // ============================================================
         // SỰ KIỆN CLICK VÀO THỂ LOẠI
         // ============================================================
         document.getElementById('categoryList').addEventListener('click', function(e) {
@@ -1522,9 +1653,15 @@
         });
 
         // ============================================================
-        // OPEN MOVIE MODAL
+        // OPEN MOVIE MODAL (Chỉ gọi khi đã đăng nhập)
         // ============================================================
         async function openMovieModal(movieId) {
+            // Kiểm tra lại đăng nhập
+            if (!isLoggedIn) {
+                showLoginRequired();
+                return;
+            }
+
             try {
                 const doc = await db.collection('movies').doc(movieId).get();
 
@@ -1602,6 +1739,7 @@
                 };
                 document.addEventListener('keydown', escHandler);
 
+                // Cập nhật lại danh sách phim sau 2s để cập nhật lượt xem
                 setTimeout(loadMovies, 2000);
 
             } catch (e) {
@@ -1644,6 +1782,7 @@
         console.log('🎬 Doraemon đã sẵn sàng!');
         console.log('👑 Admin:', ADMIN_EMAIL);
         console.log('🖼️ Logo URL:', LOGO_URL);
+        console.log('🔒 Chức năng xem phim yêu cầu đăng nhập!');
     </script>
 </body>
 </html>
