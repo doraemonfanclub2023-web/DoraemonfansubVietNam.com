@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Dashboard - Doraemon Fansub VN</title>
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js">
@@ -28,7 +28,7 @@
             min-height: 100vh;
         }
 
-        /* Sidebar */
+        /* ===== SIDEBAR ===== */
         .sidebar {
             width: 250px;
             background: linear-gradient(180deg, #1a1a2e, #16213e);
@@ -40,19 +40,24 @@
             top: 0;
             left: 0;
             bottom: 0;
-            z-index: 10;
-            transition: 0.3s;
+            z-index: 100;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overflow-y: auto;
+            transform: translateX(-100%);
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
         }
 
         .sidebar-brand {
-            padding: 0 20px 20px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 16px;
+            padding: 0 20px 16px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 12px;
         }
 
         .sidebar-brand h2 {
-            font-size: 20px;
+            font-size: 18px;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -63,37 +68,35 @@
         }
 
         .sidebar-brand small {
-            font-size: 11px;
+            font-size: 10px;
             color: rgba(255, 255, 255, 0.4);
             display: block;
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
-        /* Nút quay lại trang chủ */
         .sidebar-home-btn {
-            margin: 8px 12px 16px 12px;
-            padding: 10px 16px;
+            margin: 4px 12px 12px 12px;
+            padding: 10px 14px;
             background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
             color: white;
             text-decoration: none;
             display: flex;
             align-items: center;
             gap: 10px;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px;
             transition: 0.3s;
             cursor: pointer;
         }
 
         .sidebar-home-btn:hover {
             background: rgba(255, 255, 255, 0.18);
-            transform: translateX(4px);
         }
 
         .sidebar-home-btn .icon {
-            font-size: 18px;
+            font-size: 16px;
         }
 
         .sidebar-menu {
@@ -133,16 +136,16 @@
         }
 
         .sidebar-footer {
-            padding: 14px 20px;
+            padding: 12px 16px;
             border-top: 1px solid rgba(255, 255, 255, 0.08);
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .sidebar-footer img {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             border: 2px solid #ffeb3b;
             object-fit: cover;
@@ -150,125 +153,186 @@
 
         .sidebar-footer .info {
             flex: 1;
+            min-width: 0;
         }
 
         .sidebar-footer .info .name {
             font-weight: 600;
-            font-size: 13px;
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .sidebar-footer .info .email {
-            font-size: 11px;
+            font-size: 10px;
             color: rgba(255, 255, 255, 0.4);
-            word-break: break-all;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .sidebar-footer .logout-btn {
             background: rgba(255, 255, 255, 0.1);
             border: none;
             color: white;
-            padding: 4px 12px;
+            padding: 4px 10px;
             border-radius: 20px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
             transition: 0.3s;
+            flex-shrink: 0;
         }
 
         .sidebar-footer .logout-btn:hover {
             background: rgba(255, 0, 0, 0.3);
         }
 
-        /* Main */
-        .main {
-            margin-left: 250px;
-            padding: 24px 30px;
-            flex: 1;
-            width: calc(100% - 250px);
+        /* ===== OVERLAY (mobile) ===== */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+            transition: 0.3s;
         }
 
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* ===== MAIN ===== */
+        .main {
+            margin-left: 0;
+            padding: 16px;
+            flex: 1;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        /* ===== MOBILE MENU BUTTON ===== */
+        .mobile-menu-btn {
+            display: flex !important;
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            z-index: 50;
+            background: #1a1a2e;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+        }
+
+        .mobile-menu-btn:active {
+            transform: scale(0.9);
+        }
+
+        /* ===== PAGE HEADER ===== */
         .page-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 8px;
+            padding-top: 4px;
         }
 
         .page-header h1 {
-            font-size: 26px;
+            font-size: 20px;
             color: #1a1a2e;
+            margin-left: 44px;
         }
 
         .page-header .admin-badge {
             background: #ffeb3b;
             color: #1a1a2e;
-            padding: 4px 14px;
+            padding: 3px 12px;
             border-radius: 20px;
             font-weight: 700;
-            font-size: 13px;
+            font-size: 11px;
+            white-space: nowrap;
         }
 
         .page-header .home-link {
             background: #e8f0fe;
             color: #1a73e8;
-            padding: 6px 16px;
+            padding: 5px 12px;
             border-radius: 20px;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 12px;
             text-decoration: none;
             transition: 0.3s;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
+            white-space: nowrap;
         }
 
         .page-header .home-link:hover {
             background: #1a73e8;
             color: white;
-            transform: scale(1.02);
         }
 
+        .page-header .header-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== STATS ===== */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-            gap: 14px;
-            margin-bottom: 24px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
         }
 
         .stat-card {
             background: white;
-            border-radius: 14px;
-            padding: 18px 20px;
+            border-radius: 12px;
+            padding: 14px 16px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
             transition: 0.3s;
         }
 
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        .stat-card:active {
+            transform: scale(0.97);
         }
 
         .stat-card .number {
-            font-size: 28px;
+            font-size: 22px;
             font-weight: 800;
             color: #1a73e8;
         }
 
         .stat-card .label {
-            font-size: 13px;
+            font-size: 12px;
             color: #666;
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
         .stat-card .icon {
-            font-size: 22px;
-            margin-bottom: 4px;
+            font-size: 18px;
+            margin-bottom: 2px;
         }
 
+        /* ===== TABS ===== */
         .tab-container {
             background: white;
-            border-radius: 16px;
+            border-radius: 14px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
             overflow: hidden;
         }
@@ -279,23 +343,30 @@
             background: #fafafa;
             overflow-x: auto;
             flex-wrap: nowrap;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .tab-header::-webkit-scrollbar {
+            display: none;
         }
 
         .tab-btn {
-            padding: 12px 20px;
+            padding: 10px 14px;
             border: none;
             background: none;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 12px;
             color: #666;
             cursor: pointer;
             border-bottom: 3px solid transparent;
             transition: 0.3s;
             white-space: nowrap;
+            flex-shrink: 0;
         }
 
-        .tab-btn:hover {
-            background: #f0f2f5;
+        .tab-btn:active {
+            transform: scale(0.95);
         }
 
         .tab-btn.active {
@@ -304,7 +375,7 @@
         }
 
         .tab-content {
-            padding: 20px 24px;
+            padding: 14px 16px;
             display: none;
         }
 
@@ -312,99 +383,107 @@
             display: block;
         }
 
+        /* ===== TABLE ===== */
         .table-toolbar {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 14px;
-            flex-wrap: wrap;
-            gap: 10px;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+            margin-bottom: 12px;
         }
 
         .table-toolbar .title {
             font-weight: 600;
-            font-size: 16px;
+            font-size: 15px;
             color: #1a1a2e;
+        }
+
+        .table-toolbar .right {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-primary {
             background: #1a73e8;
             color: white;
             border: none;
-            padding: 8px 18px;
-            border-radius: 25px;
+            padding: 6px 14px;
+            border-radius: 20px;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 12px;
             cursor: pointer;
             transition: 0.3s;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
+            white-space: nowrap;
         }
 
-        .btn-primary:hover {
-            background: #1557b0;
-            transform: scale(1.02);
+        .btn-primary:active {
+            transform: scale(0.95);
         }
 
         .btn-danger {
             background: #e94560;
             color: white;
             border: none;
-            padding: 4px 14px;
-            border-radius: 8px;
+            padding: 4px 10px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 12px;
+            font-size: 11px;
             transition: 0.3s;
         }
 
-        .btn-danger:hover {
-            background: #c62828;
+        .btn-danger:active {
+            transform: scale(0.95);
         }
 
         .btn-edit {
             background: #f59e0b;
             color: white;
             border: none;
-            padding: 4px 14px;
-            border-radius: 8px;
+            padding: 4px 10px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 12px;
+            font-size: 11px;
             transition: 0.3s;
-            margin-right: 4px;
+            margin-right: 3px;
         }
 
-        .btn-edit:hover {
-            background: #d97706;
+        .btn-edit:active {
+            transform: scale(0.95);
         }
 
         .btn-sm {
-            padding: 4px 12px;
-            font-size: 12px;
+            padding: 3px 10px;
+            font-size: 11px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 13px;
         }
 
         table th {
             text-align: left;
-            padding: 10px 12px;
+            padding: 8px 8px;
             background: #f8f9fa;
-            font-size: 12px;
+            font-size: 10px;
             color: #666;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
         }
 
         table td {
-            padding: 10px 12px;
+            padding: 8px 8px;
             border-bottom: 1px solid #f0f2f5;
-            font-size: 14px;
+            font-size: 12px;
             vertical-align: middle;
         }
 
@@ -414,16 +493,17 @@
 
         .empty-state {
             text-align: center;
-            padding: 40px 20px;
+            padding: 30px 16px;
             color: #999;
+            font-size: 14px;
         }
 
         .empty-state .icon {
-            font-size: 40px;
-            margin-bottom: 8px;
+            font-size: 32px;
+            margin-bottom: 6px;
         }
 
-        /* Modal */
+        /* ===== MODAL ===== */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -436,6 +516,7 @@
             justify-content: center;
             align-items: center;
             backdrop-filter: blur(4px);
+            padding: 16px;
         }
 
         .modal-overlay.active {
@@ -444,10 +525,10 @@
 
         .modal-box {
             background: white;
-            border-radius: 20px;
-            padding: 28px 30px;
-            max-width: 580px;
-            width: 92%;
+            border-radius: 16px;
+            padding: 20px;
+            max-width: 100%;
+            width: 100%;
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
@@ -467,9 +548,9 @@
 
         .modal-box .close {
             position: absolute;
-            top: 12px;
-            right: 16px;
-            font-size: 26px;
+            top: 10px;
+            right: 14px;
+            font-size: 24px;
             cursor: pointer;
             color: #999;
             border: none;
@@ -477,42 +558,44 @@
             transition: 0.3s;
         }
 
-        .modal-box .close:hover {
+        .modal-box .close:active {
             transform: rotate(90deg);
-            color: #1a1a2e;
         }
 
         .modal-box h2 {
-            font-size: 20px;
-            margin-bottom: 16px;
+            font-size: 18px;
+            margin-bottom: 14px;
             color: #1a1a2e;
+            padding-right: 30px;
         }
 
         .modal-box .form-group {
-            margin-bottom: 14px;
+            margin-bottom: 12px;
         }
 
         .modal-box .form-group label {
             display: block;
             font-weight: 600;
-            font-size: 13px;
-            margin-bottom: 4px;
+            font-size: 12px;
+            margin-bottom: 3px;
             color: #1a1a2e;
         }
 
         .modal-box .form-group label .hint {
             font-weight: 400;
-            font-size: 12px;
+            font-size: 11px;
             color: #999;
+            display: block;
+            margin-top: 2px;
         }
 
         .modal-box .form-group input,
         .modal-box .form-group textarea {
             width: 100%;
-            padding: 10px 14px;
+            padding: 8px 12px;
             border: 2px solid #e4e6eb;
-            border-radius: 10px;
-            font-size: 14px;
+            border-radius: 8px;
+            font-size: 13px;
             outline: none;
             transition: 0.3s;
         }
@@ -524,22 +607,22 @@
 
         .modal-box .form-group textarea {
             resize: vertical;
-            min-height: 60px;
+            min-height: 50px;
         }
 
         .modal-box .form-group textarea.embed-code {
-            min-height: 100px;
+            min-height: 80px;
             font-family: 'Courier New', monospace;
-            font-size: 13px;
+            font-size: 12px;
             background: #f8f9fa;
         }
 
         .modal-box .form-group .embed-preview {
             display: none;
-            margin-top: 10px;
-            padding: 10px;
+            margin-top: 8px;
+            padding: 8px;
             background: #f0f2f5;
-            border-radius: 10px;
+            border-radius: 8px;
             border: 1px solid #e4e6eb;
             position: relative;
             overflow: hidden;
@@ -548,151 +631,239 @@
         .modal-box .form-group .embed-preview iframe,
         .modal-box .form-group .embed-preview video {
             width: 100%;
-            border-radius: 8px;
-            max-height: 250px;
+            border-radius: 6px;
+            max-height: 200px;
             background: #000;
         }
 
         .modal-box .form-group .embed-preview .remove-btn {
             position: absolute;
-            top: 6px;
-            right: 6px;
+            top: 4px;
+            right: 4px;
             background: rgba(0, 0, 0, 0.6);
             color: white;
             border: none;
             border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            font-size: 16px;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
             cursor: pointer;
             transition: 0.3s;
         }
 
-        .modal-box .form-group .embed-preview .remove-btn:hover {
-            background: #e94560;
+        .modal-box .form-group .embed-preview .remove-btn:active {
+            transform: scale(0.9);
         }
 
         .modal-box .form-group .embed-help {
-            font-size: 12px;
+            font-size: 11px;
             color: #999;
-            margin-top: 6px;
-            padding: 8px 12px;
+            margin-top: 4px;
+            padding: 6px 10px;
             background: #f8f9fa;
-            border-radius: 8px;
+            border-radius: 6px;
             border: 1px dashed #e4e6eb;
+            line-height: 1.5;
         }
 
         .modal-box .form-group .embed-help code {
             background: #e4e6eb;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 12px;
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-size: 11px;
         }
 
         .modal-box .btn-submit {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             background: #1a73e8;
             color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: 10px;
             font-weight: 700;
-            font-size: 16px;
+            font-size: 15px;
             cursor: pointer;
             transition: 0.3s;
-            margin-top: 8px;
+            margin-top: 6px;
         }
 
-        .modal-box .btn-submit:hover {
-            background: #1557b0;
+        .modal-box .btn-submit:active {
+            transform: scale(0.97);
         }
 
+        /* ===== TOAST ===== */
         .toast {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
             background: #1a1a2e;
             color: white;
-            padding: 12px 24px;
-            border-radius: 12px;
+            padding: 10px 20px;
+            border-radius: 10px;
             font-weight: 600;
             z-index: 9999;
             opacity: 0;
-            transform: translateY(20px);
             transition: 0.4s;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            font-size: 14px;
+            font-size: 13px;
             max-width: 90%;
+            text-align: center;
         }
 
         .toast.show {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateX(-50%) translateY(0);
         }
 
-        .mobile-menu-btn {
-            display: none;
-            position: fixed;
-            top: 14px;
-            left: 14px;
-            z-index: 20;
-            background: #1a1a2e;
-            color: white;
-            border: none;
-            width: 42px;
-            height: 42px;
-            border-radius: 12px;
-            font-size: 22px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        @media (max-width: 768px) {
+        /* ===== RESPONSIVE ===== */
+        @media (min-width: 769px) {
             .sidebar {
-                transform: translateX(-100%);
-                width: 280px;
+                transform: translateX(0) !important;
+                position: fixed;
             }
-            .sidebar.open {
-                transform: translateX(0);
+
+            .sidebar-overlay {
+                display: none !important;
             }
-            .main {
-                margin-left: 0;
-                padding: 16px;
-                width: 100%;
-            }
-            .stats-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            .tab-btn {
-                padding: 10px 14px;
-                font-size: 13px;
-            }
-            .tab-content {
-                padding: 16px;
-            }
-            .table-toolbar {
-                flex-direction: column;
-                align-items: stretch;
-            }
+
             .mobile-menu-btn {
-                display: block !important;
+                display: none !important;
             }
+
+            .main {
+                margin-left: 250px;
+                padding: 24px 30px;
+            }
+
             .page-header h1 {
-                font-size: 20px;
+                margin-left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 14px;
+            }
+
+            .table-toolbar {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .table-toolbar .right {
+                gap: 12px;
+            }
+
+            .modal-box {
+                max-width: 580px;
+                padding: 28px 30px;
             }
         }
 
         @media (max-width: 480px) {
             .stats-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
             }
+
+            .stat-card {
+                padding: 10px 12px;
+            }
+
+            .stat-card .number {
+                font-size: 18px;
+            }
+
+            .stat-card .label {
+                font-size: 11px;
+            }
+
+            .tab-btn {
+                font-size: 11px;
+                padding: 8px 10px;
+            }
+
+            .tab-content {
+                padding: 10px 12px;
+            }
+
+            table th,
+            table td {
+                padding: 6px 6px;
+                font-size: 11px;
+            }
+
+            .page-header h1 {
+                font-size: 17px;
+                margin-left: 38px;
+            }
+
             .modal-box {
-                padding: 20px;
+                padding: 16px;
+            }
+
+            .modal-box h2 {
+                font-size: 16px;
+            }
+
+            .sidebar {
+                width: 280px;
+            }
+
+            .btn-primary {
+                font-size: 11px;
+                padding: 5px 12px;
+            }
+
+            .toast {
+                font-size: 12px;
+                padding: 8px 16px;
+                bottom: 16px;
             }
         }
 
+        @media (max-width: 360px) {
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+            }
+
+            .stat-card {
+                padding: 8px 10px;
+            }
+
+            .stat-card .number {
+                font-size: 16px;
+            }
+
+            .page-header h1 {
+                font-size: 15px;
+                margin-left: 34px;
+            }
+
+            .page-header .home-link {
+                font-size: 10px;
+                padding: 3px 8px;
+            }
+
+            .page-header .admin-badge {
+                font-size: 10px;
+                padding: 2px 8px;
+            }
+
+            .mobile-menu-btn {
+                width: 34px;
+                height: 34px;
+                font-size: 16px;
+                top: 10px;
+                left: 10px;
+            }
+        }
+
+        /* Scrollbar */
         ::-webkit-scrollbar {
-            width: 5px;
+            width: 4px;
         }
         ::-webkit-scrollbar-track {
             background: #f0f2f5;
@@ -705,15 +876,19 @@
 </head>
 <body>
 
-    <button class="mobile-menu-btn" id="menuToggle">☰</button>
+    <!-- ===== SIDEBAR OVERLAY ===== -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
+    <!-- ===== MOBILE MENU BUTTON ===== -->
+    <button class="mobile-menu-btn" id="menuToggle" aria-label="Toggle menu">☰</button>
+
+    <!-- ===== SIDEBAR ===== -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <h2>🎬 <span>Doraemon</span> VN</h2>
             <small>Admin Dashboard</small>
         </div>
 
-        <!-- NÚT QUAY LẠI TRANG CHỦ -->
         <a href="index.html" class="sidebar-home-btn">
             <span class="icon">🏠</span>
             Về trang chủ
@@ -726,6 +901,7 @@
             <li data-tab="users"><span class="icon">👥</span> Người dùng</li>
             <li data-tab="settings"><span class="icon">⚙️</span> Cài đặt</li>
         </ul>
+
         <div class="sidebar-footer">
             <img id="adminAvatar" src="https://ui-avatars.com/api/?name=Admin" alt="avatar" />
             <div class="info">
@@ -736,22 +912,25 @@
         </div>
     </aside>
 
+    <!-- ===== MAIN ===== -->
     <main class="main">
         <div class="page-header">
             <h1 id="pageTitle">📊 Tổng quan</h1>
-            <div style="display:flex;gap:10px;align-items:center;">
-                <a href="index.html" class="home-link">🏠 Về trang chủ</a>
+            <div class="header-right">
+                <a href="index.html" class="home-link">🏠 Về trang</a>
                 <span class="admin-badge">👑 Admin</span>
             </div>
         </div>
 
+        <!-- Stats -->
         <div class="stats-grid" id="statsGrid">
             <div class="stat-card"><div class="icon">📝</div><div class="number" id="totalPosts">0</div><div class="label">Bài viết</div></div>
             <div class="stat-card"><div class="icon">🎬</div><div class="number" id="totalMovies">0</div><div class="label">Phim</div></div>
             <div class="stat-card"><div class="icon">👥</div><div class="number" id="totalUsers">0</div><div class="label">Người dùng</div></div>
-            <div class="stat-card"><div class="icon">👁️</div><div class="number" id="totalViews">0</div><div class="label">Lượt xem phim</div></div>
+            <div class="stat-card"><div class="icon">👁️</div><div class="number" id="totalViews">0</div><div class="label">Lượt xem</div></div>
         </div>
 
+        <!-- Tabs -->
         <div class="tab-container">
             <div class="tab-header">
                 <button class="tab-btn active" data-tab="overview">📊 Tổng quan</button>
@@ -761,40 +940,42 @@
                 <button class="tab-btn" data-tab="settings">⚙️ Cài đặt</button>
             </div>
 
+            <!-- Overview -->
             <div class="tab-content active" id="tab-overview">
-                <div style="padding:10px 0;">
-                    <h3 style="margin-bottom:8px;">👋 Chào mừng Admin!</h3>
-                    <p style="color:#666;font-size:15px;line-height:1.6;">Quản lý nội dung Doraemon Fansub VN tại đây.</p>
-                    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;">
-                        <span style="background:#e8f0fe;padding:6px 14px;border-radius:8px;font-size:13px;">✅ Quản lý bài viết</span>
-                        <span style="background:#e8f0fe;padding:6px 14px;border-radius:8px;font-size:13px;">✅ Quản lý phim</span>
-                        <span style="background:#e8f0fe;padding:6px 14px;border-radius:8px;font-size:13px;">✅ Quản lý người dùng</span>
-                    </div>
-                    <div style="margin-top:16px;padding:12px 16px;background:#f8f9fa;border-radius:10px;border:1px dashed #e4e6eb;">
-                        <span style="font-size:13px;color:#999;">💡 <strong>Mẹo:</strong> Click "🏠 Về trang chủ" để quay lại giao diện chính</span>
+                <div style="padding:4px 0;">
+                    <h3 style="margin-bottom:6px;font-size:16px;">👋 Chào mừng Admin!</h3>
+                    <p style="color:#666;font-size:14px;line-height:1.5;">Quản lý nội dung Doraemon Fansub VN tại đây.</p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+                        <span style="background:#e8f0fe;padding:4px 12px;border-radius:6px;font-size:12px;">✅ Quản lý bài viết</span>
+                        <span style="background:#e8f0fe;padding:4px 12px;border-radius:6px;font-size:12px;">✅ Quản lý phim</span>
+                        <span style="background:#e8f0fe;padding:4px 12px;border-radius:6px;font-size:12px;">✅ Quản lý người dùng</span>
                     </div>
                 </div>
             </div>
 
+            <!-- Posts -->
             <div class="tab-content" id="tab-posts">
                 <div class="table-toolbar">
                     <span class="title">📝 Danh sách bài viết</span>
-                    <span style="font-size:13px;color:#999;" id="postCount">0 bài viết</span>
+                    <div class="right">
+                        <span style="font-size:12px;color:#999;" id="postCount">0 bài viết</span>
+                    </div>
                 </div>
                 <div style="overflow-x:auto;">
                     <table>
-                        <thead><tr><th>#</th><th>Người đăng</th><th>Nội dung</th><th>Thời gian</th><th>Hành động</th></tr></thead>
-                        <tbody id="postsTableBody"><tr><td colspan="5" class="empty-state"><div class="icon">⏳</div>Đang tải...</td></tr></tbody>
+                        <thead><tr><th>#</th><th>Người đăng</th><th>Nội dung</th><th>Hành động</th></tr></thead>
+                        <tbody id="postsTableBody"><tr><td colspan="4" class="empty-state"><div class="icon">⏳</div>Đang tải...</td></tr></tbody>
                     </table>
                 </div>
             </div>
 
+            <!-- Movies -->
             <div class="tab-content" id="tab-movies">
                 <div class="table-toolbar">
                     <span class="title">🎬 Danh sách phim</span>
-                    <div>
-                        <span style="font-size:13px;color:#999;margin-right:12px;" id="movieCount">0 phim</span>
-                        <button class="btn-primary" id="addMovieBtn">➕ Thêm phim</button>
+                    <div class="right">
+                        <span style="font-size:12px;color:#999;" id="movieCount">0 phim</span>
+                        <button class="btn-primary" id="addMovieBtn">➕ Thêm</button>
                     </div>
                 </div>
                 <div style="overflow-x:auto;">
@@ -805,22 +986,24 @@
                 </div>
             </div>
 
+            <!-- Users -->
             <div class="tab-content" id="tab-users">
                 <div class="table-toolbar">
                     <span class="title">👥 Danh sách người dùng</span>
-                    <span style="font-size:13px;color:#999;" id="userCount">0 người dùng</span>
+                    <span style="font-size:12px;color:#999;" id="userCount">0 người dùng</span>
                 </div>
                 <div style="overflow-x:auto;">
                     <table>
-                        <thead><tr><th>#</th><th>Avatar</th><th>Tên</th><th>Email</th><th>Ngày tham gia</th></tr></thead>
-                        <tbody id="usersTableBody"><tr><td colspan="5" class="empty-state"><div class="icon">⏳</div>Đang tải...</td></tr></tbody>
+                        <thead><tr><th>#</th><th>Avatar</th><th>Tên</th><th>Email</th></tr></thead>
+                        <tbody id="usersTableBody"><tr><td colspan="4" class="empty-state"><div class="icon">⏳</div>Đang tải...</td></tr></tbody>
                     </table>
                 </div>
             </div>
 
+            <!-- Settings -->
             <div class="tab-content" id="tab-settings">
-                <div style="max-width:500px;">
-                    <h3 style="margin-bottom:16px;">⚙️ Cài đặt Admin</h3>
+                <div style="max-width:100%;">
+                    <h3 style="margin-bottom:12px;font-size:16px;">⚙️ Cài đặt Admin</h3>
                     <div class="form-group">
                         <label>Email Admin</label>
                         <input type="email" id="settingsEmail" disabled style="background:#f5f5f5;color:#666;" />
@@ -829,65 +1012,57 @@
                         <label>Tên hiển thị</label>
                         <input type="text" id="settingsName" placeholder="Tên của bạn" />
                     </div>
-                    <button class="btn-primary" id="settingsSaveBtn" style="width:100%;justify-content:center;">💾 Lưu cài đặt</button>
+                    <button class="btn-primary" id="settingsSaveBtn" style="width:100%;justify-content:center;padding:10px;">💾 Lưu cài đặt</button>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Modal -->
+    <!-- ===== MODAL ===== -->
     <div class="modal-overlay" id="movieModal">
         <div class="modal-box">
             <button class="close" id="closeModal">✕</button>
             <h2 id="modalTitle">Thêm phim mới</h2>
             <form id="movieForm" onsubmit="return false;">
-
                 <div class="form-group">
                     <label>Tên phim *</label>
                     <input type="text" id="movieTitle" placeholder="VD: Doraemon: Nobita và đảo giấu vàng" />
                 </div>
-
                 <div class="form-group">
                     <label>Thể loại *</label>
                     <input type="text" id="movieGenre" placeholder="Phiêu lưu, Hài hước" />
                 </div>
-
                 <div class="form-group">
                     <label>Mô tả *</label>
                     <textarea id="movieDesc" placeholder="Mô tả ngắn về phim..."></textarea>
                 </div>
-
                 <div class="form-group">
                     <label>URL Poster *</label>
                     <input type="url" id="moviePoster" placeholder="https://example.com/poster.jpg" />
                 </div>
-
                 <div class="form-group">
                     <label>
                         🎬 Mã nhúng video 
                         <span class="hint">(Từ YouTube, Cloudinary, Vimeo, AbyssPlayer...)</span>
                     </label>
-                    <textarea class="embed-code" id="movieEmbed" placeholder='<iframe width="640" height="360" src="https://abyssplayer.com/d9wfiN-31" frameborder="0" scrolling="0" allowfullscreen></iframe>'></textarea>
-
+                    <textarea class="embed-code" id="movieEmbed" placeholder='<iframe width="100%" height="300" src="https://abyssplayer.com/d9wfiN-31" frameborder="0" allowfullscreen></iframe>'></textarea>
                     <div class="embed-preview" id="embedPreview">
                         <div id="embedPreviewContent"></div>
                         <button class="remove-btn" id="removeEmbedBtn">✕</button>
                     </div>
-
                     <div class="embed-help">
                         💡 <strong>Hướng dẫn:</strong> Dán mã nhúng từ nguồn video:
                         <br>• <strong>YouTube:</strong> Chia sẻ → Nhúng → Copy <code>&lt;iframe&gt;</code>
                         <br>• <strong>Cloudinary:</strong> Media Library → Chọn video → Embed
                         <br>• <strong>Vimeo:</strong> Chia sẻ → Nhúng → Copy code
-                        <br>• <strong>AbyssPlayer / các nguồn khác:</strong> Copy mã nhúng <code>&lt;iframe&gt;</code>
                     </div>
                 </div>
-
                 <button type="button" class="btn-submit" id="submitMovieBtn">💾 Lưu phim</button>
             </form>
         </div>
     </div>
 
+    <!-- ===== TOAST ===== -->
     <div class="toast" id="toast"></div>
 
     <script>
@@ -914,6 +1089,7 @@
         // DOM REFS
         // ============================================================
         const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
         const menuToggle = document.getElementById('menuToggle');
         const adminName = document.getElementById('adminName');
         const adminEmail = document.getElementById('adminEmail');
@@ -932,6 +1108,29 @@
         const removeEmbedBtn = document.getElementById('removeEmbedBtn');
 
         // ============================================================
+        // MOBILE MENU
+        // ============================================================
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+            sidebarOverlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+        }
+
+        menuToggle.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', toggleSidebar);
+
+        // Đóng sidebar khi click vào menu item trên mobile
+        document.querySelectorAll('.sidebar-menu li').forEach(item => {
+            item.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('open');
+                    sidebarOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+
+        // ============================================================
         // TOAST
         // ============================================================
         function showToast(msg, isError = false) {
@@ -939,7 +1138,7 @@
             toast.style.background = isError ? '#c62828' : '#1a1a2e';
             toast.classList.add('show');
             clearTimeout(toast._timer);
-            toast._timer = setTimeout(() => toast.classList.remove('show'), 3500);
+            toast._timer = setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
         // ============================================================
@@ -998,7 +1197,7 @@
                 const snapshot = await db.collection('posts').orderBy('timestamp', 'desc').get();
                 if (snapshot.empty) {
                     tbody.innerHTML =
-                        `<tr><td colspan="5" class="empty-state"><div class="icon">📝</div>Chưa có bài viết nào</td></tr>`;
+                        `<tr><td colspan="4" class="empty-state"><div class="icon">📝</div>Chưa có bài viết nào</td></tr>`;
                     document.getElementById('postCount').textContent = '0 bài viết';
                     return;
                 }
@@ -1010,10 +1209,9 @@
                     html += `
                         <tr>
                             <td>${count}</td>
-                            <td>${data.user || 'Anonymous'}</td>
-                            <td style="max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${data.content || ''}</td>
-                            <td>${data.time || 'Vừa xong'}</td>
-                            <td><button class="btn-danger btn-sm" onclick="deletePost('${doc.id}')">🗑️ Xóa</button></td>
+                            <td style="font-size:12px;max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${data.user || 'Anonymous'}</td>
+                            <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;">${data.content || ''}</td>
+                            <td><button class="btn-danger btn-sm" onclick="deletePost('${doc.id}')">🗑️</button></td>
                         </tr>
                     `;
                 });
@@ -1023,7 +1221,7 @@
             } catch (e) {
                 console.error(e);
                 tbody.innerHTML =
-                    `<tr><td colspan="5" class="empty-state"><div class="icon">❌</div>Lỗi tải: ${e.message}</td></tr>`;
+                    `<tr><td colspan="4" class="empty-state"><div class="icon">❌</div>Lỗi tải: ${e.message}</td></tr>`;
             }
         }
 
@@ -1059,12 +1257,12 @@
                     html += `
                         <tr>
                             <td>${count}</td>
-                            <td><strong>${data.title || 'Untitled'}</strong></td>
-                            <td>${data.genre || 'Chưa phân loại'}</td>
-                            <td>${data.views || 0} 👁️</td>
+                            <td style="max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;"><strong>${data.title || 'Untitled'}</strong></td>
+                            <td style="font-size:12px;">${data.genre || 'Chưa phân loại'}</td>
+                            <td style="font-size:12px;">${data.views || 0}</td>
                             <td>
-                                <button class="btn-edit btn-sm" onclick="editMovie('${doc.id}')">✏️ Sửa</button>
-                                <button class="btn-danger btn-sm" onclick="deleteMovie('${doc.id}')">🗑️ Xóa</button>
+                                <button class="btn-edit btn-sm" onclick="editMovie('${doc.id}')">✏️</button>
+                                <button class="btn-danger btn-sm" onclick="deleteMovie('${doc.id}')">🗑️</button>
                             </td>
                         </tr>
                     `;
@@ -1192,10 +1390,9 @@
                     tbody.innerHTML = `
                         <tr>
                             <td>1</td>
-                            <td><img src="https://ui-avatars.com/api/?name=Admin" style="width:32px;height:32px;border-radius:50%;object-fit:cover;"></td>
+                            <td><img src="https://ui-avatars.com/api/?name=Admin" style="width:28px;height:28px;border-radius:50%;object-fit:cover;"></td>
                             <td>Admin</td>
                             <td>${ADMIN_EMAIL}</td>
-                            <td>${new Date().toLocaleDateString('vi-VN')}</td>
                         </tr>
                     `;
                     document.getElementById('userCount').textContent = '1 người dùng';
@@ -1211,10 +1408,9 @@
                     html += `
                         <tr>
                             <td>${count}</td>
-                            <td><img src="${avatar}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;"></td>
-                            <td>${data.displayName || 'Người dùng'}</td>
-                            <td>${data.email || ''}</td>
-                            <td>${data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString('vi-VN') : 'Chưa có'}</td>
+                            <td><img src="${avatar}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;"></td>
+                            <td style="max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;">${data.displayName || 'Người dùng'}</td>
+                            <td style="font-size:12px;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${data.email || ''}</td>
                         </tr>
                     `;
                 });
@@ -1226,10 +1422,9 @@
                 tbody.innerHTML = `
                     <tr>
                         <td>1</td>
-                        <td><img src="https://ui-avatars.com/api/?name=Admin" style="width:32px;height:32px;border-radius:50%;object-fit:cover;"></td>
+                        <td><img src="https://ui-avatars.com/api/?name=Admin" style="width:28px;height:28px;border-radius:50%;object-fit:cover;"></td>
                         <td>Admin</td>
                         <td>${ADMIN_EMAIL}</td>
-                        <td>${new Date().toLocaleDateString('vi-VN')}</td>
                     </tr>
                 `;
                 document.getElementById('userCount').textContent = '1 người dùng';
@@ -1300,12 +1495,6 @@
             });
         }
 
-        if (menuToggle) {
-            menuToggle.addEventListener('click', function() {
-                sidebar.classList.toggle('open');
-            });
-        }
-
         // ============================================================
         // TABS
         // ============================================================
@@ -1330,7 +1519,11 @@
                 if (menuItem) menuItem.classList.add('active');
                 const title = document.getElementById('pageTitle');
                 if (title) title.textContent = tabMap[tab] || '📊 Tổng quan';
-                if (window.innerWidth <= 768) sidebar.classList.remove('open');
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('open');
+                    sidebarOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
             });
         });
 
@@ -1347,12 +1540,17 @@
                 this.classList.add('active');
                 const title = document.getElementById('pageTitle');
                 if (title) title.textContent = tabMap[tab] || '📊 Tổng quan';
-                if (window.innerWidth <= 768) sidebar.classList.remove('open');
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('open');
+                    sidebarOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
             });
         });
 
         console.log('🔥 Dashboard admin đã sẵn sàng!');
         console.log('👑 Admin:', ADMIN_EMAIL);
+        console.log('📱 Đã tối ưu hóa cho điện thoại!');
         console.log('🏠 Nhấn "Về trang chủ" để quay lại giao diện chính.');
     </script>
 </body>
