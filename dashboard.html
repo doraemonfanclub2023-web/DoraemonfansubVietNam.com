@@ -130,12 +130,29 @@
             gap: 10px;
         }
 
+        .sidebar-footer a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: white;
+            flex: 1;
+            min-width: 0;
+        }
+
         .sidebar-footer img {
             width: 32px;
             height: 32px;
             border-radius: 50%;
             border: 2px solid #ffeb3b;
             object-fit: cover;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .sidebar-footer img:hover {
+            transform: scale(1.05);
+            border-color: #ffeb3b;
         }
 
         .sidebar-footer .info {
@@ -149,6 +166,12 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .sidebar-footer .info .name:hover {
+            color: #ffeb3b;
         }
 
         .sidebar-footer .info .email {
@@ -859,11 +882,13 @@
         </ul>
 
         <div class="sidebar-footer">
-            <img id="adminAvatar" src="https://ui-avatars.com/api/?name=Admin" alt="avatar" />
-            <div class="info">
-                <div class="name" id="adminName">Admin</div>
-                <div class="email" id="adminEmail">admin@doraemonfansub.com</div>
-            </div>
+            <a href="profile.html">
+                <img id="adminAvatar" src="https://ui-avatars.com/api/?name=Admin" alt="avatar" />
+                <div class="info">
+                    <div class="name" id="adminName">Admin</div>
+                    <div class="email" id="adminEmail">admin@doraemonfansub.com</div>
+                </div>
+            </a>
             <button class="logout-btn" id="logoutBtn">🚪</button>
         </div>
     </aside>
@@ -1532,6 +1557,7 @@
         console.log('🏠 Click logo để về trang chủ!');
         console.log('🗑️ Đã xóa nút "Vẽ trang chủ" trong sidebar!');
         console.log('📝 Đã sửa "Về trang" thành "Về trang chủ"!');
+        console.log('👤 Click avatar để vào trang cá nhân!');
     </script>
 </body>
 </html>
