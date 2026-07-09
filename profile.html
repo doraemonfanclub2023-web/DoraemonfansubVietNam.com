@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Trang cá nhân - Doraemon Fansub VN</title>
 
+    <!-- ===== XÁC MINH GOOGLE SEARCH CONSOLE ===== -->
+    <meta name="google-site-verification" content="HXszZpGpQu3yZVPZ0jetZcCyhA26gCjYC_oI5G7AJJw" />
+
+    <!-- ===== META BẢO MẬT ===== -->
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- ===== FAVICON ===== -->
+    <link rel="icon" href="https://i.ibb.co/9kJhtfp1/Doraemon-fansub.png" type="image/png" />
+
     <!-- Firebase compat -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js">
     </script>
@@ -30,6 +40,11 @@
         body {
             background: #f0f2f5;
             min-height: 100vh;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         header {
@@ -78,6 +93,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            flex-wrap: wrap;
         }
 
         #authStatus {
@@ -165,7 +181,6 @@
             background: rgba(255, 255, 255, 0.25);
         }
 
-        /* ===== TÍCH XANH ===== */
         .verified-badge {
             display: inline-block;
             background: #ffeb3b;
@@ -467,6 +482,22 @@
             font-weight: 600;
         }
 
+        .loading-spinner {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .loading-spinner .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f0f2f5;
+            border-top: 4px solid #1a73e8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
         @media (max-width: 480px) {
             .profile-card {
                 padding: 20px;
@@ -488,6 +519,13 @@
             .verified-badge {
                 font-size: 9px;
                 padding: 1px 6px;
+            }
+            .header-actions {
+                gap: 6px;
+            }
+            .back-link {
+                font-size: 11px;
+                padding: 4px 10px;
             }
         }
     </style>
@@ -517,8 +555,8 @@
     </header>
 
     <div class="profile-container" id="profileContainer">
-        <div id="loadingState" style="text-align:center;padding:60px 20px;color:#999;">
-            <div style="width:50px;height:50px;border:4px solid #f0f2f5;border-top:4px solid #1a73e8;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;"></div>
+        <div id="loadingState" class="loading-spinner">
+            <div class="spinner"></div>
             <p>Đang tải thông tin...</p>
         </div>
 
@@ -718,7 +756,6 @@
                 const doc = await db.collection('users').doc(user.uid).get();
 
                 if (!doc.exists) {
-                    // Nếu chưa có, tạo mới
                     const userData = {
                         email: user.email,
                         displayName: user.displayName || user.email.split('@')[0],
@@ -754,7 +791,6 @@
                     .displayName || user.email);
                 userName.textContent = user.displayName || user.email;
 
-                // Đảm bảo user được lưu trong Firestore
                 await ensureUserInFirestore(user);
 
                 isAdmin = isUserAdmin(user.email);
@@ -762,7 +798,6 @@
                 loginRequired.style.display = 'none';
                 profileContent.style.display = 'block';
 
-                // Xác định user cần xem
                 const targetUid = getUserIdFromURL() || user.uid;
                 viewingUserId = targetUid;
                 isViewingSelf = targetUid === user.uid;
@@ -786,7 +821,6 @@
                 const doc = await db.collection('users').doc(uid).get();
 
                 if (!doc.exists) {
-                    // Nếu user chưa có trong Firestore, tạo mới
                     if (uid === currentUser?.uid) {
                         await ensureUserInFirestore(currentUser);
                         const newDoc = await db.collection('users').doc(uid).get();
@@ -813,7 +847,6 @@
         // HIỂN THỊ DỮ LIỆU USER
         // ============================================================
         function displayUserData(data) {
-            // Hiển thị thông tin
             const displayName = data.displayName || data.email?.split('@')[0] || 'Người dùng';
             const email = data.email || '';
 
@@ -823,21 +856,18 @@
             profileEmail.textContent = email;
             profileBio.textContent = data.bio || '⭐ Thành viên của Doraemon Fansub VN';
 
-            // Tích xanh Admin
             if (isUserAdmin(data.email)) {
                 profileBadge.style.display = 'inline-block';
             } else {
                 profileBadge.style.display = 'none';
             }
 
-            // Badge "Bạn" nếu xem chính mình
             if (isViewingSelf) {
                 ownerBadge.style.display = 'inline-block';
             } else {
                 ownerBadge.style.display = 'none';
             }
 
-            // Chỉ hiển thị form chỉnh sửa nếu xem chính mình
             if (isViewingSelf) {
                 editSection.style.display = 'block';
                 avatarOverlay.style.display = 'block';
@@ -848,7 +878,6 @@
                 avatarOverlay.style.display = 'none';
             }
 
-            // Load thống kê
             if (viewingUserId) {
                 loadStats(viewingUserId);
             }
@@ -1045,6 +1074,7 @@
         console.log('👤 Trang cá nhân đã sẵn sàng!');
         console.log('✅ Đã sửa lỗi hiển thị tên người dùng!');
         console.log('📝 Sử dụng ?uid=USER_ID để xem trang của người khác');
+        console.log('🔗 Đường dẫn đã sửa cho GitHub Pages!');
     </script>
 </body>
 </html>
