@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Doraemon Fansub Việt Nam</title>
 
+    <!-- ===== META BẢO MẬT ===== -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self' https:;
+        script-src 'self' 'unsafe-inline' https:;
+        style-src 'self' 'unsafe-inline' https:;
+        img-src 'self' data: https:;
+        media-src 'self' https:;
+        connect-src 'self' https:;
+        frame-src 'self' https:;
+    ">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
     <!-- Firebase compat -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js">
     </script>
@@ -597,6 +609,11 @@
 
         .post-stats .likes .heart {
             color: #e94560;
+            transition: 0.3s;
+        }
+
+        .post-stats .likes .heart.liked-heart {
+            animation: heartPop 0.5s ease;
         }
 
         .post-stats .comments-count {
@@ -630,10 +647,24 @@
 
         .post-footer button:hover {
             background: #f0f2f5;
+            transform: scale(1.02);
+        }
+
+        .post-footer button:active {
+            transform: scale(0.95);
         }
 
         .post-footer button.liked {
             color: #1a73e8;
+        }
+
+        /* ===== LIKE ANIMATION ===== */
+        @keyframes heartPop {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.3); }
+            50% { transform: scale(0.9); }
+            75% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
 
         /* ===== COMMENTS ===== */
@@ -1799,6 +1830,8 @@
                     time: 'Vừa xong',
                     likes: 0,
                     liked: false,
+                    likedBy: {},
+                    totalLikes: 0,
                     comments: [],
                     showComments: false,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
@@ -1907,38 +1940,47 @@
         }
 
         // ============================================================
-        // RENDER POST CARDS
+        // RENDER POST CARDS (SỬA - LIKE THEO USER)
         // ============================================================
         async function renderPostCards(posts) {
             if (!posts || posts.length === 0) return '';
 
             let html = '';
+            const currentUser = auth.currentUser;
+            const currentUserEmail = currentUser?.email || '';
+
             for (const p of posts) {
                 const isPostAdmin = isUserAdmin(p.userEmail);
-                const profileLink = `profile.html?uid=${p.userId || ''}&email=${encodeURIComponent(p.userEmail || '')}`;
+                const profileLink =
+                `profile.html?uid=${p.userId || ''}&email=${encodeURIComponent(p.userEmail || '')}`;
+
+                // Lấy trạng thái like của user hiện tại
+                const likedBy = p.likedBy || {};
+                const isLiked = !!likedBy[currentUserEmail];
+                const totalLikes = p.totalLikes || p.likes || Object.keys(likedBy).length || 0;
 
                 const commentsHtml = await Promise.all((p.comments || []).map(async (c) => {
                     const isCommentAdmin = isUserAdmin(c.userEmail);
                     const commentProfileLink =
                         `profile.html?uid=${c.userId || ''}&email=${encodeURIComponent(c.userEmail || '')}`;
                     return `
-                        <div class="comment-item">
-                            <a href="${commentProfileLink}" class="avatar-link">
-                                <img src="${c.avatar || LOGO_URL}" alt="avatar">
-                            </a>
-                            <div class="comment-body">
-                                <div class="name">
-                                    <a href="${commentProfileLink}" class="profile-link">
-                                        ${c.user || 'Doraemon'}
-                                    </a>
-                                    ${isCommentAdmin ? `<span class="verified-badge">✓ Admin</span>` : ''}
-                                    <img src="${LOGO_URL}" class="logo-small" alt="logo">
+                            <div class="comment-item">
+                                <a href="${commentProfileLink}" class="avatar-link">
+                                    <img src="${c.avatar || LOGO_URL}" alt="avatar">
+                                </a>
+                                <div class="comment-body">
+                                    <div class="name">
+                                        <a href="${commentProfileLink}" class="profile-link">
+                                            ${c.user || 'Doraemon'}
+                                        </a>
+                                        ${isCommentAdmin ? `<span class="verified-badge">✓ Admin</span>` : ''}
+                                        <img src="${LOGO_URL}" class="logo-small" alt="logo">
+                                    </div>
+                                    <div class="text">${c.text || ''}</div>
+                                    <div class="time">${c.time || 'Vừa xong'}</div>
                                 </div>
-                                <div class="text">${c.text || ''}</div>
-                                <div class="time">${c.time || 'Vừa xong'}</div>
                             </div>
-                        </div>
-                    `;
+                        `;
                 }));
                 const commentsHtmlStr = commentsHtml.join('');
 
@@ -1956,67 +1998,131 @@
                 }
 
                 html += `
-                    <div class="post-card" id="post-${p.id}">
-                        <div class="post-header">
-                            <a href="${profileLink}" class="avatar-link">
-                                <img src="${p.avatar || LOGO_URL}" alt="avatar">
-                            </a>
-                            <div class="info">
-                                <div class="name">
-                                    <a href="${profileLink}" class="profile-link">
-                                        ${p.user || 'Doraemon'}
-                                    </a>
-                                    ${isPostAdmin ? `<span class="verified-badge">✓ Admin</span>` : ''}
-                                    <img src="${LOGO_URL}" class="logo-small" alt="logo">
-                                    <span class="badge">●</span>
+                        <div class="post-card" id="post-${p.id}">
+                            <div class="post-header">
+                                <a href="${profileLink}" class="avatar-link">
+                                    <img src="${p.avatar || LOGO_URL}" alt="avatar">
+                                </a>
+                                <div class="info">
+                                    <div class="name">
+                                        <a href="${profileLink}" class="profile-link">
+                                            ${p.user || 'Doraemon'}
+                                        </a>
+                                        ${isPostAdmin ? `<span class="verified-badge">✓ Admin</span>` : ''}
+                                        <img src="${LOGO_URL}" class="logo-small" alt="logo">
+                                        <span class="badge">●</span>
+                                    </div>
+                                    <div class="time">${p.time || 'Vừa xong'}</div>
                                 </div>
-                                <div class="time">${p.time || 'Vừa xong'}</div>
+                                <button class="more-btn" onclick="showPostOptions('${p.id}')">⋯</button>
                             </div>
-                            <button class="more-btn" onclick="showPostOptions('${p.id}')">⋯</button>
-                        </div>
-                        <div class="post-content">${p.content || ''}</div>
-                        ${fileHtml}
-                        <div class="post-stats">
-                            <span class="likes"><span class="heart">❤️</span> ${p.likes || 0}</span>
-                            <span class="comments-count" onclick="toggleComments('${p.id}')">${(p.comments || []).length} bình luận</span>
-                        </div>
-                        <div class="post-footer">
-                            <button onclick="toggleLike('${p.id}')" class="${p.liked ? 'liked' : ''}">
-                                ${p.liked ? '❤️' : '🤍'} Thích
-                            </button>
-                            <button onclick="toggleComments('${p.id}')">💬 Bình luận</button>
-                            <button onclick="sharePost('${p.id}')">📤 Chia sẻ</button>
-                        </div>
-                        <div class="comments-section ${p.showComments ? 'open' : ''}" id="comments-${p.id}">
-                            ${commentsHtmlStr}
-                            <div class="comment-input">
-                                <input type="text" id="commentInput-${p.id}" placeholder="Viết bình luận...">
-                                <button onclick="addComment('${p.id}')">Gửi</button>
+                            <div class="post-content">${p.content || ''}</div>
+                            ${fileHtml}
+                            <div class="post-stats">
+                                <span class="likes" id="likes-${p.id}">
+                                    <span class="heart ${isLiked ? 'liked-heart' : ''}" id="heart-${p.id}">${isLiked ? '❤️' : '🤍'}</span> 
+                                    <span class="like-count" id="likeCount-${p.id}">${totalLikes}</span>
+                                </span>
+                                <span class="comments-count" onclick="toggleComments('${p.id}')">${(p.comments || []).length} bình luận</span>
+                            </div>
+                            <div class="post-footer">
+                                <button onclick="toggleLike('${p.id}')" class="like-btn ${isLiked ? 'liked' : ''}" id="likeBtn-${p.id}">
+                                    ${isLiked ? '❤️' : '🤍'} Thích
+                                </button>
+                                <button onclick="toggleComments('${p.id}')">💬 Bình luận</button>
+                                <button onclick="sharePost('${p.id}')">📤 Chia sẻ</button>
+                            </div>
+                            <div class="comments-section ${p.showComments ? 'open' : ''}" id="comments-${p.id}">
+                                ${commentsHtmlStr}
+                                <div class="comment-input">
+                                    <input type="text" id="commentInput-${p.id}" placeholder="Viết bình luận...">
+                                    <button onclick="addComment('${p.id}')">Gửi</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `;
+                    `;
             }
             return html;
         }
 
         // ============================================================
-        // LIKE
+        // LIKE - LƯU THEO TỪNG USER
         // ============================================================
         async function toggleLike(postId) {
+            if (!isLoggedIn) {
+                alert('🔑 Vui lòng đăng nhập để thích bài viết!');
+                window.location.href = 'login.html';
+                return;
+            }
+
             try {
-                const doc = await db.collection('posts').doc(postId).get();
+                const user = auth.currentUser;
+                const userEmail = user.email;
+
+                const docRef = db.collection('posts').doc(postId);
+                const doc = await docRef.get();
+
                 if (!doc.exists) return;
+
                 const data = doc.data();
-                const newLiked = !data.liked;
-                const newLikes = (data.likes || 0) + (newLiked ? 1 : -1);
-                await db.collection('posts').doc(postId).update({
-                    liked: newLiked,
-                    likes: newLikes
+                const likedBy = data.likedBy || {};
+                const isLiked = !!likedBy[userEmail];
+
+                // Cập nhật
+                if (isLiked) {
+                    delete likedBy[userEmail];
+                } else {
+                    likedBy[userEmail] = true;
+                }
+
+                const totalLikes = Object.keys(likedBy).length;
+
+                await docRef.update({
+                    likedBy: likedBy,
+                    totalLikes: totalLikes,
+                    likes: totalLikes,
+                    liked: !!likedBy[userEmail]
                 });
-                await loadPosts();
+
+                // Cập nhật UI
+                updateLikeUI(postId, !!likedBy[userEmail], totalLikes);
+
             } catch (e) {
-                console.error(e);
+                console.error('Lỗi like:', e);
+                alert('❌ Lỗi: ' + e.message);
+            }
+        }
+
+        // ============================================================
+        // CẬP NHẬT UI LIKE (KHÔNG RELOAD)
+        // ============================================================
+        function updateLikeUI(postId, isLiked, likeCount) {
+            // Cập nhật nút like
+            const likeBtn = document.getElementById(`likeBtn-${postId}`);
+            if (likeBtn) {
+                likeBtn.innerHTML = isLiked ? '❤️ Thích' : '🤍 Thích';
+                likeBtn.className = `like-btn ${isLiked ? 'liked' : ''}`;
+            }
+
+            // Cập nhật số lượng like
+            const likeCountEl = document.getElementById(`likeCount-${postId}`);
+            if (likeCountEl) {
+                likeCountEl.textContent = likeCount;
+            }
+
+            // Cập nhật icon heart
+            const heartEl = document.getElementById(`heart-${postId}`);
+            if (heartEl) {
+                heartEl.textContent = isLiked ? '❤️' : '🤍';
+                heartEl.className = `heart ${isLiked ? 'liked-heart' : ''}`;
+
+                // Animation khi like
+                if (isLiked) {
+                    heartEl.style.animation = 'heartPop 0.5s ease';
+                    setTimeout(() => {
+                        heartEl.style.animation = '';
+                    }, 500);
+                }
             }
         }
 
@@ -2116,30 +2222,25 @@
         // HIỂN THỊ POP-UP YÊU CẦU ĐĂNG NHẬP
         // ============================================================
         function showLoginRequired() {
-            // Xóa pop-up cũ nếu có
-            const oldOverlay = document.getElementById('loginRequiredOverlay');
-            if (oldOverlay) oldOverlay.remove();
-
             const overlay = document.createElement('div');
             overlay.className = 'login-required-overlay';
             overlay.id = 'loginRequiredOverlay';
 
             overlay.innerHTML = `
-                <div class="login-required-popup">
-                    <div class="popup-icon">🔒</div>
-                    <h3>Vui lòng đăng nhập</h3>
-                    <p>Bạn cần đăng nhập để xem phim này.<br>Đăng nhập ngay để trải nghiệm đầy đủ tính năng!</p>
-                    <div class="popup-actions">
-                        <a href="login.html" class="popup-btn-login">🔑 Đăng nhập ngay</a>
-                        <button onclick="closeLoginRequiredPopup()" class="popup-btn-close">Đóng</button>
+                    <div class="login-required-popup">
+                        <div class="popup-icon">🔒</div>
+                        <h3>Vui lòng đăng nhập</h3>
+                        <p>Bạn cần đăng nhập để xem phim này.<br>Đăng nhập ngay để trải nghiệm đầy đủ tính năng!</p>
+                        <div class="popup-actions">
+                            <a href="login.html" class="popup-btn-login">🔑 Đăng nhập ngay</a>
+                            <button onclick="closeLoginRequiredPopup()" class="popup-btn-close">Đóng</button>
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
 
             document.body.appendChild(overlay);
             document.body.style.overflow = 'hidden';
 
-            // Click outside để đóng
             overlay.addEventListener('click', function(e) {
                 if (e.target === overlay) {
                     closeLoginRequiredPopup();
@@ -2186,12 +2287,12 @@
 
                 if (snapshot.empty) {
                     movieList.innerHTML = `
-                        <div class="empty-state">
-                            <div class="icon">🎬</div>
-                            <h3>Chưa có phim nào</h3>
-                            <p>Admin sẽ sớm cập nhật phim mới!</p>
-                        </div>
-                    `;
+                            <div class="empty-state">
+                                <div class="icon">🎬</div>
+                                <h3>Chưa có phim nào</h3>
+                                <p>Admin sẽ sớm cập nhật phim mới!</p>
+                            </div>
+                        `;
                     updateCategoryCounts([]);
                     return;
                 }
@@ -2212,14 +2313,14 @@
             } catch (e) {
                 console.error('Lỗi tải phim:', e);
                 movieList.innerHTML = `
-                    <div class="empty-state">
-                        <div class="icon">❌</div>
-                        <h3>Lỗi tải phim</h3>
-                        <p>${e.message}</p>
-                        <br>
-                        <button onclick="loadMovies()" style="padding:8px 20px;background:#1a73e8;color:white;border:none;border-radius:20px;cursor:pointer;">🔄 Thử lại</button>
-                    </div>
-                `;
+                        <div class="empty-state">
+                            <div class="icon">❌</div>
+                            <h3>Lỗi tải phim</h3>
+                            <p>${e.message}</p>
+                            <br>
+                            <button onclick="loadMovies()" style="padding:8px 20px;background:#1a73e8;color:white;border:none;border-radius:20px;cursor:pointer;">🔄 Thử lại</button>
+                        </div>
+                    `;
             }
         }
 
@@ -2245,38 +2346,38 @@
 
             if (filtered.length === 0) {
                 movieList.innerHTML = `
-                    <div class="empty-state">
-                        <div class="icon">🎬</div>
-                        <h3>Không có phim nào</h3>
-                        <p>Chưa có phim thuộc thể loại này</p>
-                    </div>
-                `;
+                        <div class="empty-state">
+                            <div class="icon">🎬</div>
+                            <h3>Không có phim nào</h3>
+                            <p>Chưa có phim thuộc thể loại này</p>
+                        </div>
+                    `;
                 return;
             }
 
             let html = `<div class="movie-grid">`;
             filtered.forEach(m => {
                 html += `
-                    <div class="movie-card ${!isLoggedIn ? 'locked' : ''}" 
-                         onclick="${isLoggedIn ? `openMovieDetail('${m.id}')` : `showLoginRequired()`}">
-                        ${!isLoggedIn ? `
-                        <div class="lock-overlay show">
-                            <div class="lock-icon">🔒</div>
-                            <div class="lock-text">Đăng nhập để xem</div>
-                            <div class="lock-sub">Vui lòng đăng nhập</div>
+                        <div class="movie-card ${!isLoggedIn ? 'locked' : ''}" 
+                             onclick="${isLoggedIn ? `openMovieDetail('${m.id}')` : `showLoginRequired()`}">
+                            ${!isLoggedIn ? `
+                            <div class="lock-overlay show">
+                                <div class="lock-icon">🔒</div>
+                                <div class="lock-text">Đăng nhập để xem</div>
+                                <div class="lock-sub">Vui lòng đăng nhập</div>
+                            </div>
+                            ` : ''}
+                            <img src="${m.poster || 'https://via.placeholder.com/400x250/1a73e8/FFFFFF?text=Doraemon'}" 
+                                 alt="${m.title || 'Phim'}"
+                                 onerror="this.src='https://via.placeholder.com/400x250/1a73e8/FFFFFF?text=Doraemon'">
+                            <div class="movie-info">
+                                <h4>${m.title || 'Untitled'}</h4>
+                                <p>${m.desc || ''}</p>
+                                <span class="genre">${m.genre || 'Phim'}</span>
+                                <div class="views">👁️ ${m.views || 0} lượt xem</div>
+                            </div>
                         </div>
-                        ` : ''}
-                        <img src="${m.poster || 'https://via.placeholder.com/400x250/1a73e8/FFFFFF?text=Doraemon'}" 
-                             alt="${m.title || 'Phim'}"
-                             onerror="this.src='https://via.placeholder.com/400x250/1a73e8/FFFFFF?text=Doraemon'">
-                        <div class="movie-info">
-                            <h4>${m.title || 'Untitled'}</h4>
-                            <p>${m.desc || ''}</p>
-                            <span class="genre">${m.genre || 'Phim'}</span>
-                            <div class="views">👁️ ${m.views || 0} lượt xem</div>
-                        </div>
-                    </div>
-                `;
+                    `;
             });
             html += `</div>`;
             movieList.innerHTML = html;
@@ -2300,6 +2401,7 @@
         console.log('👑 Super Admin:', SUPER_ADMIN_EMAIL);
         console.log('✅ Đã fix lỗi click avatar/tên -> vào profile');
         console.log('✅ Đã fix lỗi xuống dòng khi đăng bài');
+        console.log('✅ Đã sửa like theo từng user riêng biệt');
         console.log('✅ Đã thêm pop-up yêu cầu đăng nhập khi xem phim');
         console.log('🎬 Click vào phim sẽ mở trang chi tiết riêng!');
     </script>
