@@ -264,11 +264,14 @@
 
         .create-post-top {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 12px;
         }
 
-        .create-post-top .avatar {
+        .avatar-link {
+            text-decoration: none;
+            cursor: pointer;
+            transition: 0.3s;
             width: 44px;
             height: 44px;
             border-radius: 50%;
@@ -277,23 +280,21 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            text-decoration: none;
             border: 2px solid #ffeb3b;
-            transition: 0.3s;
         }
 
-        .create-post-top .avatar:hover {
+        .avatar-link:hover {
             transform: scale(1.05);
             box-shadow: 0 0 20px rgba(255, 235, 59, 0.4);
         }
 
-        .create-post-top .avatar img {
+        .avatar-link img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .create-post-top input {
+        .create-post-top textarea {
             flex: 1;
             padding: 12px 18px;
             border: none;
@@ -303,9 +304,13 @@
             outline: none;
             transition: 0.3s;
             resize: vertical;
+            min-height: 44px;
+            max-height: 200px;
+            font-family: inherit;
+            line-height: 1.6;
         }
 
-        .create-post-top input:focus {
+        .create-post-top textarea:focus {
             background: #e4e6eb;
         }
 
@@ -461,7 +466,7 @@
             margin-bottom: 10px;
         }
 
-        .post-header .avatar {
+        .post-header .avatar-link {
             width: 44px;
             height: 44px;
             border-radius: 50%;
@@ -470,10 +475,17 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #1a73e8, #0d47a1);
+            border: none;
+            text-decoration: none;
+            cursor: pointer;
+            transition: 0.3s;
         }
 
-        .post-header .avatar img {
+        .post-header .avatar-link:hover {
+            transform: scale(1.05);
+        }
+
+        .post-header .avatar-link img {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -491,6 +503,18 @@
             align-items: center;
             gap: 6px;
             flex-wrap: wrap;
+        }
+
+        .post-header .info .name .profile-link {
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .post-header .info .name .profile-link:hover {
+            color: #1a73e8;
+            text-decoration: underline;
         }
 
         .post-header .info .name .badge {
@@ -532,10 +556,12 @@
 
         .post-content {
             font-size: 15px;
-            line-height: 1.6;
+            line-height: 1.8;
             margin: 8px 0 12px;
             color: #1a1a2e;
             white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .post-image {
@@ -628,7 +654,7 @@
             padding: 8px 0;
         }
 
-        .comment-item .avatar {
+        .comment-item .avatar-link {
             width: 32px;
             height: 32px;
             border-radius: 50%;
@@ -637,10 +663,17 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #1a73e8, #0d47a1);
+            border: none;
+            text-decoration: none;
+            cursor: pointer;
+            transition: 0.3s;
         }
 
-        .comment-item .avatar img {
+        .comment-item .avatar-link:hover {
+            transform: scale(1.05);
+        }
+
+        .comment-item .avatar-link img {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -660,6 +693,18 @@
             align-items: center;
             gap: 4px;
             flex-wrap: wrap;
+        }
+
+        .comment-item .comment-body .name .profile-link {
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .comment-item .comment-body .name .profile-link:hover {
+            color: #1a73e8;
+            text-decoration: underline;
         }
 
         .comment-item .comment-body .name .logo-small {
@@ -1155,7 +1200,7 @@
                 font-size: 13px;
                 padding: 4px 8px;
             }
-            .create-post-top input {
+            .create-post-top textarea {
                 font-size: 14px;
             }
             #authStatus .user-name {
@@ -1282,10 +1327,10 @@
                         <!-- Create Post -->
                         <div class="create-post" id="createPostBox">
                             <div class="create-post-top">
-                                <a href="profile.html" class="avatar">
+                                <a href="profile.html" class="avatar-link">
                                     <img src="https://i.ibb.co/9kJhtfp1/Doraemon-fansub.png" alt="Logo">
                                 </a>
-                                <input type="text" id="postInput" placeholder="Bạn đang nghĩ gì thế?" />
+                                <textarea id="postInput" placeholder="Bạn đang nghĩ gì thế?" rows="1"></textarea>
                             </div>
 
                             <div class="upload-preview" id="uploadPreview">
@@ -1686,7 +1731,7 @@
         }
 
         // ============================================================
-        // CREATE POST
+        // CREATE POST (SỬA - GIỮ XUỐNG DÒNG)
         // ============================================================
         async function createPost() {
             if (!isLoggedIn) {
@@ -1695,7 +1740,7 @@
                 return;
             }
 
-            const content = postInput.value.trim();
+            const content = postInput.value;
             if (!content && !uploadedFileUrl) {
                 alert('📝 Vui lòng nhập nội dung hoặc đính kèm ảnh/video!');
                 return;
@@ -1731,6 +1776,7 @@
                 await db.collection('posts').add(postData);
 
                 postInput.value = '';
+                postInput.style.height = 'auto';
                 removeUpload();
                 await loadPosts();
 
@@ -1751,6 +1797,22 @@
                 btn.disabled = false;
             }
         }
+
+        // ============================================================
+        // TỰ ĐỘNG TĂNG CHIỀU CAO TEXTAREA
+        // ============================================================
+        postInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+        });
+
+        // Enter để đăng bài (Shift+Enter để xuống dòng)
+        postInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                createPost();
+            }
+        });
 
         // ============================================================
         // LOAD POSTS
@@ -1806,7 +1868,7 @@
         }
 
         // ============================================================
-        // RENDER POST CARDS
+        // RENDER POST CARDS (SỬA - THÊM LINK PROFILE)
         // ============================================================
         async function renderPostCards(posts) {
             if (!posts || posts.length === 0) return '';
@@ -1814,17 +1876,23 @@
             let html = '';
             for (const p of posts) {
                 const isPostAdmin = isUserAdmin(p.userEmail);
+                
+                // Tạo link profile
+                const profileLink = `profile.html?uid=${p.userId || ''}&email=${encodeURIComponent(p.userEmail || '')}`;
 
                 const commentsHtml = await Promise.all((p.comments || []).map(async (c) => {
                     const isCommentAdmin = isUserAdmin(c.userEmail);
+                    const commentProfileLink = `profile.html?uid=${c.userId || ''}&email=${encodeURIComponent(c.userEmail || '')}`;
                     return `
                         <div class="comment-item">
-                            <div class="avatar">
+                            <a href="${commentProfileLink}" class="avatar-link">
                                 <img src="${c.avatar || LOGO_URL}" alt="avatar">
-                            </div>
+                            </a>
                             <div class="comment-body">
                                 <div class="name">
-                                    ${c.user || 'Doraemon'}
+                                    <a href="${commentProfileLink}" class="profile-link">
+                                        ${c.user || 'Doraemon'}
+                                    </a>
                                     ${isCommentAdmin ? `<span class="verified-badge">✓ Admin</span>` : ''}
                                     <img src="${LOGO_URL}" class="logo-small" alt="logo">
                                 </div>
@@ -1852,12 +1920,14 @@
                 html += `
                     <div class="post-card" id="post-${p.id}">
                         <div class="post-header">
-                            <div class="avatar">
+                            <a href="${profileLink}" class="avatar-link">
                                 <img src="${p.avatar || LOGO_URL}" alt="avatar">
-                            </div>
+                            </a>
                             <div class="info">
                                 <div class="name">
-                                    ${p.user || 'Doraemon'}
+                                    <a href="${profileLink}" class="profile-link">
+                                        ${p.user || 'Doraemon'}
+                                    </a>
                                     ${isPostAdmin ? `<span class="verified-badge">✓ Admin</span>` : ''}
                                     <img src="${LOGO_URL}" class="logo-small" alt="logo">
                                     <span class="badge">●</span>
@@ -1946,6 +2016,7 @@
                     text: text,
                     time: 'Vừa xong',
                     userEmail: user?.email || '',
+                    userId: user?.uid || '',
                     isAdmin: isAdmin
                 });
                 await db.collection('posts').doc(postId).update({ comments });
@@ -2004,14 +2075,13 @@
         let currentCategory = 'all';
 
         // ============================================================
-        // MỞ TRANG CHI TIẾT PHIM (THAY THẾ MODAL)
+        // MỞ TRANG CHI TIẾT PHIM
         // ============================================================
         function openMovieDetail(movieId) {
             if (!isLoggedIn) {
                 showLoginRequired();
                 return;
             }
-            // Chuyển đến trang chi tiết với ID phim
             window.location.href = `movie-detail.html?id=${movieId}`;
         }
 
@@ -2140,29 +2210,12 @@
         });
 
         // ============================================================
-        // ENTER KEY
-        // ============================================================
-        document.getElementById('postInput').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                createPost();
-            }
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && e.target.id && e.target.id.startsWith('commentInput-')) {
-                const postId = e.target.id.replace('commentInput-', '');
-                addComment(postId);
-            }
-        });
-
-        // ============================================================
         // INIT
         // ============================================================
         console.log('🎬 Doraemon Fansub đã sẵn sàng!');
         console.log('👑 Super Admin:', SUPER_ADMIN_EMAIL);
-        console.log('✅ Đã thêm kiểm tra tài khoản bị cấm (banned_users)!');
-        console.log('🚫 Tài khoản bị xóa sẽ hiển thị popup yêu cầu liên hệ page!');
+        console.log('✅ Đã fix lỗi click vào avatar/tên -> vào profile');
+        console.log('✅ Đã fix lỗi xuống dòng khi đăng bài');
         console.log('📎 Đã thêm tính năng đính kèm ảnh/video!');
         console.log('🎬 Click vào phim sẽ mở trang chi tiết riêng!');
     </script>
