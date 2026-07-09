@@ -976,47 +976,95 @@
             100% { transform: rotate(360deg); }
         }
 
-        .login-required-toast {
+        /* ===== LOGIN REQUIRED POPUP ===== */
+        .login-required-overlay {
             position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1a1a2e;
-            color: white;
-            padding: 16px 28px;
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-            z-index: 9998;
-            display: none;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 99999;
+            display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 16px;
-            font-weight: 600;
-            font-size: 15px;
+            backdrop-filter: blur(5px);
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        .login-required-popup {
+            background: white;
+            border-radius: 24px;
+            padding: 40px 35px;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
             animation: slideUp 0.4s ease;
-            max-width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .login-required-popup .popup-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .login-required-popup h3 {
+            font-size: 22px;
+            color: #1a1a2e;
+            margin-bottom: 12px;
+        }
+
+        .login-required-popup p {
+            color: #666;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .login-required-popup .popup-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+            width: 100%;
+        }
+
+        .login-required-popup .popup-btn-login {
+            display: inline-block;
+            background: #1a73e8;
+            color: white;
+            padding: 12px 40px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: 0.3s;
+            width: 100%;
             text-align: center;
         }
 
-        .login-required-toast.show {
-            display: flex;
+        .login-required-popup .popup-btn-login:hover {
+            background: #1557b0;
+            transform: scale(1.02);
         }
 
-        .login-required-toast .btn-login-now {
-            background: #ffeb3b;
-            color: #0d47a1;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 25px;
-            font-weight: 700;
+        .login-required-popup .popup-btn-close {
+            background: transparent;
+            color: #666;
+            border: 1px solid #ddd;
+            padding: 10px 30px;
+            border-radius: 30px;
             font-size: 14px;
             cursor: pointer;
             transition: 0.3s;
-            text-decoration: none;
-            white-space: nowrap;
+            width: 100%;
         }
 
-        .login-required-toast .btn-login-now:hover {
-            transform: scale(1.05);
+        .login-required-popup .popup-btn-close:hover {
+            background: #f0f2f5;
+            border-color: #999;
         }
 
         /* ===== ACCOUNT DELETED MODAL ===== */
@@ -1213,11 +1261,6 @@
             .movie-card img {
                 height: 140px;
             }
-            .login-required-toast {
-                flex-direction: column;
-                gap: 12px;
-                padding: 16px 20px;
-            }
             .dashboard-link {
                 font-size: 11px;
                 padding: 4px 10px;
@@ -1257,6 +1300,9 @@
                 padding: 0px 4px;
             }
             .account-deleted-content {
+                padding: 30px 20px;
+            }
+            .login-required-popup {
                 padding: 30px 20px;
             }
         }
@@ -1393,12 +1439,6 @@
         </div>
     </main>
 
-    <!-- ===== LOGIN REQUIRED TOAST ===== -->
-    <div class="login-required-toast" id="loginRequiredToast">
-        <span>🔒 Vui lòng đăng nhập để xem phim</span>
-        <a href="login.html" class="btn-login-now">Đăng nhập ngay</a>
-    </div>
-
     <script>
         // ============================================================
         // FIREBASE CONFIG
@@ -1451,7 +1491,6 @@
         const postList = document.getElementById('postList');
         const postListRight = document.getElementById('postListRight');
         const movieList = document.getElementById('movieList');
-        const loginRequiredToast = document.getElementById('loginRequiredToast');
         const uploadPreview = document.getElementById('uploadPreview');
         const previewContent = document.getElementById('previewContent');
         const fileName = document.getElementById('fileName');
@@ -1731,7 +1770,7 @@
         }
 
         // ============================================================
-        // CREATE POST (SỬA - GIỮ XUỐNG DÒNG)
+        // CREATE POST
         // ============================================================
         async function createPost() {
             if (!isLoggedIn) {
@@ -1868,7 +1907,7 @@
         }
 
         // ============================================================
-        // RENDER POST CARDS (SỬA - THÊM LINK PROFILE)
+        // RENDER POST CARDS
         // ============================================================
         async function renderPostCards(posts) {
             if (!posts || posts.length === 0) return '';
@@ -1876,13 +1915,12 @@
             let html = '';
             for (const p of posts) {
                 const isPostAdmin = isUserAdmin(p.userEmail);
-                
-                // Tạo link profile
                 const profileLink = `profile.html?uid=${p.userId || ''}&email=${encodeURIComponent(p.userEmail || '')}`;
 
                 const commentsHtml = await Promise.all((p.comments || []).map(async (c) => {
                     const isCommentAdmin = isUserAdmin(c.userEmail);
-                    const commentProfileLink = `profile.html?uid=${c.userId || ''}&email=${encodeURIComponent(c.userEmail || '')}`;
+                    const commentProfileLink =
+                        `profile.html?uid=${c.userId || ''}&email=${encodeURIComponent(c.userEmail || '')}`;
                     return `
                         <div class="comment-item">
                             <a href="${commentProfileLink}" class="avatar-link">
@@ -2075,6 +2113,59 @@
         let currentCategory = 'all';
 
         // ============================================================
+        // HIỂN THỊ POP-UP YÊU CẦU ĐĂNG NHẬP
+        // ============================================================
+        function showLoginRequired() {
+            // Xóa pop-up cũ nếu có
+            const oldOverlay = document.getElementById('loginRequiredOverlay');
+            if (oldOverlay) oldOverlay.remove();
+
+            const overlay = document.createElement('div');
+            overlay.className = 'login-required-overlay';
+            overlay.id = 'loginRequiredOverlay';
+
+            overlay.innerHTML = `
+                <div class="login-required-popup">
+                    <div class="popup-icon">🔒</div>
+                    <h3>Vui lòng đăng nhập</h3>
+                    <p>Bạn cần đăng nhập để xem phim này.<br>Đăng nhập ngay để trải nghiệm đầy đủ tính năng!</p>
+                    <div class="popup-actions">
+                        <a href="login.html" class="popup-btn-login">🔑 Đăng nhập ngay</a>
+                        <button onclick="closeLoginRequiredPopup()" class="popup-btn-close">Đóng</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(overlay);
+            document.body.style.overflow = 'hidden';
+
+            // Click outside để đóng
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) {
+                    closeLoginRequiredPopup();
+                }
+            });
+        }
+
+        // ============================================================
+        // ĐÓNG POP-UP YÊU CẦU ĐĂNG NHẬP
+        // ============================================================
+        function closeLoginRequiredPopup() {
+            const overlay = document.getElementById('loginRequiredOverlay');
+            if (overlay) {
+                overlay.remove();
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // ESC để đóng pop-up
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeLoginRequiredPopup();
+            }
+        });
+
+        // ============================================================
         // MỞ TRANG CHI TIẾT PHIM
         // ============================================================
         function openMovieDetail(movieId) {
@@ -2191,13 +2282,6 @@
             movieList.innerHTML = html;
         }
 
-        function showLoginRequired() {
-            loginRequiredToast.classList.add('show');
-            setTimeout(() => {
-                loginRequiredToast.classList.remove('show');
-            }, 5000);
-        }
-
         document.getElementById('categoryList').addEventListener('click', function(e) {
             const li = e.target.closest('li');
             if (!li) return;
@@ -2214,9 +2298,9 @@
         // ============================================================
         console.log('🎬 Doraemon Fansub đã sẵn sàng!');
         console.log('👑 Super Admin:', SUPER_ADMIN_EMAIL);
-        console.log('✅ Đã fix lỗi click vào avatar/tên -> vào profile');
+        console.log('✅ Đã fix lỗi click avatar/tên -> vào profile');
         console.log('✅ Đã fix lỗi xuống dòng khi đăng bài');
-        console.log('📎 Đã thêm tính năng đính kèm ảnh/video!');
+        console.log('✅ Đã thêm pop-up yêu cầu đăng nhập khi xem phim');
         console.log('🎬 Click vào phim sẽ mở trang chi tiết riêng!');
     </script>
 </body>
