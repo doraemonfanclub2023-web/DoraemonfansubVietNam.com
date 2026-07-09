@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Xem phim - Doraemon Fansub</title>
 
+    <!-- Meta Tags cho chia sẻ -->
+    <meta property="og:title" content="Doraemon Fansub - Xem phim" />
+    <meta property="og:description" content="Xem phim Doraemon và nhiều bộ phim hay khác" />
+    <meta property="og:image" content="https://i.ibb.co/9kJhtfp1/Doraemon-fansub.png" />
+    <meta property="og:url" content="https://doraemon-fansub-vietnam.web.app" />
+    <meta name="twitter:card" content="summary_large_image" />
+
     <!-- Firebase compat -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -61,6 +68,11 @@
             width: auto;
             border-radius: 50%;
             object-fit: cover;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
         }
 
         .back-btn {
@@ -303,7 +315,7 @@
                     <img src="https://i.ibb.co/9kJhtfp1/Doraemon-fansub.png" alt="Doraemon Fansub">
                     Doraemon
                 </a>
-                <div style="display: flex; gap: 10px;">
+                <div class="header-actions">
                     <a href="index.html" class="back-btn">← Quay lại</a>
                     <button class="share-btn" onclick="shareMovie()">📤 Chia sẻ</button>
                 </div>
@@ -436,6 +448,12 @@
 
             // Cập nhật title trang
             document.title = `${movie.title || 'Xem phim'} - Doraemon Fansub`;
+
+            // Cập nhật meta tags cho chia sẻ
+            const metaTitle = document.querySelector('meta[property="og:title"]');
+            const metaDesc = document.querySelector('meta[property="og:description"]');
+            if (metaTitle) metaTitle.content = `${movie.title || 'Xem phim'} - Doraemon Fansub`;
+            if (metaDesc) metaDesc.content = movie.desc || 'Xem phim Doraemon và nhiều bộ phim hay khác';
 
             container.innerHTML = `
                 <div class="movie-player">
