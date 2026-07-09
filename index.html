@@ -877,6 +877,114 @@
             color: white;
         }
 
+        /* ===== MOVIE TOOLBAR ===== */
+        .movie-toolbar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            display: flex;
+            gap: 8px;
+            background: white;
+            border-radius: 30px;
+            padding: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            min-width: 200px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 10px 18px;
+            border: none;
+            background: transparent;
+            font-size: 15px;
+            outline: none;
+            border-radius: 30px;
+        }
+
+        .search-box input::placeholder {
+            color: #999;
+        }
+
+        .search-btn {
+            background: #1a73e8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-btn:hover {
+            background: #1557b0;
+            transform: scale(1.02);
+        }
+
+        .contact-btn {
+            background: #1877f2;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 15px;
+            text-decoration: none;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(24, 119, 242, 0.3);
+        }
+
+        .contact-btn:hover {
+            background: #1664d9;
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(24, 119, 242, 0.4);
+        }
+
+        /* ===== NO SEARCH RESULT ===== */
+        .no-search-result {
+            grid-column: 1 / -1;
+        }
+
+        .no-search-result .empty-state {
+            background: white;
+            border-radius: 16px;
+            padding: 60px 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .no-search-result .empty-state .icon {
+            font-size: 60px;
+            margin-bottom: 16px;
+        }
+
+        .no-search-result .empty-state h3 {
+            font-size: 22px;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+
+        .no-search-result .empty-state p {
+            color: #65676b;
+            font-size: 16px;
+        }
+
+        .no-search-result .empty-state strong {
+            color: #1a73e8;
+        }
+
         .movie-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -1300,6 +1408,16 @@
                 font-size: 8px;
                 padding: 0px 5px;
             }
+            .movie-toolbar {
+                flex-direction: column;
+            }
+            .contact-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .search-box {
+                width: 100%;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1458,10 +1576,23 @@
                         </ul>
                     </div>
 
-                    <div id="movieList">
-                        <div class="loading-spinner">
-                            <div class="spinner"></div>
-                            <p>Đang tải phim...</p>
+                    <div>
+                        <!-- ===== TOOLBAR: SEARCH + CONTACT ===== -->
+                        <div class="movie-toolbar">
+                            <div class="search-box">
+                                <input type="text" id="movieSearch" placeholder="🔍 Tìm kiếm phim..." oninput="searchMovies()">
+                                <button class="search-btn" onclick="searchMovies()">🔍</button>
+                            </div>
+                            <a href="https://www.facebook.com/DoraemonFansubVietNam" target="_blank" class="contact-btn">
+                                💬 Liên hệ
+                            </a>
+                        </div>
+
+                        <div id="movieList">
+                            <div class="loading-spinner">
+                                <div class="spinner"></div>
+                                <p>Đang tải phim...</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1940,7 +2071,7 @@
         }
 
         // ============================================================
-        // RENDER POST CARDS (SỬA - LIKE THEO USER)
+        // RENDER POST CARDS
         // ============================================================
         async function renderPostCards(posts) {
             if (!posts || posts.length === 0) return '';
@@ -1954,7 +2085,6 @@
                 const profileLink =
                 `profile.html?uid=${p.userId || ''}&email=${encodeURIComponent(p.userEmail || '')}`;
 
-                // Lấy trạng thái like của user hiện tại
                 const likedBy = p.likedBy || {};
                 const isLiked = !!likedBy[currentUserEmail];
                 const totalLikes = p.totalLikes || p.likes || Object.keys(likedBy).length || 0;
@@ -2046,7 +2176,7 @@
         }
 
         // ============================================================
-        // LIKE - LƯU THEO TỪNG USER
+        // LIKE
         // ============================================================
         async function toggleLike(postId) {
             if (!isLoggedIn) {
@@ -2068,7 +2198,6 @@
                 const likedBy = data.likedBy || {};
                 const isLiked = !!likedBy[userEmail];
 
-                // Cập nhật
                 if (isLiked) {
                     delete likedBy[userEmail];
                 } else {
@@ -2084,7 +2213,6 @@
                     liked: !!likedBy[userEmail]
                 });
 
-                // Cập nhật UI
                 updateLikeUI(postId, !!likedBy[userEmail], totalLikes);
 
             } catch (e) {
@@ -2094,29 +2222,25 @@
         }
 
         // ============================================================
-        // CẬP NHẬT UI LIKE (KHÔNG RELOAD)
+        // CẬP NHẬT UI LIKE
         // ============================================================
         function updateLikeUI(postId, isLiked, likeCount) {
-            // Cập nhật nút like
             const likeBtn = document.getElementById(`likeBtn-${postId}`);
             if (likeBtn) {
                 likeBtn.innerHTML = isLiked ? '❤️ Thích' : '🤍 Thích';
                 likeBtn.className = `like-btn ${isLiked ? 'liked' : ''}`;
             }
 
-            // Cập nhật số lượng like
             const likeCountEl = document.getElementById(`likeCount-${postId}`);
             if (likeCountEl) {
                 likeCountEl.textContent = likeCount;
             }
 
-            // Cập nhật icon heart
             const heartEl = document.getElementById(`heart-${postId}`);
             if (heartEl) {
                 heartEl.textContent = isLiked ? '❤️' : '🤍';
                 heartEl.className = `heart ${isLiked ? 'liked-heart' : ''}`;
 
-                // Animation khi like
                 if (isLiked) {
                     heartEl.style.animation = 'heartPop 0.5s ease';
                     setTimeout(() => {
@@ -2217,6 +2341,57 @@
         // ============================================================
         let allMovies = [];
         let currentCategory = 'all';
+
+        // ============================================================
+        // TÌM KIẾM PHIM
+        // ============================================================
+        function searchMovies() {
+            const keyword = document.getElementById('movieSearch').value.toLowerCase().trim();
+            const movieCards = document.querySelectorAll('.movie-card');
+            const noResult = document.getElementById('noSearchResult');
+
+            if (noResult) {
+                noResult.remove();
+            }
+
+            if (!keyword) {
+                movieCards.forEach(card => {
+                    card.style.display = 'block';
+                });
+                return;
+            }
+
+            let found = false;
+            movieCards.forEach(card => {
+                const title = card.querySelector('h4')?.textContent?.toLowerCase() || '';
+                const desc = card.querySelector('p')?.textContent?.toLowerCase() || '';
+                const genre = card.querySelector('.genre')?.textContent?.toLowerCase() || '';
+
+                if (title.includes(keyword) || desc.includes(keyword) || genre.includes(keyword)) {
+                    card.style.display = 'block';
+                    found = true;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            if (!found && keyword) {
+                const grid = document.querySelector('.movie-grid');
+                if (grid) {
+                    const msg = document.createElement('div');
+                    msg.id = 'noSearchResult';
+                    msg.className = 'no-search-result';
+                    msg.innerHTML = `
+                            <div class="empty-state">
+                                <div class="icon">🔍</div>
+                                <h3>Không tìm thấy phim</h3>
+                                <p>Không tìm thấy phim nào phù hợp với "<strong>${keyword}</strong>"</p>
+                            </div>
+                        `;
+                    grid.appendChild(msg);
+                }
+            }
+        }
 
         // ============================================================
         // HIỂN THỊ POP-UP YÊU CẦU ĐĂNG NHẬP
@@ -2381,6 +2556,12 @@
             });
             html += `</div>`;
             movieList.innerHTML = html;
+
+            // Reset tìm kiếm
+            const searchInput = document.getElementById('movieSearch');
+            if (searchInput) {
+                searchInput.value = '';
+            }
         }
 
         document.getElementById('categoryList').addEventListener('click', function(e) {
@@ -2402,8 +2583,9 @@
         console.log('✅ Đã fix lỗi click avatar/tên -> vào profile');
         console.log('✅ Đã fix lỗi xuống dòng khi đăng bài');
         console.log('✅ Đã sửa like theo từng user riêng biệt');
+        console.log('✅ Đã thêm thanh tìm kiếm phim');
+        console.log('✅ Đã thêm nút liên hệ');
         console.log('✅ Đã thêm pop-up yêu cầu đăng nhập khi xem phim');
-        console.log('🎬 Click vào phim sẽ mở trang chi tiết riêng!');
     </script>
 </body>
 </html>
