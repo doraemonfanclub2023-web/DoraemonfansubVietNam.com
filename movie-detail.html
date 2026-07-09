@@ -43,7 +43,6 @@
             min-height: 100vh;
         }
 
-        /* Header */
         .header {
             background: linear-gradient(135deg, #1a73e8, #0d47a1);
             padding: 16px 0;
@@ -126,7 +125,6 @@
             background: rgba(255, 255, 255, 0.25);
         }
 
-        /* Movie Player */
         .movie-player {
             padding: 30px 0;
         }
@@ -258,7 +256,6 @@
             transform: scale(1.05);
         }
 
-        /* Toast thông báo copy link */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -291,7 +288,6 @@
             }
         }
 
-        /* ===== LOGIN REQUIRED POPUP ===== */
         .login-required-overlay {
             position: fixed;
             top: 0;
@@ -397,7 +393,6 @@
             }
         }
 
-        /* ===== LOGIN REQUIRED MESSAGE ===== */
         .login-required-message {
             text-align: center;
             padding: 80px 20px;
@@ -422,7 +417,6 @@
             line-height: 1.6;
         }
 
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .movie-info h1 {
                 font-size: 22px;
@@ -471,7 +465,6 @@
 </head>
 <body>
 
-    <!-- ===== HEADER ===== -->
     <header class="header">
         <div class="container">
             <div class="header-content">
@@ -487,7 +480,6 @@
         </div>
     </header>
 
-    <!-- ===== MAIN CONTENT ===== -->
     <main class="container">
         <div id="movieContent">
             <div class="loading-state">
@@ -497,7 +489,6 @@
         </div>
     </main>
 
-    <!-- ===== LOGIN REQUIRED POPUP ===== -->
     <div class="login-required-overlay" id="loginRequiredOverlay">
         <div class="login-required-popup">
             <div class="popup-icon">🔒</div>
@@ -510,13 +501,9 @@
         </div>
     </div>
 
-    <!-- ===== TOAST ===== -->
     <div class="toast" id="toast">✅ Đã sao chép link phim!</div>
 
     <script>
-        // ============================================================
-        // FIREBASE CONFIG
-        // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyBt3G9n5JYu3EsvqJR9IoW2vRAc_Es3-ws",
             authDomain: "doraemon-fansub-vietnam.firebaseapp.com",
@@ -537,17 +524,11 @@
         let isLoggedIn = false;
         let isBanned = false;
 
-        // ============================================================
-        // LẤY ID PHIM TỪ URL
-        // ============================================================
         function getMovieIdFromURL() {
             const params = new URLSearchParams(window.location.search);
             return params.get('id');
         }
 
-        // ============================================================
-        // KIỂM TRA TÀI KHOẢN BỊ CẤM
-        // ============================================================
         async function checkBannedUser(email) {
             if (!email) return false;
             try {
@@ -559,22 +540,19 @@
             }
         }
 
-        // ============================================================
-        // TẢI THÔNG TIN PHIM
-        // ============================================================
         async function loadMovieDetail() {
             movieId = getMovieIdFromURL();
             const container = document.getElementById('movieContent');
 
             if (!movieId) {
                 container.innerHTML = `
-                    <div class="error-state">
-                        <div class="icon">❌</div>
-                        <h2>Không tìm thấy phim</h2>
-                        <p>ID phim không hợp lệ hoặc không tồn tại.</p>
-                        <a href="index.html" class="btn-home">🏠 Về trang chủ</a>
-                    </div>
-                `;
+                        <div class="error-state">
+                            <div class="icon">❌</div>
+                            <h2>Không tìm thấy phim</h2>
+                            <p>ID phim không hợp lệ hoặc không tồn tại.</p>
+                            <a href="index.html" class="btn-home">🏠 Về trang chủ</a>
+                        </div>
+                    `;
                 return;
             }
 
@@ -583,19 +561,18 @@
 
                 if (!doc.exists) {
                     container.innerHTML = `
-                        <div class="error-state">
-                            <div class="icon">🎬</div>
-                            <h2>Phim không tồn tại</h2>
-                            <p>Phim bạn tìm kiếm đã bị xóa hoặc không có.</p>
-                            <a href="index.html" class="btn-home">🏠 Về trang chủ</a>
-                        </div>
-                    `;
+                            <div class="error-state">
+                                <div class="icon">🎬</div>
+                                <h2>Phim không tồn tại</h2>
+                                <p>Phim bạn tìm kiếm đã bị xóa hoặc không có.</p>
+                                <a href="index.html" class="btn-home">🏠 Về trang chủ</a>
+                            </div>
+                        `;
                     return;
                 }
 
                 currentMovie = doc.data();
 
-                // Cập nhật lượt xem
                 try {
                     await db.collection('movies').doc(movieId).update({
                         views: (currentMovie.views || 0) + 1
@@ -609,19 +586,16 @@
             } catch (e) {
                 console.error('Lỗi tải phim:', e);
                 container.innerHTML = `
-                    <div class="error-state">
-                        <div class="icon">❌</div>
-                        <h2>Lỗi tải phim</h2>
-                        <p>${e.message || 'Không thể tải phim. Vui lòng thử lại sau.'}</p>
-                        <a href="index.html" class="btn-home">🏠 Về trang chủ</a>
-                    </div>
-                `;
+                        <div class="error-state">
+                            <div class="icon">❌</div>
+                            <h2>Lỗi tải phim</h2>
+                            <p>${e.message || 'Không thể tải phim. Vui lòng thử lại sau.'}</p>
+                            <a href="index.html" class="btn-home">🏠 Về trang chủ</a>
+                        </div>
+                    `;
             }
         }
 
-        // ============================================================
-        // HIỂN THỊ CHI TIẾT PHIM
-        // ============================================================
         function renderMovieDetail(movie) {
             const container = document.getElementById('movieContent');
 
@@ -630,45 +604,40 @@
                 videoContent = movie.embed;
             } else if (movie.video) {
                 videoContent = `
-                    <video controls autoplay>
-                        <source src="${movie.video}">
-                        Trình duyệt không hỗ trợ video
-                    </video>
-                `;
+                        <video controls autoplay>
+                            <source src="${movie.video}">
+                            Trình duyệt không hỗ trợ video
+                        </video>
+                    `;
             } else {
                 videoContent = `<p style="color:#999;text-align:center;padding:40px;">Không có video</p>`;
             }
 
-            // Cập nhật title trang
             document.title = `${movie.title || 'Xem phim'} - Doraemon Fansub`;
 
-            // Cập nhật meta tags cho chia sẻ
             const metaTitle = document.querySelector('meta[property="og:title"]');
             const metaDesc = document.querySelector('meta[property="og:description"]');
             if (metaTitle) metaTitle.content = `${movie.title || 'Xem phim'} - Doraemon Fansub`;
             if (metaDesc) metaDesc.content = movie.desc || 'Xem phim Doraemon và nhiều bộ phim hay khác';
 
             container.innerHTML = `
-                <div class="movie-player">
-                    <div class="video-wrapper">
-                        ${videoContent}
-                    </div>
-                    <div class="movie-info">
-                        <h1>${movie.title || 'Không có tiêu đề'}</h1>
-                        <div class="meta">
-                            <span class="genre">${movie.genre || 'Phim'}</span>
-                            <span class="views">👁️ ${(movie.views || 0) + 1} lượt xem</span>
-                            <span class="year">📅 ${movie.year || 'N/A'}</span>
+                    <div class="movie-player">
+                        <div class="video-wrapper">
+                            ${videoContent}
                         </div>
-                        <p class="desc">${movie.desc || ''}</p>
+                        <div class="movie-info">
+                            <h1>${movie.title || 'Không có tiêu đề'}</h1>
+                            <div class="meta">
+                                <span class="genre">${movie.genre || 'Phim'}</span>
+                                <span class="views">👁️ ${(movie.views || 0) + 1} lượt xem</span>
+                                <span class="year">📅 ${movie.year || 'N/A'}</span>
+                            </div>
+                            <p class="desc">${movie.desc || ''}</p>
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
         }
 
-        // ============================================================
-        // HIỂN THỊ POP-UP YÊU CẦU ĐĂNG NHẬP
-        // ============================================================
         function showLoginRequired() {
             const overlay = document.getElementById('loginRequiredOverlay');
             if (overlay) {
@@ -678,9 +647,6 @@
             }
         }
 
-        // ============================================================
-        // ĐÓNG POP-UP YÊU CẦU ĐĂNG NHẬP
-        // ============================================================
         function closeLoginRequiredPopup() {
             const overlay = document.getElementById('loginRequiredOverlay');
             if (overlay) {
@@ -688,13 +654,9 @@
                 overlay.style.display = 'none';
                 document.body.style.overflow = 'auto';
             }
-            // Quay lại trang chủ
             window.location.href = 'index.html';
         }
 
-        // ============================================================
-        // CHIA SẺ PHIM
-        // ============================================================
         function shareMovie() {
             if (!isLoggedIn || isBanned) {
                 showLoginRequired();
@@ -721,9 +683,6 @@
             }
         }
 
-        // ============================================================
-        // TOAST NOTIFICATION
-        // ============================================================
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
@@ -733,23 +692,18 @@
             }, 3000);
         }
 
-        // ============================================================
-        // AUTH STATE - KIỂM TRA ĐĂNG NHẬP
-        // ============================================================
         auth.onAuthStateChanged(async (user) => {
             if (user) {
-                // Kiểm tra tài khoản bị cấm
                 isBanned = await checkBannedUser(user.email);
                 if (isBanned) {
-                    // Nếu bị cấm, hiển thị thông báo và yêu cầu đăng nhập lại
                     showLoginRequired();
                     document.getElementById('movieContent').innerHTML = `
-                        <div class="login-required-message">
-                            <span class="icon">🚫</span>
-                            <h2>Tài khoản đã bị khóa</h2>
-                            <p>Tài khoản của bạn đã bị khóa. Vui lòng liên hệ admin để được hỗ trợ.</p>
-                        </div>
-                    `;
+                            <div class="login-required-message">
+                                <span class="icon">🚫</span>
+                                <h2>Tài khoản đã bị khóa</h2>
+                                <p>Tài khoản của bạn đã bị khóa. Vui lòng liên hệ admin để được hỗ trợ.</p>
+                            </div>
+                        `;
                     return;
                 }
 
@@ -758,22 +712,17 @@
             } else {
                 isLoggedIn = false;
                 isBanned = false;
-                // Hiển thị pop-up yêu cầu đăng nhập
                 showLoginRequired();
-                // Ẩn nội dung phim
                 document.getElementById('movieContent').innerHTML = `
-                    <div class="login-required-message">
-                        <span class="icon">🔒</span>
-                        <h2>Vui lòng đăng nhập</h2>
-                        <p>Bạn cần đăng nhập để xem phim này.</p>
-                    </div>
-                `;
+                        <div class="login-required-message">
+                            <span class="icon">🔒</span>
+                            <h2>Vui lòng đăng nhập</h2>
+                            <p>Bạn cần đăng nhập để xem phim này.</p>
+                        </div>
+                    `;
             }
         });
 
-        // ============================================================
-        // CLICK OUTSIDE ĐỂ ĐÓNG POP-UP
-        // ============================================================
         document.addEventListener('click', function(e) {
             const overlay = document.getElementById('loginRequiredOverlay');
             if (overlay && overlay.classList.contains('show')) {
@@ -783,33 +732,22 @@
             }
         });
 
-        // ============================================================
-        // ESC ĐỂ ĐÓNG POP-UP
-        // ============================================================
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeLoginRequiredPopup();
             }
         });
 
-        // ============================================================
-        // KEYBOARD SHORTCUTS
-        // ============================================================
         document.addEventListener('keydown', (e) => {
-            // ESC để quay lại (chỉ khi đã đăng nhập)
             if (e.key === 'Escape' && isLoggedIn && !isBanned) {
                 window.location.href = 'index.html';
             }
-            // Ctrl + S để chia sẻ
             if ((e.ctrlKey || e.metaKey) && e.key === 's') {
                 e.preventDefault();
                 shareMovie();
             }
         });
 
-        // ============================================================
-        // INIT
-        // ============================================================
         console.log('🎬 Trang chi tiết phim đã sẵn sàng!');
         console.log('📤 Nhấn Ctrl+S để chia sẻ phim');
         console.log('⌨️ Nhấn ESC để quay lại');
