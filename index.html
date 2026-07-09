@@ -2347,7 +2347,7 @@
         }
 
         // ============================================================
-        // MOVIES
+        // MOVIES - LẤY PHIM TỪ FIRESTORE (SỬA)
         // ============================================================
         let allMovies = [];
         let currentCategory = 'all';
@@ -2400,6 +2400,88 @@
                         `;
                     grid.appendChild(msg);
                 }
+            }
+        }
+
+        // ============================================================
+        // LOAD MOVIES - LẤY PHIM TỪ FIRESTORE (SỬA)
+        // ============================================================
+        async function loadMovies() {
+            if (!movieList) return;
+
+            try {
+                // Lấy phim từ Firestore, sắp xếp theo thời gian mới nhất
+                const snapshot = await db.collection('movies')
+                    .orderBy('timestamp', 'desc')
+                    .get();
+
+                if (snapshot.empty) {
+                    // Nếu chưa có phim, hiển thị phim mẫu
+                    const sampleMovies = [
+                        {
+                            id: 'sample1',
+                            title: 'Doraemon tập 830: Thủy cung sứa của Nobita',
+                            desc: 'Nobita và các bạn cùng Doraemon phiêu lưu kỳ thú.',
+                            genre: 'Phiêu lưu, Hài hước',
+                            category: 'movie',
+                            poster: 'https://picsum.photos/seed/doraemon1/400/250',
+                            views: 0,
+                            video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
+                        },
+                        {
+                            id: 'sample2',
+                            title: 'Doraemon tập 802: Vực dậy, Robot không lộ thủ công',
+                            desc: 'Doraemon và Nobita phiêu lưu trong thế giới robot.',
+                            genre: 'Khoa học viễn tưởng',
+                            category: 'movie',
+                            poster: 'https://picsum.photos/seed/doraemon2/400/250',
+                            views: 0,
+                            video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4'
+                        }
+                    ];
+
+                    allMovies = sampleMovies;
+                    updateCategoryCounts(allMovies);
+                    renderMoviesByCategory('all');
+                    console.log('📽️ Đang hiển thị phim mẫu (chưa có dữ liệu Firestore)');
+                    return;
+                }
+
+                // Lấy dữ liệu từ Firestore
+                allMovies = [];
+                snapshot.forEach(doc => {
+                    const m = doc.data();
+                    m.id = doc.id;
+                    if (!m.category) {
+                        m.category = 'movie';
+                    }
+                    allMovies.push(m);
+                });
+
+                console.log(`✅ Đã tải ${allMovies.length} phim từ Firestore!`);
+                updateCategoryCounts(allMovies);
+                renderMoviesByCategory(currentCategory);
+
+            } catch (e) {
+                console.error('❌ Lỗi tải phim từ Firestore:', e);
+
+                // Khi lỗi, hiển thị phim mẫu
+                const sampleMovies = [
+                    {
+                        id: 'sample1',
+                        title: 'Doraemon tập 830: Thủy cung sứa của Nobita',
+                        desc: 'Nobita và các bạn cùng Doraemon phiêu lưu kỳ thú.',
+                        genre: 'Phiêu lưu, Hài hước',
+                        category: 'movie',
+                        poster: 'https://picsum.photos/seed/doraemon1/400/250',
+                        views: 0,
+                        video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
+                    }
+                ];
+                allMovies = sampleMovies;
+                updateCategoryCounts(allMovies);
+                renderMoviesByCategory('all');
+                console.warn('⚠️ Chuyển sang phim mẫu do lỗi kết nối Firestore');
             }
         }
 
@@ -2460,82 +2542,6 @@
                 return;
             }
             window.location.href = `movie-detail.html?id=${movieId}`;
-        }
-
-        async function loadMovies() {
-            if (!movieList) return;
-
-            try {
-                const snapshot = await db.collection('movies')
-                    .orderBy('timestamp', 'desc')
-                    .get();
-
-                if (snapshot.empty) {
-                    // HIỂN THỊ PHIM MẪU KHI CHƯA CÓ DỮ LIỆU
-                    const sampleMovies = [{
-                        id: 'sample1',
-                        title: 'Doraemon tập 830: Thủy cung sứa của Nobita',
-                        desc: 'Nobita và các bạn cùng Doraemon phiêu lưu kỳ thú.',
-                        genre: 'Phiêu lưu, Hài hước',
-                        category: 'movie',
-                        poster: 'https://picsum.photos/seed/doraemon1/400/250',
-                        views: 0,
-                        video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
-                    }, {
-                        id: 'sample2',
-                        title: 'Doraemon tập 802: Vực dậy, Robot không lộ thủ công',
-                        desc: 'Doraemon và Nobita phiêu lưu trong thế giới robot.',
-                        genre: 'Khoa học viễn tưởng',
-                        category: 'movie',
-                        poster: 'https://picsum.photos/seed/doraemon2/400/250',
-                        views: 0,
-                        video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4'
-                    }, {
-                        id: 'sample3',
-                        title: 'Doraemon: Nobita và đảo giấu vàng',
-                        desc: 'Nobita và các bạn cùng Doraemon lên đường tìm kiếm hòn đảo bí ẩn chứa kho báu khổng lồ.',
-                        genre: 'Phiêu lưu',
-                        category: 'movie',
-                        poster: 'https://picsum.photos/seed/doraemon3/400/250',
-                        views: 0,
-                        video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'
-                    }];
-
-                    allMovies = sampleMovies;
-                    updateCategoryCounts(allMovies);
-                    renderMoviesByCategory('all');
-                    console.log('✅ Đã load phim mẫu (chưa có dữ liệu Firestore)');
-                    return;
-                }
-
-                allMovies = [];
-                snapshot.forEach(doc => {
-                    const m = doc.data();
-                    m.id = doc.id;
-                    if (!m.category) m.category = 'movie';
-                    allMovies.push(m);
-                });
-
-                updateCategoryCounts(allMovies);
-                renderMoviesByCategory(currentCategory);
-
-            } catch (e) {
-                console.error('Lỗi tải phim:', e);
-                // Hiển thị phim mẫu khi lỗi kết nối
-                const sampleMovies = [{
-                    id: 'sample1',
-                    title: 'Doraemon tập 830: Thủy cung sứa của Nobita',
-                    desc: 'Nobita và các bạn cùng Doraemon phiêu lưu kỳ thú.',
-                    genre: 'Phiêu lưu',
-                    category: 'movie',
-                    poster: 'https://picsum.photos/seed/doraemon1/400/250',
-                    views: 0,
-                    video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
-                }];
-                allMovies = sampleMovies;
-                updateCategoryCounts(allMovies);
-                renderMoviesByCategory('all');
-            }
         }
 
         function updateCategoryCounts(movies) {
@@ -2626,7 +2632,7 @@
         console.log('✅ Tất cả link đã chuyển sang HTTPS');
         console.log('✅ Đã thêm rel="noopener noreferrer" cho link ngoài');
         console.log('✅ Đã thêm loading="lazy" cho ảnh');
-        console.log('✅ Đã thêm phim mẫu khi chưa có dữ liệu Firestore');
+        console.log('✅ Đã sửa loadMovies() để hiển thị phim từ Firestore');
     </script>
 </body>
 </html>
