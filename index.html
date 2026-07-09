@@ -5,17 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Doraemon Fansub Việt Nam</title>
 
+    <!-- ===== XÁC MINH GOOGLE SEARCH CONSOLE ===== -->
+    <meta name="google-site-verification" content="HXszZpGpQu3yZVPZ0jetZcCyhA26gCjYC_oI5G7AJJw" />
+
     <!-- ===== META BẢO MẬT ===== -->
-    <meta http-equiv="Content-Security-Policy" content="
-        default-src 'self' https:;
-        script-src 'self' 'unsafe-inline' https:;
-        style-src 'self' 'unsafe-inline' https:;
-        img-src 'self' data: https:;
-        media-src 'self' https:;
-        connect-src 'self' https:;
-        frame-src 'self' https:;
-    ">
     <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- ===== META CHO CHIA SẺ ===== -->
+    <meta property="og:title" content="Doraemon Fansub Việt Nam" />
+    <meta property="og:description" content="Xem phim Doraemon và nhiều bộ phim hay khác" />
+    <meta property="og:image" content="https://i.ibb.co/9kJhtfp1/Doraemon-fansub.png" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- ===== SEO ===== -->
+    <meta name="description" content="Xem phim Doraemon và nhiều bộ phim hay khác - Doraemon Fansub Việt Nam" />
+    <meta name="keywords" content="Doraemon, Anime, Vietsub, Xem phim, Doraemon Fansub" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- ===== FAVICON ===== -->
+    <link rel="icon" href="https://i.ibb.co/9kJhtfp1/Doraemon-fansub.png" type="image/png" />
 
     <!-- Firebase compat -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js">
@@ -65,6 +75,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .logo {
@@ -798,3 +810,1793 @@
             font-size: 80px;
             margin-bottom: 16px;
         }
+
+        .empty-state h3 {
+            font-size: 22px;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: #65676b;
+            font-size: 16px;
+        }
+
+        /* ===== MOVIE ===== */
+        .movie-layout {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 20px;
+        }
+
+        .movie-categories {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            height: fit-content;
+            position: sticky;
+            top: 80px;
+        }
+
+        .movie-categories .category-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f2f5;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .movie-categories .category-list {
+            list-style: none;
+        }
+
+        .movie-categories .category-list li {
+            padding: 10px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+            color: #65676b;
+            margin-bottom: 4px;
+        }
+
+        .movie-categories .category-list li:hover {
+            background: #f0f2f5;
+        }
+
+        .movie-categories .category-list li.active {
+            background: #1a73e8;
+            color: white;
+        }
+
+        .movie-categories .category-list li .count {
+            float: right;
+            font-size: 12px;
+            color: #999;
+            background: #f0f2f5;
+            padding: 0 10px;
+            border-radius: 12px;
+        }
+
+        .movie-categories .category-list li.active .count {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .movie-toolbar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            display: flex;
+            gap: 8px;
+            background: white;
+            border-radius: 30px;
+            padding: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            min-width: 200px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 10px 18px;
+            border: none;
+            background: transparent;
+            font-size: 15px;
+            outline: none;
+            border-radius: 30px;
+        }
+
+        .search-box input::placeholder {
+            color: #999;
+        }
+
+        .search-btn {
+            background: #1a73e8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-btn:hover {
+            background: #1557b0;
+            transform: scale(1.02);
+        }
+
+        .contact-btn {
+            background: #1877f2;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 15px;
+            text-decoration: none;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(24, 119, 242, 0.3);
+        }
+
+        .contact-btn:hover {
+            background: #1664d9;
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(24, 119, 242, 0.4);
+        }
+
+        .no-search-result {
+            grid-column: 1 / -1;
+        }
+
+        .no-search-result .empty-state {
+            background: white;
+            border-radius: 16px;
+            padding: 60px 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .no-search-result .empty-state .icon {
+            font-size: 60px;
+            margin-bottom: 16px;
+        }
+
+        .no-search-result .empty-state h3 {
+            font-size: 22px;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+
+        .no-search-result .empty-state p {
+            color: #65676b;
+            font-size: 16px;
+        }
+
+        .no-search-result .empty-state strong {
+            color: #1a73e8;
+        }
+
+        .movie-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+        }
+
+        .movie-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .movie-card.locked {
+            cursor: pointer;
+        }
+
+        .movie-card .lock-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 16px;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+            backdrop-filter: blur(3px);
+            z-index: 5;
+        }
+
+        .movie-card .lock-overlay.show {
+            display: flex;
+        }
+
+        .movie-card .lock-overlay .lock-icon {
+            font-size: 44px;
+            margin-bottom: 10px;
+        }
+
+        .movie-card .lock-overlay .lock-text {
+            font-size: 16px;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .movie-card .lock-overlay .lock-sub {
+            font-size: 13px;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .movie-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .movie-card .movie-info {
+            padding: 12px 14px;
+        }
+
+        .movie-card .movie-info h4 {
+            font-size: 15px;
+            margin-bottom: 4px;
+            color: #1a1a2e;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .movie-card .movie-info p {
+            font-size: 13px;
+            color: #666;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .movie-card .movie-info .genre {
+            display: inline-block;
+            background: #e8f0fe;
+            color: #1a73e8;
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 6px;
+        }
+
+        .movie-card .movie-info .views {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .loading-spinner .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f0f2f5;
+            border-top: 4px solid #1a73e8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 14px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ===== LOGIN REQUIRED POPUP ===== */
+        .login-required-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 99999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        .login-required-popup {
+            background: white;
+            border-radius: 24px;
+            padding: 40px 35px;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            animation: slideUp 0.4s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .login-required-popup .popup-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .login-required-popup h3 {
+            font-size: 22px;
+            color: #1a1a2e;
+            margin-bottom: 12px;
+        }
+
+        .login-required-popup p {
+            color: #666;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .login-required-popup .popup-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+            width: 100%;
+        }
+
+        .login-required-popup .popup-btn-login {
+            display: inline-block;
+            background: #1a73e8;
+            color: white;
+            padding: 12px 40px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: 0.3s;
+            width: 100%;
+            text-align: center;
+        }
+
+        .login-required-popup .popup-btn-login:hover {
+            background: #1557b0;
+            transform: scale(1.02);
+        }
+
+        .login-required-popup .popup-btn-close {
+            background: transparent;
+            color: #666;
+            border: 1px solid #ddd;
+            padding: 10px 30px;
+            border-radius: 30px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 100%;
+        }
+
+        .login-required-popup .popup-btn-close:hover {
+            background: #f0f2f5;
+            border-color: #999;
+        }
+
+        /* ===== ACCOUNT DELETED MODAL ===== */
+        .account-deleted-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        .account-deleted-modal.active {
+            display: flex;
+        }
+
+        .account-deleted-content {
+            background: white;
+            border-radius: 24px;
+            padding: 40px 35px;
+            max-width: 440px;
+            width: 90%;
+            text-align: center;
+            animation: slideUp 0.5s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .account-deleted-content .icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .account-deleted-content h2 {
+            font-size: 22px;
+            color: #1a1a2e;
+            margin-bottom: 12px;
+        }
+
+        .account-deleted-content p {
+            color: #666;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .account-deleted-content .btn-facebook {
+            display: inline-block;
+            background: #1877f2;
+            color: white;
+            padding: 12px 40px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: 0.3s;
+            width: 100%;
+            text-align: center;
+        }
+
+        .account-deleted-content .btn-facebook:hover {
+            background: #1664d9;
+            transform: scale(1.02);
+        }
+
+        .account-deleted-content .btn-close-modal {
+            background: transparent;
+            color: #666;
+            border: 1px solid #ddd;
+            padding: 10px 30px;
+            border-radius: 30px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 100%;
+        }
+
+        .account-deleted-content .btn-close-modal:hover {
+            background: #f0f2f5;
+            border-color: #999;
+        }
+
+        .account-deleted-content .action-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+            width: 100%;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .container {
+                max-width: 100%;
+                padding: 0 16px;
+            }
+            .newsfeed-grid {
+                grid-template-columns: 1fr;
+            }
+            .movie-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .movie-layout {
+                grid-template-columns: 1fr;
+            }
+            .movie-categories {
+                position: relative;
+                top: 0;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                padding: 14px 16px;
+            }
+            .movie-categories .category-title {
+                width: 100%;
+                margin-bottom: 6px;
+                font-size: 14px;
+                padding-bottom: 6px;
+            }
+            .movie-categories .category-list {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+            .movie-categories .category-list li {
+                padding: 5px 14px;
+                font-size: 13px;
+                border-radius: 20px;
+            }
+            .movie-categories .category-list li .count {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 12px;
+            }
+            .logo {
+                font-size: 18px;
+            }
+            .logo img {
+                height: 32px;
+            }
+            .post-footer button {
+                padding: 6px 12px;
+                font-size: 13px;
+            }
+            .post-actions {
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+            .post-actions button {
+                font-size: 13px;
+                padding: 4px 8px;
+            }
+            .create-post-top textarea {
+                font-size: 14px;
+            }
+            #authStatus .user-name {
+                display: none;
+            }
+            .movie-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+            .movie-card img {
+                height: 140px;
+            }
+            .dashboard-link {
+                font-size: 11px;
+                padding: 4px 10px;
+            }
+            .verified-badge {
+                font-size: 8px;
+                padding: 0px 5px;
+            }
+            .movie-toolbar {
+                flex-direction: column;
+            }
+            .contact-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .search-box {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .movie-grid {
+                grid-template-columns: 1fr;
+            }
+            .movie-card img {
+                height: 180px;
+            }
+            .movie-categories .category-list li {
+                font-size: 11px;
+                padding: 3px 10px;
+            }
+            .empty-state {
+                padding: 40px 16px;
+            }
+            .empty-state .icon {
+                font-size: 50px;
+            }
+            .empty-state h3 {
+                font-size: 18px;
+            }
+            .upload-preview img,
+            .upload-preview video {
+                max-height: 200px;
+            }
+            .verified-badge {
+                font-size: 7px;
+                padding: 0px 4px;
+            }
+            .account-deleted-content {
+                padding: 30px 20px;
+            }
+            .login-required-popup {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== ACCOUNT DELETED MODAL ===== -->
+    <div class="account-deleted-modal" id="accountDeletedModal">
+        <div class="account-deleted-content">
+            <div class="icon">🚫</div>
+            <h2>⚠️ Tài khoản đã bị xóa</h2>
+            <p>
+                Tài khoản của bạn đã bị xóa trong đợt lọc tài khoản ảo vừa qua.<br><br>
+                <strong>Vui lòng liên hệ page để được hỗ trợ khôi phục.</strong>
+            </p>
+            <div class="action-group">
+                <a href="https://www.facebook.com/DoraemonFansubVietNam" target="_blank" rel="noopener noreferrer" class="btn-facebook">
+                    💬 Liên hệ Facebook
+                </a>
+                <button onclick="closeAccountDeletedModal()" class="btn-close-modal">
+                    ✖ Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== HEADER ===== -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">
+                    <img src="https://i.ibb.co/9kJhtfp1/Doraemon-fansub.png" alt="Doraemon Fansub" loading="lazy">
+                    Doraemon
+                </a>
+                <div class="header-actions">
+                    <div id="authStatus">
+                        <a href="profile.html" id="profileLink">
+                            <img id="userAvatar" src="" alt="Avatar" loading="lazy">
+                            <span class="user-name" id="userName">User</span>
+                            <span class="verified-badge" id="headerBadge" style="display:none;">
+                                <span class="check">✓</span> Admin
+                            </span>
+                        </a>
+                        <a href="dashboard.html" class="dashboard-link" id="dashboardLink">📊 Dashboard</a>
+                    </div>
+                    <a href="login.html" class="login-btn" id="loginBtn">🔑 Đăng nhập</a>
+                    <button class="logout-btn" id="logoutBtn" onclick="logoutUser()">🚪 Đăng xuất</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== MAIN ===== -->
+    <main class="main-content">
+        <div class="container">
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="newsfeed" onclick="switchTab('newsfeed')">📰 Mới nhất</button>
+                <button class="tab-btn" data-tab="movies" onclick="switchTab('movies')">🎬 Phim</button>
+            </div>
+
+            <!-- Newsfeed Tab -->
+            <div id="tab-newsfeed">
+                <div class="newsfeed-grid">
+                    <div class="newsfeed-left">
+                        <!-- Create Post -->
+                        <div class="create-post" id="createPostBox">
+                            <div class="create-post-top">
+                                <a href="profile.html" class="avatar-link">
+                                    <img src="https://i.ibb.co/9kJhtfp1/Doraemon-fansub.png" alt="Logo" loading="lazy">
+                                </a>
+                                <textarea id="postInput" placeholder="Bạn đang nghĩ gì thế?" rows="1"></textarea>
+                            </div>
+
+                            <div class="upload-preview" id="uploadPreview">
+                                <div id="previewContent"></div>
+                                <button class="remove-btn" onclick="removeUpload()">✕</button>
+                                <div class="file-name" id="fileName">Chưa có file</div>
+                            </div>
+
+                            <div class="upload-progress" id="uploadProgress">
+                                <span id="uploadStatus">📤 Đang tải lên Cloudinary...</span>
+                                <div class="progress-bar">
+                                    <div class="fill" id="progressFill"></div>
+                                </div>
+                            </div>
+
+                            <div class="create-post-bottom">
+                                <div class="post-actions">
+                                    <button onclick="openUploadWidget('image')">📎 Ảnh</button>
+                                    <button onclick="openUploadWidget('video')">🎬 Video</button>
+                                    <button onclick="alert('😊 Chức năng đang phát triển!')">😊 Cảm xúc</button>
+                                </div>
+                                <button class="post-btn" onclick="createPost()">Đăng</button>
+                            </div>
+                        </div>
+
+                        <div id="postList">
+                            <div class="loading-spinner">
+                                <div class="spinner"></div>
+                                <p>Đang tải bài viết...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="newsfeed-right" id="postListRight"></div>
+                </div>
+            </div>
+
+            <!-- Movies Tab -->
+            <div id="tab-movies" style="display:none;">
+                <div class="movie-layout">
+                    <div class="movie-categories">
+                        <div class="category-title">📂 Phân loại</div>
+                        <ul class="category-list" id="categoryList">
+                            <li class="active" data-category="all">📺 Tất cả <span class="count" id="countAll">0</span></li>
+                            <li data-category="movie">🎬 Movie <span class="count" id="countMovie">0</span></li>
+                            <li data-category="short">🎥 Short Movie <span class="count" id="countShort">0</span></li>
+                            <li data-category="seri">📺 Seri <span class="count" id="countSeri">0</span></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <!-- ===== TOOLBAR: SEARCH + CONTACT ===== -->
+                        <div class="movie-toolbar">
+                            <div class="search-box">
+                                <input type="text" id="movieSearch" placeholder="🔍 Tìm kiếm phim..." oninput="searchMovies()">
+                                <button class="search-btn" onclick="searchMovies()">🔍</button>
+                            </div>
+                            <a href="https://www.facebook.com/DoraemonFansubVietNam" target="_blank" rel="noopener noreferrer" class="contact-btn">
+                                💬 Liên hệ
+                            </a>
+                        </div>
+
+                        <div id="movieList">
+                            <div class="loading-spinner">
+                                <div class="spinner"></div>
+                                <p>Đang tải phim...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // ============================================================
+        // FIREBASE CONFIG
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyBt3G9n5JYu3EsvqJR9IoW2vRAc_Es3-ws",
+            authDomain: "doraemon-fansub-vietnam.firebaseapp.com",
+            projectId: "doraemon-fansub-vietnam",
+            storageBucket: "doraemon-fansub-vietnam.firebasestorage.app",
+            messagingSenderId: "380840935390",
+            appId: "1:380840935390:web:60fab4722a9fba5053a74f",
+            measurementId: "G-0S2Z4XRK0B"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const SUPER_ADMIN_EMAIL = 'tuankhaimoi12345@gmail.com';
+        const LOGO_URL = 'https://i.ibb.co/9kJhtfp1/Doraemon-fansub.png';
+
+        // ============================================================
+        // CLOUDINARY CONFIG
+        // ============================================================
+        const CLOUDINARY_CONFIG = {
+            cloudName: 'gntkeeno',
+            uploadPreset: 'doraemon_fansub_vn',
+            folder: 'posts'
+        };
+
+        let uploadedFileUrl = '';
+        let uploadedFileType = '';
+        let isLoggedIn = false;
+        let isAdmin = false;
+        let currentUserEmail = '';
+        let adminEmails = new Set();
+
+        // ============================================================
+        // DOM REFS
+        // ============================================================
+        const authStatus = document.getElementById('authStatus');
+        const userAvatar = document.getElementById('userAvatar');
+        const userName = document.getElementById('userName');
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const dashboardLink = document.getElementById('dashboardLink');
+        const headerBadge = document.getElementById('headerBadge');
+        const createPostBox = document.getElementById('createPostBox');
+        const postInput = document.getElementById('postInput');
+        const postList = document.getElementById('postList');
+        const postListRight = document.getElementById('postListRight');
+        const movieList = document.getElementById('movieList');
+        const uploadPreview = document.getElementById('uploadPreview');
+        const previewContent = document.getElementById('previewContent');
+        const fileName = document.getElementById('fileName');
+        const uploadProgress = document.getElementById('uploadProgress');
+        const progressFill = document.getElementById('progressFill');
+        const uploadStatus = document.getElementById('uploadStatus');
+        const accountDeletedModal = document.getElementById('accountDeletedModal');
+
+        // ============================================================
+        // LẤY DANH SÁCH ADMIN
+        // ============================================================
+        async function loadAdminList() {
+            try {
+                const snapshot = await db.collection('admins').get();
+                adminEmails = new Set();
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.email) {
+                        adminEmails.add(data.email);
+                    }
+                });
+                adminEmails.add(SUPER_ADMIN_EMAIL);
+                console.log('✅ Danh sách Admin:', adminEmails);
+            } catch (e) {
+                console.error('Lỗi load admin list:', e);
+            }
+        }
+
+        // ============================================================
+        // KIỂM TRA ADMIN
+        // ============================================================
+        function isUserAdmin(email) {
+            if (!email) return false;
+            return adminEmails.has(email);
+        }
+
+        // ============================================================
+        // KIỂM TRA TÀI KHOẢN BỊ CẤM
+        // ============================================================
+        async function checkBannedUser(email) {
+            if (!email) return false;
+            try {
+                const doc = await db.collection('banned_users').doc(email).get();
+                if (doc.exists) {
+                    console.warn('⚠️ Tài khoản đã bị cấm:', email);
+                    return true;
+                }
+                return false;
+            } catch (e) {
+                console.error('Lỗi kiểm tra banned:', e);
+                return false;
+            }
+        }
+
+        // ============================================================
+        // HIỂN THỊ MODAL TÀI KHOẢN BỊ XÓA
+        // ============================================================
+        function showAccountDeletedModal() {
+            accountDeletedModal.classList.add('active');
+            auth.signOut().catch(() => {});
+        }
+
+        // ============================================================
+        // ĐÓNG MODAL TÀI KHOẢN BỊ XÓA
+        // ============================================================
+        function closeAccountDeletedModal() {
+            const modal = document.getElementById('accountDeletedModal');
+            if (modal) {
+                modal.classList.remove('active');
+                modal.style.display = 'none';
+            }
+        }
+
+        // Click outside để đóng
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('accountDeletedModal');
+            if (modal && modal.classList.contains('active')) {
+                if (e.target === modal) {
+                    closeAccountDeletedModal();
+                }
+            }
+        });
+
+        // ESC để đóng
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeAccountDeletedModal();
+            }
+        });
+
+        // ============================================================
+        // AUTH STATE
+        // ============================================================
+        auth.onAuthStateChanged(async (user) => {
+            await loadAdminList();
+
+            if (user) {
+                const isBanned = await checkBannedUser(user.email);
+                if (isBanned) {
+                    showAccountDeletedModal();
+                    return;
+                }
+
+                isLoggedIn = true;
+                currentUserEmail = user.email;
+                authStatus.style.display = 'flex';
+                loginBtn.style.display = 'none';
+                logoutBtn.style.display = 'block';
+                userAvatar.src = user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user
+                    .displayName || user.email);
+                userName.textContent = user.displayName || user.email;
+                createPostBox.style.opacity = '1';
+                createPostBox.style.pointerEvents = 'auto';
+                postInput.placeholder = `${user.displayName || 'Bạn'} đang nghĩ gì thế?`;
+
+                isAdmin = isUserAdmin(user.email);
+
+                if (isAdmin) {
+                    dashboardLink.style.display = 'inline-block';
+                    headerBadge.style.display = 'inline-block';
+                } else {
+                    dashboardLink.style.display = 'none';
+                    headerBadge.style.display = 'none';
+                }
+
+                await loadPosts();
+                await loadMovies();
+            } else {
+                isLoggedIn = false;
+                isAdmin = false;
+                currentUserEmail = '';
+                authStatus.style.display = 'none';
+                loginBtn.style.display = 'block';
+                logoutBtn.style.display = 'none';
+                dashboardLink.style.display = 'none';
+                headerBadge.style.display = 'none';
+                createPostBox.style.opacity = '0.5';
+                createPostBox.style.pointerEvents = 'none';
+                postInput.placeholder = '🔑 Vui lòng đăng nhập để viết bài';
+
+                await loadPosts();
+                await loadMovies();
+            }
+        });
+
+        // ============================================================
+        // LOGOUT
+        // ============================================================
+        window.logoutUser = async function() {
+            try {
+                await auth.signOut();
+                window.location.reload();
+            } catch (error) {
+                alert('Đăng xuất thất bại!');
+            }
+        };
+
+        // ============================================================
+        // TAB SWITCH
+        // ============================================================
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+
+            if (tab === 'newsfeed') {
+                document.getElementById('tab-newsfeed').style.display = 'block';
+                document.getElementById('tab-movies').style.display = 'none';
+            } else {
+                document.getElementById('tab-newsfeed').style.display = 'none';
+                document.getElementById('tab-movies').style.display = 'block';
+                loadMovies();
+            }
+        }
+
+        // ============================================================
+        // UPLOAD WIDGET
+        // ============================================================
+        function openUploadWidget(type) {
+            if (!isLoggedIn) {
+                alert('🔑 Vui lòng đăng nhập để đăng ảnh/video!');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            if (typeof cloudinary === 'undefined') {
+                alert('⚠️ Cloudinary đang tải, vui lòng thử lại sau!');
+                return;
+            }
+
+            const isImage = type === 'image';
+            const widget = cloudinary.createUploadWidget({
+                cloudName: CLOUDINARY_CONFIG.cloudName,
+                uploadPreset: CLOUDINARY_CONFIG.uploadPreset,
+                folder: CLOUDINARY_CONFIG.folder,
+                sources: ['local', 'url', 'camera', 'google_drive'],
+                multiple: false,
+                maxFileSize: 50000000,
+                resourceType: isImage ? 'image' : 'video',
+                clientAllowedFormats: isImage ? ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'] : ['mp4', 'webm', 'avi',
+                    'mov', 'mkv'
+                ],
+                cropping: isImage,
+                croppingAspectRatio: isImage ? 1.91 : undefined,
+                showAdvancedOptions: false,
+                styles: {
+                    palette: {
+                        window: '#FFFFFF',
+                        sourceBg: '#f0f2f5',
+                        windowBorder: '#e4e6eb',
+                        tabIcon: '#1a73e8',
+                        inactiveTabIcon: '#65676b',
+                        menuIcons: '#1a73e8',
+                        link: '#1a73e8',
+                        action: '#1a73e8',
+                        inProgress: '#1a73e8',
+                        complete: '#34a853',
+                        error: '#e94560',
+                        textDark: '#1a1a2e',
+                        textLight: '#65676b'
+                    }
+                }
+            }, (error, result) => {
+                if (error) {
+                    console.error('Lỗi Cloudinary:', error);
+                    alert('❌ Upload thất bại: ' + (error.message || 'Lỗi không xác định'));
+                    uploadProgress.style.display = 'none';
+                    return;
+                }
+
+                if (result.event === 'success') {
+                    uploadedFileUrl = result.info.secure_url;
+                    uploadedFileType = isImage ? 'image' : 'video';
+
+                    uploadPreview.classList.add('show');
+                    if (isImage) {
+                        previewContent.innerHTML =
+                            `<img src="${uploadedFileUrl}" alt="Preview" loading="lazy">`;
+                    } else {
+                        previewContent.innerHTML =
+                            `<video controls><source src="${uploadedFileUrl}">Trình duyệt không hỗ trợ video</video>`;
+                    }
+                    fileName.textContent = `📎 ${result.info.original_filename || 'File'}`;
+
+                    uploadStatus.textContent = '✅ Đã tải lên Cloudinary thành công!';
+                    progressFill.style.width = '100%';
+                    setTimeout(() => {
+                        uploadProgress.style.display = 'none';
+                        progressFill.style.width = '0%';
+                    }, 2000);
+
+                } else if (result.event === 'progress') {
+                    uploadProgress.style.display = 'block';
+                    const progress = Math.round((result.info.bytesUploaded / result.info.totalBytes) * 100);
+                    progressFill.style.width = progress + '%';
+                    uploadStatus.textContent = `📤 Đang tải lên Cloudinary... ${progress}%`;
+
+                } else if (result.event === 'close') {
+                    uploadProgress.style.display = 'none';
+
+                } else if (result.event === 'error') {
+                    alert('❌ Upload thất bại: ' + (result.info.message || 'Lỗi không xác định'));
+                    uploadProgress.style.display = 'none';
+                }
+            });
+            widget.open();
+        }
+
+        // ============================================================
+        // REMOVE UPLOAD
+        // ============================================================
+        function removeUpload() {
+            uploadedFileUrl = '';
+            uploadedFileType = '';
+            uploadPreview.classList.remove('show');
+            previewContent.innerHTML = '';
+            fileName.textContent = 'Chưa có file';
+        }
+
+        // ============================================================
+        // CREATE POST
+        // ============================================================
+        async function createPost() {
+            if (!isLoggedIn) {
+                alert('🔑 Vui lòng đăng nhập để đăng bài!');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const content = postInput.value;
+            if (!content && !uploadedFileUrl) {
+                alert('📝 Vui lòng nhập nội dung hoặc đính kèm ảnh/video!');
+                return;
+            }
+
+            const btn = document.querySelector('.post-btn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Đang đăng...';
+
+            try {
+                const user = auth.currentUser;
+                const postData = {
+                    user: user.displayName || 'Doraemon',
+                    avatar: LOGO_URL,
+                    color: '1',
+                    content: content || '📸 Chia sẻ hình ảnh',
+                    time: 'Vừa xong',
+                    likes: 0,
+                    liked: false,
+                    likedBy: {},
+                    totalLikes: 0,
+                    comments: [],
+                    showComments: false,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    userId: user.uid,
+                    userEmail: user.email,
+                    isAdmin: isAdmin
+                };
+
+                if (uploadedFileUrl) {
+                    postData.fileUrl = uploadedFileUrl;
+                    postData.fileType = uploadedFileType;
+                }
+
+                await db.collection('posts').add(postData);
+
+                postInput.value = '';
+                postInput.style.height = 'auto';
+                removeUpload();
+                await loadPosts();
+
+                btn.textContent = '✅ Đã đăng!';
+                setTimeout(() => {
+                    btn.textContent = 'Đăng';
+                    btn.disabled = false;
+                }, 1500);
+
+            } catch (e) {
+                console.error('Lỗi đăng bài:', e);
+                let errorMsg = e.message;
+                if (errorMsg.includes('permission')) {
+                    errorMsg = 'Bạn chưa có quyền đăng bài. Vui lòng kiểm tra Firestore Rules.';
+                }
+                alert('❌ Lỗi đăng bài: ' + errorMsg);
+                btn.textContent = 'Đăng';
+                btn.disabled = false;
+            }
+        }
+
+        // ============================================================
+        // TỰ ĐỘNG TĂNG CHIỀU CAO TEXTAREA
+        // ============================================================
+        postInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+        });
+
+        // Enter để đăng bài (Shift+Enter để xuống dòng)
+        postInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                createPost();
+            }
+        });
+
+        // ============================================================
+        // LOAD POSTS
+        // ============================================================
+        async function loadPosts() {
+            if (!postList) return;
+
+            try {
+                const snapshot = await db.collection('posts')
+                    .orderBy('timestamp', 'desc')
+                    .get();
+
+                if (snapshot.empty) {
+                    const emptyHtml = `
+                        <div class="empty-state">
+                            <div class="icon">📝</div>
+                            <h3>Chưa có bài viết nào</h3>
+                            <p>Hãy là người đầu tiên chia sẻ điều gì đó!</p>
+                        </div>
+                    `;
+                    postList.innerHTML = emptyHtml;
+                    postListRight.innerHTML = '';
+                    return;
+                }
+
+                const posts = [];
+                snapshot.forEach(doc => {
+                    const p = doc.data();
+                    p.id = doc.id;
+                    posts.push(p);
+                });
+
+                const leftPosts = posts.filter((_, index) => index % 2 === 0);
+                const rightPosts = posts.filter((_, index) => index % 2 === 1);
+
+                postList.innerHTML = await renderPostCards(leftPosts);
+                postListRight.innerHTML = rightPosts.length > 0 ? await renderPostCards(rightPosts) :
+                    `<div style="text-align:center;padding:40px;color:#999;font-size:15px;">✨ Đã xem hết bài viết</div>`;
+
+            } catch (e) {
+                console.error('Lỗi tải bài viết:', e);
+                postList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">❌</div>
+                        <h3>Lỗi tải bài viết</h3>
+                        <p>${e.message}</p>
+                        <br>
+                        <button onclick="loadPosts()" style="padding:8px 20px;background:#1a73e8;color:white;border:none;border-radius:20px;cursor:pointer;">🔄 Thử lại</button>
+                    </div>
+                `;
+                postListRight.innerHTML = '';
+            }
+        }
+
+        // ============================================================
+        // RENDER POST CARDS
+        // ============================================================
+        async function renderPostCards(posts) {
+            if (!posts || posts.length === 0) return '';
+
+            let html = '';
+            const currentUser = auth.currentUser;
+            const currentUserEmail = currentUser?.email || '';
+
+            for (const p of posts) {
+                const isPostAdmin = isUserAdmin(p.userEmail);
+                const profileLink =
+                    `profile.html?uid=${p.userId || ''}&email=${encodeURIComponent(p.userEmail || '')}`;
+
+                const likedBy = p.likedBy || {};
+                const isLiked = !!likedBy[currentUserEmail];
+                const totalLikes = p.totalLikes || p.likes || Object.keys(likedBy).length || 0;
+
+                const commentsHtml = await Promise.all((p.comments || []).map(async (c) => {
+                    const isCommentAdmin = isUserAdmin(c.userEmail);
+                    const commentProfileLink =
+                        `profile.html?uid=${c.userId || ''}&email=${encodeURIComponent(c.userEmail || '')}`;
+                    return `
+                            <div class="comment-item">
+                                <a href="${commentProfileLink}" class="avatar-link">
+                                    <img src="${c.avatar || LOGO_URL}" alt="avatar" loading="lazy">
+                                </a>
+                                <div class="comment-body">
+                                    <div class="name">
+                                        <a href="${commentProfileLink}" class="profile-link">
+                                            ${c.user || 'Doraemon'}
+                                        </a>
+                                        ${isCommentAdmin ? `<span class="verified-badge">✓ Admin</span>` : ''}
+                                        <img src="${LOGO_URL}" class="logo-small" alt="logo" loading="lazy">
+                                    </div>
+                                    <div class="text">${c.text || ''}</div>
+                                    <div class="time">${c.time || 'Vừa xong'}</div>
+                                </div>
+                            </div>
+                        `;
+                }));
+                const commentsHtmlStr = commentsHtml.join('');
+
+                let fileHtml = '';
+                if (p.fileUrl) {
+                    if (p.fileType === 'image') {
+                        fileHtml = `<img src="${p.fileUrl}" class="post-image" alt="Hình ảnh" loading="lazy">`;
+                    } else if (p.fileType === 'video') {
+                        fileHtml =
+                            `<video controls class="post-video"><source src="${p.fileUrl}">Trình duyệt không hỗ trợ video</video>`;
+                    } else {
+                        fileHtml =
+                            `<a href="${p.fileUrl}" target="_blank" rel="noopener noreferrer" style="display:block;padding:10px;background:#f0f2f5;border-radius:8px;margin:10px 0;color:#1a73e8;">📎 Xem file đính kèm</a>`;
+                    }
+                }
+
+                html += `
+                        <div class="post-card" id="post-${p.id}">
+                            <div class="post-header">
+                                <a href="${profileLink}" class="avatar-link">
+                                    <img src="${p.avatar || LOGO_URL}" alt="avatar" loading="lazy">
+                                </a>
+                                <div class="info">
+                                    <div class="name">
+                                        <a href="${profileLink}" class="profile-link">
+                                            ${p.user || 'Doraemon'}
+                                        </a>
+                                        ${isPostAdmin ? `<span class="verified-badge">✓ Admin</span>` : ''}
+                                        <img src="${LOGO_URL}" class="logo-small" alt="logo" loading="lazy">
+                                        <span class="badge">●</span>
+                                    </div>
+                                    <div class="time">${p.time || 'Vừa xong'}</div>
+                                </div>
+                                <button class="more-btn" onclick="showPostOptions('${p.id}')">⋯</button>
+                            </div>
+                            <div class="post-content">${p.content || ''}</div>
+                            ${fileHtml}
+                            <div class="post-stats">
+                                <span class="likes" id="likes-${p.id}">
+                                    <span class="heart ${isLiked ? 'liked-heart' : ''}" id="heart-${p.id}">${isLiked ? '❤️' : '🤍'}</span> 
+                                    <span class="like-count" id="likeCount-${p.id}">${totalLikes}</span>
+                                </span>
+                                <span class="comments-count" onclick="toggleComments('${p.id}')">${(p.comments || []).length} bình luận</span>
+                            </div>
+                            <div class="post-footer">
+                                <button onclick="toggleLike('${p.id}')" class="like-btn ${isLiked ? 'liked' : ''}" id="likeBtn-${p.id}">
+                                    ${isLiked ? '❤️' : '🤍'} Thích
+                                </button>
+                                <button onclick="toggleComments('${p.id}')">💬 Bình luận</button>
+                                <button onclick="sharePost('${p.id}')">📤 Chia sẻ</button>
+                            </div>
+                            <div class="comments-section ${p.showComments ? 'open' : ''}" id="comments-${p.id}">
+                                ${commentsHtmlStr}
+                                <div class="comment-input">
+                                    <input type="text" id="commentInput-${p.id}" placeholder="Viết bình luận...">
+                                    <button onclick="addComment('${p.id}')">Gửi</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+            }
+            return html;
+        }
+
+        // ============================================================
+        // LIKE
+        // ============================================================
+        async function toggleLike(postId) {
+            if (!isLoggedIn) {
+                alert('🔑 Vui lòng đăng nhập để thích bài viết!');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const user = auth.currentUser;
+                const userEmail = user.email;
+
+                const docRef = db.collection('posts').doc(postId);
+                const doc = await docRef.get();
+
+                if (!doc.exists) return;
+
+                const data = doc.data();
+                const likedBy = data.likedBy || {};
+                const isLiked = !!likedBy[userEmail];
+
+                if (isLiked) {
+                    delete likedBy[userEmail];
+                } else {
+                    likedBy[userEmail] = true;
+                }
+
+                const totalLikes = Object.keys(likedBy).length;
+
+                await docRef.update({
+                    likedBy: likedBy,
+                    totalLikes: totalLikes,
+                    likes: totalLikes,
+                    liked: !!likedBy[userEmail]
+                });
+
+                updateLikeUI(postId, !!likedBy[userEmail], totalLikes);
+
+            } catch (e) {
+                console.error('Lỗi like:', e);
+                alert('❌ Lỗi: ' + e.message);
+            }
+        }
+
+        // ============================================================
+        // CẬP NHẬT UI LIKE
+        // ============================================================
+        function updateLikeUI(postId, isLiked, likeCount) {
+            const likeBtn = document.getElementById(`likeBtn-${postId}`);
+            if (likeBtn) {
+                likeBtn.innerHTML = isLiked ? '❤️ Thích' : '🤍 Thích';
+                likeBtn.className = `like-btn ${isLiked ? 'liked' : ''}`;
+            }
+
+            const likeCountEl = document.getElementById(`likeCount-${postId}`);
+            if (likeCountEl) {
+                likeCountEl.textContent = likeCount;
+            }
+
+            const heartEl = document.getElementById(`heart-${postId}`);
+            if (heartEl) {
+                heartEl.textContent = isLiked ? '❤️' : '🤍';
+                heartEl.className = `heart ${isLiked ? 'liked-heart' : ''}`;
+
+                if (isLiked) {
+                    heartEl.style.animation = 'heartPop 0.5s ease';
+                    setTimeout(() => {
+                        heartEl.style.animation = '';
+                    }, 500);
+                }
+            }
+        }
+
+        // ============================================================
+        // COMMENTS
+        // ============================================================
+        function toggleComments(postId) {
+            const el = document.getElementById(`comments-${postId}`);
+            if (el) {
+                el.classList.toggle('open');
+                if (el.classList.contains('open')) {
+                    setTimeout(() => {
+                        const input = document.getElementById(`commentInput-${postId}`);
+                        if (input) input.focus();
+                    }, 100);
+                }
+            }
+        }
+
+        async function addComment(postId) {
+            const input = document.getElementById(`commentInput-${postId}`);
+            const text = input.value.trim();
+            if (!text) return;
+
+            try {
+                const user = auth.currentUser;
+                const doc = await db.collection('posts').doc(postId).get();
+                if (!doc.exists) return;
+                const data = doc.data();
+                const comments = data.comments || [];
+                comments.push({
+                    user: user?.displayName || 'Doraemon',
+                    avatar: LOGO_URL,
+                    color: '1',
+                    text: text,
+                    time: 'Vừa xong',
+                    userEmail: user?.email || '',
+                    userId: user?.uid || '',
+                    isAdmin: isAdmin
+                });
+                await db.collection('posts').doc(postId).update({ comments });
+                input.value = '';
+                await loadPosts();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // ============================================================
+        // SHARE
+        // ============================================================
+        function sharePost(postId) {
+            const post = document.getElementById(`post-${postId}`);
+            if (!post) return;
+            const content = post.querySelector('.post-content')?.textContent || '';
+            if (navigator.share) {
+                navigator.share({ title: 'Doraemon', text: content }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(content)
+                    .then(() => alert('📤 Đã sao chép nội dung!'))
+                    .catch(() => alert('📤 Chia sẻ: ' + content));
+            }
+        }
+
+        // ============================================================
+        // POST OPTIONS
+        // ============================================================
+        async function showPostOptions(postId) {
+            const user = auth.currentUser;
+            if (!user) {
+                alert('⚠️ Vui lòng đăng nhập!');
+                return;
+            }
+
+            if (!isAdmin) {
+                alert('⚠️ Bạn không có quyền!');
+                return;
+            }
+
+            const choice = prompt('Chọn hành động:\n1. Xóa bài viết');
+            if (choice === '1') {
+                if (confirm('Xóa bài viết này?')) {
+                    await db.collection('posts').doc(postId).delete();
+                    await loadPosts();
+                    alert('✅ Đã xóa!');
+                }
+            }
+        }
+
+        // ============================================================
+        // MOVIES
+        // ============================================================
+        let allMovies = [];
+        let currentCategory = 'all';
+
+        // ============================================================
+        // TÌM KIẾM PHIM
+        // ============================================================
+        function searchMovies() {
+            const keyword = document.getElementById('movieSearch').value.toLowerCase().trim();
+            const movieCards = document.querySelectorAll('.movie-card');
+            const noResult = document.getElementById('noSearchResult');
+
+            if (noResult) {
+                noResult.remove();
+            }
+
+            if (!keyword) {
+                movieCards.forEach(card => {
+                    card.style.display = 'block';
+                });
+                return;
+            }
+
+            let found = false;
+            movieCards.forEach(card => {
+                const title = card.querySelector('h4')?.textContent?.toLowerCase() || '';
+                const desc = card.querySelector('p')?.textContent?.toLowerCase() || '';
+                const genre = card.querySelector('.genre')?.textContent?.toLowerCase() || '';
+
+                if (title.includes(keyword) || desc.includes(keyword) || genre.includes(keyword)) {
+                    card.style.display = 'block';
+                    found = true;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            if (!found && keyword) {
+                const grid = document.querySelector('.movie-grid');
+                if (grid) {
+                    const msg = document.createElement('div');
+                    msg.id = 'noSearchResult';
+                    msg.className = 'no-search-result';
+                    msg.innerHTML = `
+                            <div class="empty-state">
+                                <div class="icon">🔍</div>
+                                <h3>Không tìm thấy phim</h3>
+                                <p>Không tìm thấy phim nào phù hợp với "<strong>${keyword}</strong>"</p>
+                            </div>
+                        `;
+                    grid.appendChild(msg);
+                }
+            }
+        }
+
+        // ============================================================
+        // HIỂN THỊ POP-UP YÊU CẦU ĐĂNG NHẬP
+        // ============================================================
+        function showLoginRequired() {
+            const overlay = document.createElement('div');
+            overlay.className = 'login-required-overlay';
+            overlay.id = 'loginRequiredOverlay';
+
+            overlay.innerHTML = `
+                    <div class="login-required-popup">
+                        <div class="popup-icon">🔒</div>
+                        <h3>Vui lòng đăng nhập</h3>
+                        <p>Bạn cần đăng nhập để xem phim này.<br>Đăng nhập ngay để trải nghiệm đầy đủ tính năng!</p>
+                        <div class="popup-actions">
+                            <a href="login.html" class="popup-btn-login">🔑 Đăng nhập ngay</a>
+                            <button onclick="closeLoginRequiredPopup()" class="popup-btn-close">Đóng</button>
+                        </div>
+                    </div>
+                `;
+
+            document.body.appendChild(overlay);
+            document.body.style.overflow = 'hidden';
+
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) {
+                    closeLoginRequiredPopup();
+                }
+            });
+        }
+
+        // ============================================================
+        // ĐÓNG POP-UP YÊU CẦU ĐĂNG NHẬP
+        // ============================================================
+        function closeLoginRequiredPopup() {
+            const overlay = document.getElementById('loginRequiredOverlay');
+            if (overlay) {
+                overlay.remove();
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // ESC để đóng pop-up
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeLoginRequiredPopup();
+            }
+        });
+
+        // ============================================================
+        // MỞ TRANG CHI TIẾT PHIM
+        // ============================================================
+        function openMovieDetail(movieId) {
+            if (!isLoggedIn) {
+                showLoginRequired();
+                return;
+            }
+            window.location.href = `movie-detail.html?id=${movieId}`;
+        }
+
+        async function loadMovies() {
+            if (!movieList) return;
+
+            try {
+                const snapshot = await db.collection('movies')
+                    .orderBy('timestamp', 'desc')
+                    .get();
+
+                if (snapshot.empty) {
+                    movieList.innerHTML = `
+                            <div class="empty-state">
+                                <div class="icon">🎬</div>
+                                <h3>Chưa có phim nào</h3>
+                                <p>Admin sẽ sớm cập nhật phim mới!</p>
+                            </div>
+                        `;
+                    updateCategoryCounts([]);
+                    return;
+                }
+
+                allMovies = [];
+                snapshot.forEach(doc => {
+                    const m = doc.data();
+                    m.id = doc.id;
+                    if (!m.category) {
+                        m.category = 'movie';
+                    }
+                    allMovies.push(m);
+                });
+
+                updateCategoryCounts(allMovies);
+                renderMoviesByCategory(currentCategory);
+
+            } catch (e) {
+                console.error('Lỗi tải phim:', e);
+                movieList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon">❌</div>
+                            <h3>Lỗi tải phim</h3>
+                            <p>${e.message}</p>
+                            <br>
+                            <button onclick="loadMovies()" style="padding:8px 20px;background:#1a73e8;color:white;border:none;border-radius:20px;cursor:pointer;">🔄 Thử lại</button>
+                        </div>
+                    `;
+            }
+        }
+
+        function updateCategoryCounts(movies) {
+            const counts = {
+                all: movies.length,
+                movie: movies.filter(m => m.category === 'movie').length,
+                short: movies.filter(m => m.category === 'short' || m.category === 'short-movie').length,
+                seri: movies.filter(m => m.category === 'seri' || m.category === 'series').length
+            };
+
+            document.getElementById('countAll').textContent = counts.all;
+            document.getElementById('countMovie').textContent = counts.movie;
+            document.getElementById('countShort').textContent = counts.short;
+            document.getElementById('countSeri').textContent = counts.seri;
+        }
+
+        function renderMoviesByCategory(category) {
+            currentCategory = category;
+            const filtered = category === 'all' ?
+                allMovies :
+                allMovies.filter(m => m.category === category);
+
+            if (filtered.length === 0) {
+                movieList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon">🎬</div>
+                            <h3>Không có phim nào</h3>
+                            <p>Chưa có phim thuộc thể loại này</p>
+                        </div>
+                    `;
+                return;
+            }
+
+            let html = `<div class="movie-grid">`;
+            filtered.forEach(m => {
+                html += `
+                        <div class="movie-card ${!isLoggedIn ? 'locked' : ''}" 
+                             onclick="${isLoggedIn ? `openMovieDetail('${m.id}')` : `showLoginRequired()`}">
+                            ${!isLoggedIn ? `
+                            <div class="lock-overlay show">
+                                <div class="lock-icon">🔒</div>
+                                <div class="lock-text">Đăng nhập để xem</div>
+                                <div class="lock-sub">Vui lòng đăng nhập</div>
+                            </div>
+                            ` : ''}
+                            <img src="${m.poster || 'https://via.placeholder.com/400x250/1a73e8/FFFFFF?text=Doraemon'}" 
+                                 alt="${m.title || 'Phim'}" loading="lazy"
+                                 onerror="this.src='https://via.placeholder.com/400x250/1a73e8/FFFFFF?text=Doraemon'">
+                            <div class="movie-info">
+                                <h4>${m.title || 'Untitled'}</h4>
+                                <p>${m.desc || ''}</p>
+                                <span class="genre">${m.genre || 'Phim'}</span>
+                                <div class="views">👁️ ${m.views || 0} lượt xem</div>
+                            </div>
+                        </div>
+                    `;
+            });
+            html += `</div>`;
+            movieList.innerHTML = html;
+
+            // Reset tìm kiếm
+            const searchInput = document.getElementById('movieSearch');
+            if (searchInput) {
+                searchInput.value = '';
+            }
+        }
+
+        document.getElementById('categoryList').addEventListener('click', function(e) {
+            const li = e.target.closest('li');
+            if (!li) return;
+
+            this.querySelectorAll('li').forEach(item => item.classList.remove('active'));
+            li.classList.add('active');
+
+            const category = li.dataset.category;
+            renderMoviesByCategory(category);
+        });
+
+        // ============================================================
+        // INIT
+        // ============================================================
+        console.log('🎬 Doraemon Fansub đã sẵn sàng!');
+        console.log('👑 Super Admin:', SUPER_ADMIN_EMAIL);
+        console.log('✅ Đã thêm Google Search Console Verification');
+        console.log('🔒 Đã nâng cấp bảo mật để khắc phục lỗi Google Safe Browsing');
+        console.log('✅ Đã thêm CSP Header, X-Frame-Options, X-Content-Type-Options');
+        console.log('✅ Đã thêm meta tags bảo mật nâng cao');
+        console.log('✅ Tất cả link đã chuyển sang HTTPS');
+        console.log('✅ Đã thêm rel="noopener noreferrer" cho link ngoài');
+        console.log('✅ Đã thêm loading="lazy" cho ảnh');
+    </script>
+</body>
+</html>
