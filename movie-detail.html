@@ -5,24 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Xem phim - Doraemon Fansub</title>
 
-    <!-- ===== META BẢO MẬT ===== -->
-    <meta http-equiv="Content-Security-Policy" content="
-        default-src 'self' https:;
-        script-src 'self' 'unsafe-inline' https:;
-        style-src 'self' 'unsafe-inline' https:;
-        img-src 'self' data: https:;
-        media-src 'self' https:;
-        connect-src 'self' https:;
-        frame-src 'self' https:;
-    ">
-    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <!-- ===== XÁC MINH GOOGLE SEARCH CONSOLE ===== -->
+    <meta name="google-site-verification" content="HXszZpGpQu3yZVPZ0jetZcCyhA26gCjYC_oI5G7AJJw" />
 
-    <!-- Meta Tags cho chia sẻ -->
+    <!-- ===== META BẢO MẬT ===== -->
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- ===== META CHO CHIA SẺ ===== -->
     <meta property="og:title" content="Doraemon Fansub - Xem phim" />
     <meta property="og:description" content="Xem phim Doraemon và nhiều bộ phim hay khác" />
     <meta property="og:image" content="https://i.ibb.co/9kJhtfp1/Doraemon-fansub.png" />
     <meta property="og:url" content="https://doraemon-fansub-vietnam.web.app" />
+    <meta property="og:type" content="video.other" />
     <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- ===== SEO ===== -->
+    <meta name="description" content="Xem phim Doraemon và nhiều bộ phim hay khác - Doraemon Fansub Việt Nam" />
+    <meta name="keywords" content="Doraemon, Anime, Vietsub, Xem phim, Doraemon Fansub" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- ===== FAVICON ===== -->
+    <link rel="icon" href="https://i.ibb.co/9kJhtfp1/Doraemon-fansub.png" type="image/png" />
 
     <!-- Firebase compat -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -62,6 +66,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .logo {
@@ -469,7 +475,7 @@
         <div class="container">
             <div class="header-content">
                 <a href="index.html" class="logo">
-                    <img src="https://i.ibb.co/9kJhtfp1/Doraemon-fansub.png" alt="Doraemon Fansub">
+                    <img src="https://i.ibb.co/9kJhtfp1/Doraemon-fansub.png" alt="Doraemon Fansub" loading="lazy">
                     Doraemon
                 </a>
                 <div class="header-actions">
@@ -670,4 +676,90 @@
                 navigator.share({
                     title: title,
                     text: `🎬 ${title}\nXem ngay tại:`,
-                    u
+                    url: url
+                }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(url)
+                    .then(() => {
+                        showToast('✅ Đã sao chép link phim!');
+                    })
+                    .catch(() => {
+                        prompt('📤 Sao chép link này để chia sẻ:', url);
+                    });
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                isBanned = await checkBannedUser(user.email);
+                if (isBanned) {
+                    showLoginRequired();
+                    document.getElementById('movieContent').innerHTML = `
+                            <div class="login-required-message">
+                                <span class="icon">🚫</span>
+                                <h2>Tài khoản đã bị khóa</h2>
+                                <p>Tài khoản của bạn đã bị khóa. Vui lòng liên hệ admin để được hỗ trợ.</p>
+                            </div>
+                        `;
+                    return;
+                }
+
+                isLoggedIn = true;
+                await loadMovieDetail();
+            } else {
+                isLoggedIn = false;
+                isBanned = false;
+                showLoginRequired();
+                document.getElementById('movieContent').innerHTML = `
+                        <div class="login-required-message">
+                            <span class="icon">🔒</span>
+                            <h2>Vui lòng đăng nhập</h2>
+                            <p>Bạn cần đăng nhập để xem phim này.</p>
+                        </div>
+                    `;
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            const overlay = document.getElementById('loginRequiredOverlay');
+            if (overlay && overlay.classList.contains('show')) {
+                if (e.target === overlay) {
+                    closeLoginRequiredPopup();
+                }
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeLoginRequiredPopup();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && isLoggedIn && !isBanned) {
+                window.location.href = 'index.html';
+            }
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                shareMovie();
+            }
+        });
+
+        console.log('🎬 Trang chi tiết phim đã sẵn sàng!');
+        console.log('📤 Nhấn Ctrl+S để chia sẻ phim');
+        console.log('⌨️ Nhấn ESC để quay lại');
+        console.log('🔒 Kiểm tra đăng nhập trước khi xem phim');
+        console.log('🚫 Kiểm tra tài khoản bị cấm');
+        console.log('🔗 Đường dẫn đã sửa cho GitHub Pages!');
+    </script>
+</body>
+</html>
