@@ -931,127 +931,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* ===== MOVIE MODAL ===== */
-        .movie-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(5px);
-            padding: 20px;
-            animation: modalFadeIn 0.3s ease;
-        }
-
-        @keyframes modalFadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        .movie-modal-content {
-            background: #1a1a2e;
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 900px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-            animation: modalSlideUp 0.3s ease;
-        }
-
-        @keyframes modalSlideUp {
-            from {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .movie-modal-close {
-            position: absolute;
-            top: 12px;
-            right: 18px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: white;
-            font-size: 28px;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.3s;
-            z-index: 10;
-        }
-
-        .movie-modal-close:hover {
-            background: rgba(255, 0, 0, 0.4);
-            transform: rotate(90deg);
-        }
-
-        .movie-modal-content h2 {
-            color: white;
-            margin-bottom: 6px;
-            font-size: 24px;
-        }
-
-        .movie-modal-content .genre-tag {
-            color: #ffeb3b;
-            font-size: 15px;
-            font-weight: 600;
-        }
-
-        .movie-modal-content .desc {
-            color: #ccc;
-            margin: 10px 0 16px 0;
-            line-height: 1.6;
-            font-size: 15px;
-        }
-
-        .movie-modal-content .video-wrapper {
-            border-radius: 12px;
-            overflow: hidden;
-            background: #000;
-        }
-
-        .movie-modal-content .video-wrapper iframe {
-            width: 100%;
-            height: 450px;
-            border: none;
-            display: block;
-        }
-
-        .movie-modal-content .video-wrapper video {
-            width: 100%;
-            display: block;
-            max-height: 60vh;
-        }
-
-        .movie-modal-content .movie-footer {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 14px;
-            color: #999;
-            font-size: 14px;
-        }
-
         .login-required-toast {
             position: fixed;
             bottom: 30px;
@@ -1095,7 +974,7 @@
             transform: scale(1.05);
         }
 
-        /* ===== ACCOUNT DELETED MODAL (SỬA) ===== */
+        /* ===== ACCOUNT DELETED MODAL ===== */
         .account-deleted-modal {
             display: none;
             position: fixed;
@@ -1199,6 +1078,17 @@
             }
         }
 
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 992px) {
             .container {
@@ -1240,9 +1130,6 @@
             }
             .movie-categories .category-list li .count {
                 display: none;
-            }
-            .movie-modal-content .video-wrapper iframe {
-                height: 350px;
             }
         }
 
@@ -1303,12 +1190,6 @@
             .movie-card img {
                 height: 180px;
             }
-            .movie-modal-content {
-                padding: 16px;
-            }
-            .movie-modal-content .video-wrapper iframe {
-                height: 200px;
-            }
             .movie-categories .category-list li {
                 font-size: 11px;
                 padding: 3px 10px;
@@ -1338,7 +1219,7 @@
 </head>
 <body>
 
-    <!-- ===== ACCOUNT DELETED MODAL (SỬA) ===== -->
+    <!-- ===== ACCOUNT DELETED MODAL ===== -->
     <div class="account-deleted-modal" id="accountDeletedModal">
         <div class="account-deleted-content">
             <div class="icon">🚫</div>
@@ -1348,7 +1229,7 @@
                 <strong>Vui lòng liên hệ page để được hỗ trợ khôi phục.</strong>
             </p>
             <div class="action-group">
-                <a href="https://www.facebook.com/doraemonfansubvietnam24/" target="_blank" class="btn-facebook">
+                <a href="https://www.facebook.com/DoraemonFansubVietNam" target="_blank" class="btn-facebook">
                     💬 Liên hệ Facebook
                 </a>
                 <button onclick="closeAccountDeletedModal()" class="btn-close-modal">
@@ -1585,7 +1466,6 @@
         // ============================================================
         function showAccountDeletedModal() {
             accountDeletedModal.classList.add('active');
-            // Đăng xuất người dùng
             auth.signOut().catch(() => {});
         }
 
@@ -2123,6 +2003,18 @@
         let allMovies = [];
         let currentCategory = 'all';
 
+        // ============================================================
+        // MỞ TRANG CHI TIẾT PHIM (THAY THẾ MODAL)
+        // ============================================================
+        function openMovieDetail(movieId) {
+            if (!isLoggedIn) {
+                showLoginRequired();
+                return;
+            }
+            // Chuyển đến trang chi tiết với ID phim
+            window.location.href = `movie-detail.html?id=${movieId}`;
+        }
+
         async function loadMovies() {
             if (!movieList) return;
 
@@ -2204,7 +2096,8 @@
             let html = `<div class="movie-grid">`;
             filtered.forEach(m => {
                 html += `
-                    <div class="movie-card ${!isLoggedIn ? 'locked' : ''}" onclick="${isLoggedIn ? `openMovieModal('${m.id}')` : `showLoginRequired()`}">
+                    <div class="movie-card ${!isLoggedIn ? 'locked' : ''}" 
+                         onclick="${isLoggedIn ? `openMovieDetail('${m.id}')` : `showLoginRequired()`}">
                         ${!isLoggedIn ? `
                         <div class="lock-overlay show">
                             <div class="lock-icon">🔒</div>
@@ -2247,115 +2140,6 @@
         });
 
         // ============================================================
-        // OPEN MOVIE MODAL
-        // ============================================================
-        async function openMovieModal(movieId) {
-            if (!isLoggedIn) {
-                showLoginRequired();
-                return;
-            }
-
-            try {
-                const doc = await db.collection('movies').doc(movieId).get();
-
-                if (!doc.exists) {
-                    alert('❌ Phim không tồn tại!');
-                    return;
-                }
-
-                const m = doc.data();
-
-                try {
-                    await db.collection('movies').doc(movieId).update({
-                        views: (m.views || 0) + 1
-                    });
-                } catch (updateError) {
-                    console.warn('Không thể cập nhật lượt xem:', updateError);
-                }
-
-                let videoContent = '';
-                if (m.embed) {
-                    videoContent = `<div class="video-wrapper">${m.embed}</div>`;
-                } else if (m.video) {
-                    videoContent = `
-                        <div class="video-wrapper">
-                            <video controls>
-                                <source src="${m.video}">
-                                Trình duyệt không hỗ trợ video
-                            </video>
-                        </div>
-                    `;
-                } else {
-                    videoContent = `<p style="color:#999;text-align:center;padding:20px;">Không có video</p>`;
-                }
-
-                const existingModal = document.getElementById('movieModal');
-                if (existingModal) {
-                    existingModal.remove();
-                }
-
-                const modal = document.createElement('div');
-                modal.className = 'movie-modal-overlay';
-                modal.setAttribute('id', 'movieModal');
-
-                modal.innerHTML = `
-                    <div class="movie-modal-content">
-                        <button class="movie-modal-close" id="modalCloseBtn">✕</button>
-                        <h2>${m.title || 'Phim'}</h2>
-                        <span class="genre-tag">${m.genre || ''}</span>
-                        <p class="desc">${m.desc || ''}</p>
-                        ${videoContent}
-                        <div class="movie-footer">
-                            <span>👁️ ${(m.views || 0) + 1} lượt xem</span>
-                            <span>🎬 <img src="${LOGO_URL}" style="height:20px;width:auto;border-radius:50%;vertical-align:middle;"> Doraemon</span>
-                        </div>
-                    </div>
-                `;
-
-                document.body.appendChild(modal);
-
-                const closeBtn = document.getElementById('modalCloseBtn');
-                if (closeBtn) {
-                    closeBtn.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        closeMovieModal(modal);
-                    });
-                }
-
-                modal.addEventListener('click', function(e) {
-                    if (e.target === modal) {
-                        closeMovieModal(modal);
-                    }
-                });
-
-                const escHandler = function(e) {
-                    if (e.key === 'Escape') {
-                        closeMovieModal(modal);
-                        document.removeEventListener('keydown', escHandler);
-                    }
-                };
-                document.addEventListener('keydown', escHandler);
-
-                setTimeout(loadMovies, 2000);
-
-            } catch (e) {
-                console.error('Lỗi mở phim:', e);
-                alert('❌ Lỗi mở phim: ' + (e.message || 'Không thể tải phim. Vui lòng thử lại.'));
-            }
-        }
-
-        function closeMovieModal(modalElement) {
-            if (modalElement && modalElement.parentNode) {
-                const video = modalElement.querySelector('video');
-                if (video) {
-                    video.pause();
-                    video.currentTime = 0;
-                }
-                modalElement.remove();
-            }
-        }
-
-        // ============================================================
         // ENTER KEY
         // ============================================================
         document.getElementById('postInput').addEventListener('keydown', (e) => {
@@ -2380,7 +2164,7 @@
         console.log('✅ Đã thêm kiểm tra tài khoản bị cấm (banned_users)!');
         console.log('🚫 Tài khoản bị xóa sẽ hiển thị popup yêu cầu liên hệ page!');
         console.log('📎 Đã thêm tính năng đính kèm ảnh/video!');
-        console.log('👥 Click vào tên user để xem trang cá nhân!');
+        console.log('🎬 Click vào phim sẽ mở trang chi tiết riêng!');
     </script>
 </body>
 </html>
